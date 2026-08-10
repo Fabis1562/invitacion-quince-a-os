@@ -1,0 +1,10 @@
+{
+  "description": "Create elegant interactive quinceañera invitations featuring countdowns, photo galleries, event details, dress codes, and RSVP confirmations for seamless guest engagement.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
