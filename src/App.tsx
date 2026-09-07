@@ -21,6 +21,8 @@ const VENUE_ADDRESS = "Quinta Maria Teresa"
 const VENUE_MAPS = "https://maps.google.com/?q=Quinta+Maria+Teresa"
 
 const WHATSAPP_PHONE = "5212345678901" // Reemplazar con el número real de WhatsApp
+// 💡 Carpeta compartida de Google Drive / Google Photos para fotos de los invitados
+const GOOGLE_DRIVE_PHOTOS_URL = "https://drive.google.com/drive/folders/1_krista_mariel_quince_fotos_compartidas"
 // 💡 URL desplegada de Google Apps Script para sincronización automática en Google Sheets
 const GOOGLE_SHEETS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz6KnvPPgf2EyKAWXBqQhGVVQWQsZl8Ily03inC-8bRfdFMbnh41SH0PmywnaMKRyNT/exec" 
 
@@ -55,47 +57,46 @@ const BANK_NAME = "BBVA México"
 const BANK_CLABE = "0121 8001 2345 6789 01"
 
 const DRESS_CODE = "Rigurosa Etiqueta · Gala Elegante"
-const DRESS_PALETTE = [
-  { color: "#FFE57F", label: "Amarillo Pastel" },
-  { color: "#F5E6D3", label: "Beige / Vainilla" },
-  { color: "#FFFFFF", label: "Blanco" },
-  { color: "#2E6B34", label: "Verde Botánico" },
-  { color: "#D4AF37", label: "Dorado Elegante" },
+const DRESS_RESERVED_COLORS = [
+  { color: "#FFFFFF", label: "Blanco / Marfil", role: "Quinceañera" },
+  { color: "#F5E6D3", label: "Beige / Champán", role: "Familia" },
+  { color: "#B88E52", label: "Dorado Ocre", role: "Mamá" },
+  { color: "#8FA396", label: "Verde Menta", role: "Hermana & Corte" },
 ]
 
-// ─── Photo Gallery Data ───────────────────────────────────────────────────────
+// ─── Photo Gallery Data (Fotos Reales de Krista Mariel) ───────────────────────
 const GALLERY_ITEMS = [
   {
     id: 1,
     category: "pre-xv",
-    title: "Sesión Pre-XV Krista Mariel",
-    src: "/images/quinceanera_crista_portrait_1785996487711.png",
+    title: "Retrato Sonriente de Krista Mariel",
+    src: "/images/krista_portrait_1.jpg",
     aspect: "aspect-[3/4]",
-    likes: 215,
+    likes: 245,
   },
   {
     id: 2,
-    category: "decor",
-    title: "Mariposas & Detalles",
-    src: "/images/quinceanera_decor_hall_1785996498584.png",
+    category: "pre-xv",
+    title: "Tarde Mágica en el Jardín",
+    src: "/images/krista_sitting_garden.png",
     aspect: "aspect-[4/3]",
-    likes: 189,
+    likes: 218,
   },
   {
     id: 3,
-    category: "decor",
-    title: "Corona Real & Vestido",
-    src: "/images/quinceanera_details_tiara_1785996508526.png",
+    category: "pre-xv",
+    title: "Rosas Amarillas & Ilusión",
+    src: "/images/krista_yellow_roses.jpg",
     aspect: "aspect-[3/4]",
-    likes: 240,
+    likes: 262,
   },
   {
     id: 4,
     category: "pre-xv",
-    title: "Sueños & Fantasía",
-    src: "/images/quinceanera_crista_portrait_1785996487711.png",
-    aspect: "aspect-[4/3]",
-    likes: 176,
+    title: "Globo Mariposa · 17.10.2026",
+    src: "/images/krista_butterfly_balloon.jpg",
+    aspect: "aspect-[3/4]",
+    likes: 289,
   },
 ]
 
@@ -314,7 +315,23 @@ function ButterflyCanvas({ onSpawnRef, onExplosiveBurstRef }: ButterflyCanvasPro
     window.addEventListener('touchmove', handleTouchMove, { passive: true })
     window.addEventListener('click', handleClick)
 
+    let isPaused = false
+    const handlePauseButterflies = () => {
+      isPaused = true
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+    }
+    const handleResumeButterflies = () => {
+      isPaused = false
+    }
+    window.addEventListener('pause-butterflies', handlePauseButterflies)
+    window.addEventListener('resume-butterflies', handleResumeButterflies)
+
     const render = () => {
+      if (isPaused) {
+        animationFrameId = requestAnimationFrame(render)
+        return
+      }
+
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       // Maintain max particle count limit to guarantee 60fps
@@ -464,6 +481,8 @@ function ButterflyCanvas({ onSpawnRef, onExplosiveBurstRef }: ButterflyCanvasPro
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('touchmove', handleTouchMove)
       window.removeEventListener('click', handleClick)
+      window.removeEventListener('pause-butterflies', handlePauseButterflies)
+      window.removeEventListener('resume-butterflies', handleResumeButterflies)
       cancelAnimationFrame(animationFrameId)
     }
   }, [createButterfly])
@@ -594,77 +613,6 @@ function speakEventDetails(onTriggerToast: (msg: string) => void) {
   onTriggerToast("🔊 Leyendo invitación en voz alta...")
 }
 
-// ─── Before & After Baby to Quinceañera Slider ──────────────────────────────────
-function BeforeAfterSlider() {
-  const [sliderPos, setSliderPos] = useState(50)
-  const containerRef = useRef<HTMLDivElement | null>(null)
-  const isDragging = useRef(false)
-
-  const handleMove = (clientX: number) => {
-    if (!containerRef.current) return
-    const rect = containerRef.current.getBoundingClientRect()
-    const x = Math.max(0, Math.min(clientX - rect.left, rect.width))
-    setSliderPos((x / rect.width) * 100)
-  }
-
-  return (
-    <section id="antes-despues" className="relative py-16 md:py-24 px-4 md:px-6">
-      <div className="section-sep mb-16 md:mb-20" />
-      <div className="max-w-3xl mx-auto text-center flex flex-col items-center gap-6">
-        <SectionHeader tag="Nuestra Historia" title="De Bebé a Quinceañera" />
-        <p className="font-montserrat text-xs md:text-sm text-text-sub font-medium -mt-4 max-w-lg">
-          Arrastra con el dedo o el mouse la barra divisoria para ver la hermosa transformación de Krista Mariel.
-        </p>
-
-        <div
-          ref={containerRef}
-          onMouseDown={() => (isDragging.current = true)}
-          onMouseUp={() => (isDragging.current = false)}
-          onMouseLeave={() => (isDragging.current = false)}
-          onMouseMove={e => isDragging.current && handleMove(e.clientX)}
-          onTouchMove={e => handleMove(e.touches[0].clientX)}
-          className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden border-2 border-gold/50 shadow-2xl select-none cursor-ew-resize touch-none"
-        >
-          {/* After Image (Quinceañera) */}
-          <img
-            src="/images/quinceanera_crista_portrait_1785996487711.png"
-            alt="Krista Mariel Quinceañera"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          <div className="absolute top-4 right-4 glass-card px-3 py-1 rounded-full text-[10px] uppercase font-montserrat font-bold text-gold-dark z-10 shadow-md">
-            15 Años 👑
-          </div>
-
-          {/* Before Image (Childhood) */}
-          <div
-            className="absolute inset-0 overflow-hidden border-r-2 border-gold shadow-2xl"
-            style={{ width: `${sliderPos}%` }}
-          >
-            <img
-              src="/images/quinceanera_crista_portrait_1785996487711.png"
-              alt="Krista Mariel de Bebé"
-              className="absolute inset-0 w-full h-full object-cover filter sepia-[0.3]"
-              style={{ width: containerRef.current ? containerRef.current.clientWidth : '100%', maxWidth: 'none' }}
-            />
-            <div className="absolute top-4 left-4 glass-card px-3 py-1 rounded-full text-[10px] uppercase font-montserrat font-bold text-gold-dark z-10 shadow-md">
-              Mi Infancia 🌸
-            </div>
-          </div>
-
-          {/* Divider Handle */}
-          <div
-            className="absolute top-0 bottom-0 z-20 flex items-center justify-center -translate-x-1/2 pointer-events-none"
-            style={{ left: `${sliderPos}%` }}
-          >
-            <div className="w-10 h-10 rounded-full glass-card border-2 border-gold flex items-center justify-center text-lg text-gold-dark shadow-2xl bg-cream">
-              🦋
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
 
 // ─── Virtual Cheers & Toast Counter Section ─────────────────────────────────────
 function VirtualCheersSection({ onTriggerSwarm, onTriggerToast }: { onTriggerSwarm: () => void; onTriggerToast: (msg: string) => void }) {
@@ -865,34 +813,232 @@ function PostPartyThanksBanner({ isManualPostParty }: { isManualPostParty: boole
   )
 }
 
-// ─── Real Audio Music Player ────────────────────────────────────────────────────
+// ─── Ambient Audio Synthesizer for Quinceañera Melodies ─────────────────────────
+class AmbientQuinceSynth {
+  private ctx: AudioContext | null = null
+  private isRunning: boolean = false
+  private timerId: any = null
+  private mode: 'piano' | 'harp' = 'piano'
+  private masterGain: GainNode | null = null
+  private isMuted: boolean = false
+
+  // Harmonious progressions in D Major / G Major tailored for luxury gala
+  private chords = [
+    { root: 146.83, notes: [293.66, 369.99, 440.00, 587.33, 739.99] }, // D chord
+    { root: 110.00, notes: [220.00, 277.18, 329.63, 440.00, 554.37] }, // A chord
+    { root: 123.47, notes: [246.94, 293.66, 369.99, 493.88, 587.33] }, // Bm chord
+    { root: 98.00,  notes: [196.00, 246.94, 293.66, 392.00, 493.88] }, // G chord
+  ]
+
+  start(mode: 'piano' | 'harp') {
+    this.mode = mode
+    this.stop()
+    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
+    if (!AudioCtx) return
+    this.ctx = new AudioCtx()
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume()
+    }
+    this.masterGain = this.ctx.createGain()
+    this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : 0.16, this.ctx.currentTime)
+    this.masterGain.connect(this.ctx.destination)
+    this.isRunning = true
+
+    let chordIdx = 0
+    let step = 0
+
+    const tick = () => {
+      if (!this.isRunning || !this.ctx || !this.masterGain) return
+      const curChord = this.chords[chordIdx]
+      const noteFreq = curChord.notes[step % curChord.notes.length]
+      this.playNote(noteFreq, step === 0 ? curChord.root : undefined)
+
+      step++
+      if (step >= 6) {
+        step = 0
+        chordIdx = (chordIdx + 1) % this.chords.length
+      }
+      this.timerId = setTimeout(tick, this.mode === 'harp' ? 360 : 440)
+    }
+
+    tick()
+  }
+
+  playNote(freq: number, bassFreq?: number) {
+    if (!this.ctx || !this.masterGain) return
+    const now = this.ctx.currentTime
+
+    const osc = this.ctx.createOscillator()
+    const noteGain = this.ctx.createGain()
+    const filter = this.ctx.createBiquadFilter()
+
+    osc.type = this.mode === 'harp' ? 'triangle' : 'sine'
+    osc.frequency.setValueAtTime(freq, now)
+
+    filter.type = 'lowpass'
+    filter.frequency.setValueAtTime(this.mode === 'harp' ? 2400 : 1700, now)
+
+    const dur = this.mode === 'harp' ? 2.0 : 2.5
+    noteGain.gain.setValueAtTime(0.001, now)
+    noteGain.gain.exponentialRampToValueAtTime(0.18, now + 0.04)
+    noteGain.gain.exponentialRampToValueAtTime(0.0001, now + dur)
+
+    osc.connect(filter)
+    filter.connect(noteGain)
+    noteGain.connect(this.masterGain)
+
+    osc.start(now)
+    osc.stop(now + dur)
+
+    if (bassFreq) {
+      const bassOsc = this.ctx.createOscillator()
+      const bassGain = this.ctx.createGain()
+      bassOsc.type = 'sine'
+      bassOsc.frequency.setValueAtTime(bassFreq, now)
+      bassGain.gain.setValueAtTime(0.001, now)
+      bassGain.gain.exponentialRampToValueAtTime(0.12, now + 0.08)
+      bassGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.8)
+      bassOsc.connect(bassGain)
+      bassGain.connect(this.masterGain)
+      bassOsc.start(now)
+      bassOsc.stop(now + 2.8)
+    }
+  }
+
+  setMuted(muted: boolean) {
+    this.isMuted = muted
+    if (!this.ctx || !this.masterGain) return
+    this.masterGain.gain.setValueAtTime(muted ? 0 : 0.16, this.ctx.currentTime)
+  }
+
+  stop() {
+    this.isRunning = false
+    if (this.timerId) clearTimeout(this.timerId)
+    if (this.ctx) {
+      try {
+        this.ctx.close()
+      } catch (e) {}
+      this.ctx = null
+    }
+  }
+}
+
+const quinceSynth = new AmbientQuinceSynth()
+
+interface AmbientTrack {
+  id: string
+  name: string
+  tag: string
+  icon: string
+  type: 'mp3' | 'synth-piano' | 'synth-harp'
+}
+
+const AMBIENT_TRACKS: AmbientTrack[] = [
+  {
+    id: 'vals',
+    name: 'Vals de Krista Mariel',
+    tag: 'Vals Oficial de Gala · Quinceañera',
+    icon: '👑',
+    type: 'mp3',
+  },
+  {
+    id: 'piano',
+    name: 'Balada en Piano Romántico',
+    tag: 'Melodía Acústica & Clásica',
+    icon: '🎹',
+    type: 'synth-piano',
+  },
+  {
+    id: 'harp',
+    name: 'Fantasía de Arpa de Cristal',
+    tag: 'Armonía de Cuento de Hadas 🦋',
+    icon: '🦋',
+    type: 'synth-harp',
+  },
+]
+
+// ─── Real Audio Music Player with Melody Selector ───────────────────────────────
 function RealMusicPlayer({ playTriggerRef }: { playTriggerRef: React.MutableRefObject<(() => void) | null> }) {
   const [isPlaying, setIsPlaying] = useState(false)
+  const [currentTrackId, setCurrentTrackId] = useState<string>('vals')
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [muted, setMuted] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  const togglePlay = useCallback(() => {
-    const audio = audioRef.current
-    if (!audio) return
-    if (audio.paused) {
-      audio.play().then(() => setIsPlaying(true)).catch(err => console.warn("Audio play blocked", err))
-    } else {
-      audio.pause()
-      setIsPlaying(false)
+  const currentTrack = AMBIENT_TRACKS.find(t => t.id === currentTrackId) || AMBIENT_TRACKS[0]
+
+  const startPlaybackForTrack = useCallback((track: AmbientTrack) => {
+    if (track.type === 'mp3') {
+      quinceSynth.stop()
+      const audio = audioRef.current
+      if (audio) {
+        audio.play().then(() => setIsPlaying(true)).catch(err => console.warn("Audio play blocked", err))
+      }
+    } else if (track.type === 'synth-piano') {
+      const audio = audioRef.current
+      if (audio) audio.pause()
+      quinceSynth.start('piano')
+      setIsPlaying(true)
+    } else if (track.type === 'synth-harp') {
+      const audio = audioRef.current
+      if (audio) audio.pause()
+      quinceSynth.start('harp')
+      setIsPlaying(true)
     }
   }, [])
 
+  const stopAllPlayback = useCallback(() => {
+    const audio = audioRef.current
+    if (audio) audio.pause()
+    quinceSynth.stop()
+    setIsPlaying(false)
+  }, [])
+
+  const togglePlay = useCallback(() => {
+    if (isPlaying) {
+      stopAllPlayback()
+    } else {
+      startPlaybackForTrack(currentTrack)
+    }
+  }, [isPlaying, currentTrack, startPlaybackForTrack, stopAllPlayback])
+
+  const selectTrack = (track: AmbientTrack) => {
+    setCurrentTrackId(track.id)
+    if (isPlaying) {
+      startPlaybackForTrack(track)
+    }
+  }
+
   useEffect(() => {
     playTriggerRef.current = () => {
-      const audio = audioRef.current
-      if (audio && audio.paused) {
-        audio.play().then(() => setIsPlaying(true)).catch(err => console.warn("Autoplay audio blocked", err))
-      }
+      startPlaybackForTrack(currentTrack)
     }
-  }, [playTriggerRef])
+
+    const handlePauseMusic = () => {
+      stopAllPlayback()
+    }
+
+    const handleResumeMusic = () => {
+      startPlaybackForTrack(currentTrack)
+    }
+
+    const handleOpenSelector = () => {
+      setExpanded(true)
+    }
+
+    window.addEventListener('pause-bg-music', handlePauseMusic)
+    window.addEventListener('resume-bg-music', handleResumeMusic)
+    window.addEventListener('open-music-selector', handleOpenSelector)
+
+    return () => {
+      window.removeEventListener('pause-bg-music', handlePauseMusic)
+      window.removeEventListener('resume-bg-music', handleResumeMusic)
+      window.removeEventListener('open-music-selector', handleOpenSelector)
+      quinceSynth.stop()
+    }
+  }, [playTriggerRef, currentTrack, startPlaybackForTrack, stopAllPlayback])
 
   const handleTimeUpdate = () => {
     const audio = audioRef.current
@@ -904,7 +1050,7 @@ function RealMusicPlayer({ playTriggerRef }: { playTriggerRef: React.MutableRefO
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const audio = audioRef.current
-    if (audio) {
+    if (audio && currentTrack.type === 'mp3') {
       const seekTime = Number(e.target.value)
       audio.currentTime = seekTime
       setCurrentTime(seekTime)
@@ -912,11 +1058,13 @@ function RealMusicPlayer({ playTriggerRef }: { playTriggerRef: React.MutableRefO
   }
 
   const toggleMute = () => {
+    const nextMuted = !muted
+    setMuted(nextMuted)
     const audio = audioRef.current
     if (audio) {
-      audio.muted = !muted
-      setMuted(!muted)
+      audio.muted = nextMuted
     }
+    quinceSynth.setMuted(nextMuted)
   }
 
   const formatTime = (secs: number) => {
@@ -934,59 +1082,115 @@ function RealMusicPlayer({ playTriggerRef }: { playTriggerRef: React.MutableRefO
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleTimeUpdate}
         onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
+        onPause={() => {
+          if (currentTrack.type === 'mp3') setIsPlaying(false)
+        }}
       />
 
-      <div className="glass-card p-2 md:p-3 rounded-full md:rounded-2xl border-gold/50 shadow-xl flex flex-col gap-2 transition-all">
+      <div className="glass-card p-2 md:p-3 rounded-2xl border-2 border-gold/50 shadow-2xl flex flex-col gap-2.5 transition-all bg-cream/95 backdrop-blur-2xl">
         <div className="flex items-center gap-3">
           <button
             onClick={togglePlay}
-            className="w-10 h-10 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-text-main flex items-center justify-center font-bold text-sm shadow-md hover:scale-105 active:scale-95 transition-transform shrink-0"
-            title={isPlaying ? "Pausar Vals" : "Reproducir Vals de Krista Mariel"}
+            className="w-10 h-10 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-text-main flex items-center justify-center font-bold text-sm shadow-md hover:scale-105 active:scale-95 transition-transform shrink-0 cursor-pointer"
+            title={isPlaying ? "Pausar Melodía" : `Reproducir ${currentTrack.name}`}
           >
             {isPlaying ? "⏸" : "▶"}
           </button>
 
-          <div className="hidden sm:flex flex-col min-w-[130px] pr-2">
-            <span className="text-[10px] uppercase font-montserrat tracking-widest text-gold-dark font-bold truncate">
-              Vals de Krista Mariel
-            </span>
+          <div className="flex flex-col min-w-[130px] max-w-[190px] pr-1 cursor-pointer" onClick={() => setExpanded(!expanded)}>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs">{currentTrack.icon}</span>
+              <span className="text-[10px] uppercase font-montserrat tracking-wider text-gold-dark font-bold truncate">
+                {currentTrack.name}
+              </span>
+            </div>
             <span className="text-[9px] font-montserrat text-text-sub truncate">
-              Música de Fondo 🦋
+              {isPlaying ? "Reproduciendo ahora..." : "Toca para reproducir"}
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={toggleMute}
-              className="text-xs text-gold-dark hover:text-gold p-1"
+              className="text-xs text-gold-dark hover:text-gold p-1 cursor-pointer transition-colors"
               title={muted ? "Activar Sonido" : "Silenciar"}
             >
               {muted ? "🔇" : "🔊"}
             </button>
             <button
               onClick={() => setExpanded(!expanded)}
-              className="text-xs text-gold-dark/70 hover:text-gold hidden sm:block p-1"
+              className="text-[10px] font-montserrat font-bold text-gold-dark bg-gold/15 hover:bg-gold/25 px-2 py-1 rounded-lg border border-gold/30 flex items-center gap-1 cursor-pointer transition-colors"
+              title="Cambiar Melodía de Fondo"
             >
-              {expanded ? "▲" : "▼"}
+              <span>🎵</span>
+              <span className="hidden sm:inline">Melodía</span>
+              <span>{expanded ? "▲" : "▼"}</span>
             </button>
           </div>
         </div>
 
         {expanded && (
-          <div className="px-2 pt-1 pb-2 flex flex-col gap-1 text-[9px] font-montserrat text-text-sub animate-fade-in">
-            <input
-              type="range"
-              min={0}
-              max={duration || 100}
-              value={currentTime}
-              onChange={handleSeek}
-              className="w-full accent-gold h-1 bg-pastel-beige rounded-lg cursor-pointer"
-            />
-            <div className="flex justify-between">
-              <span>{formatTime(currentTime)}</span>
-              <span>{formatTime(duration)}</span>
+          <div className="px-1 pt-1 pb-1 flex flex-col gap-2.5 border-t border-gold/30 animate-fade-in">
+            {/* Melody / Track Selector Pills */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex justify-between items-center px-1">
+                <span className="text-[9px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">
+                  Seleccionar Melodía de Fondo
+                </span>
+                <span className="text-[8px] text-text-sub">3 Piezas de Gala</span>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                {AMBIENT_TRACKS.map(track => {
+                  const isSelected = track.id === currentTrackId
+                  return (
+                    <button
+                      key={track.id}
+                      onClick={() => selectTrack(track)}
+                      className={`p-2 rounded-xl text-left flex items-center justify-between border transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-gold/20 border-gold shadow-sm text-text-main'
+                          : 'bg-white/40 hover:bg-gold/10 border-gold/30 text-text-sub'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="text-base shrink-0">{track.icon}</span>
+                        <div className="min-w-0">
+                          <p className={`text-[11px] font-montserrat font-bold truncate ${isSelected ? 'text-gold-dark' : 'text-text-main'}`}>
+                            {track.name}
+                          </p>
+                          <p className="text-[9px] text-text-muted truncate">{track.tag}</p>
+                        </div>
+                      </div>
+
+                      {isSelected && (
+                        <span className="text-xs text-gold-dark font-bold shrink-0 ml-2 animate-pulse">
+                          {isPlaying ? '🎶' : '✓'}
+                        </span>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
+
+            {/* Time scrubber (when MP3 is active) */}
+            {currentTrack.type === 'mp3' && (
+              <div className="px-1 pt-1 flex flex-col gap-1 text-[9px] font-montserrat text-text-sub border-t border-gold/20">
+                <input
+                  type="range"
+                  min={0}
+                  max={duration || 100}
+                  value={currentTime}
+                  onChange={handleSeek}
+                  className="w-full accent-gold h-1 bg-pastel-beige rounded-lg cursor-pointer"
+                />
+                <div className="flex justify-between font-semibold">
+                  <span>{formatTime(currentTime)}</span>
+                  <span>{formatTime(duration)}</span>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -1322,7 +1526,224 @@ function GiantGoldenButterflySeal({ isOpening }: { isOpening: boolean }) {
   )
 }
 
-// ─── Regal Interactive Envelope Modal with Pastel Butterfly Explosion ─────────
+// ─── Welcome Intro Cinema Video Modal ──────────────────────────────────────────
+function IntroVideoModal({
+  isOpen,
+  onFinish,
+  onTriggerBurst,
+}: {
+  isOpen: boolean
+  onFinish: () => void
+  onTriggerBurst?: () => void
+}) {
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [hasStarted, setHasStarted] = useState(false)
+  const [isMuted, setIsMuted] = useState(false)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const progressFillRef = useRef<HTMLDivElement | null>(null)
+  const timeDisplayRef = useRef<HTMLSpanElement | null>(null)
+
+  useEffect(() => {
+    if (isOpen) {
+      window.dispatchEvent(new CustomEvent('pause-bg-music'))
+      window.dispatchEvent(new CustomEvent('pause-butterflies'))
+    }
+  }, [isOpen])
+
+  if (!isOpen) return null
+
+  const formatSec = (sec: number) => {
+    const s = Math.floor(sec)
+    const m = Math.floor(s / 60)
+    const rem = s % 60
+    return `${m}:${rem < 10 ? '0' : ''}${rem}`
+  }
+
+  const handleStartPlay = () => {
+    const video = videoRef.current
+    if (!video) return
+
+    window.dispatchEvent(new CustomEvent('pause-bg-music'))
+    window.dispatchEvent(new CustomEvent('pause-butterflies'))
+
+    if (onTriggerBurst && !hasStarted) {
+      onTriggerBurst()
+    }
+
+    video.play().then(() => {
+      setIsPlaying(true)
+      setHasStarted(true)
+    }).catch(err => {
+      console.warn("Autoplay gesture required", err)
+    })
+  }
+
+  const handleTogglePlay = () => {
+    const video = videoRef.current
+    if (!video) return
+    if (isPlaying) {
+      video.pause()
+      setIsPlaying(false)
+    } else {
+      handleStartPlay()
+    }
+  }
+
+  const handleTimeUpdate = () => {
+    const video = videoRef.current
+    if (!video) return
+    const cur = video.currentTime
+    const dur = video.duration || 36
+    const pct = Math.min(100, (cur / dur) * 100)
+    if (progressFillRef.current) {
+      progressFillRef.current.style.width = `${pct}%`
+    }
+    if (timeDisplayRef.current) {
+      timeDisplayRef.current.textContent = `${formatSec(cur)} / ${formatSec(dur)}`
+    }
+    if (dur > 0 && cur >= dur - 0.4) {
+      handleSkipOrFinish()
+    }
+  }
+
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const video = videoRef.current
+    if (!video) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
+    const targetTime = pct * (video.duration || 36)
+    video.currentTime = targetTime
+    if (progressFillRef.current) {
+      progressFillRef.current.style.width = `${pct * 100}%`
+    }
+  }
+
+  const toggleMute = () => {
+    const video = videoRef.current
+    if (video) {
+      const nextMuted = !isMuted
+      video.muted = nextMuted
+      setIsMuted(nextMuted)
+    }
+  }
+
+  const handleSkipOrFinish = () => {
+    if (videoRef.current) {
+      videoRef.current.pause()
+    }
+    onFinish()
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 bg-[#0C0A09]/95 backdrop-blur-2xl flex flex-col items-center justify-between p-4 sm:p-6 animate-fade-in select-none overflow-y-auto">
+      {/* Dynamic Background Atmosphere */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-gold/15 rounded-full blur-[120px]" />
+        <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-gold/10 rounded-full blur-[100px]" />
+      </div>
+
+      {/* Top Bar - Solo botón discreto para saltar directo al Sobre */}
+      <div className="relative z-10 w-full max-w-[360px] flex items-center justify-end pt-1">
+        <button
+          onClick={handleSkipOrFinish}
+          className="px-4 py-2 rounded-full border border-gold/60 bg-black/70 text-gold-light text-xs font-montserrat uppercase tracking-wider font-bold hover:bg-gold/25 flex items-center gap-2 transition-all shadow-xl cursor-pointer backdrop-blur-md"
+        >
+          <span>Abrir Sobre</span>
+          <span>✉️</span>
+        </button>
+      </div>
+
+      {/* Central Video Frame */}
+      <div className="relative z-10 my-auto w-full max-w-[320px] sm:max-w-[360px] aspect-[9/16] rounded-3xl overflow-hidden border-2 border-gold shadow-[0_0_70px_rgba(212,175,55,0.4)] bg-black">
+        {/* Filigree Gold Corners */}
+        <div className="absolute top-2.5 left-2.5 w-6 h-6 border-t-2 border-l-2 border-gold pointer-events-none z-20" />
+        <div className="absolute top-2.5 right-2.5 w-6 h-6 border-t-2 border-r-2 border-gold pointer-events-none z-20" />
+        <div className="absolute bottom-2.5 left-2.5 w-6 h-6 border-b-2 border-l-2 border-gold pointer-events-none z-20" />
+        <div className="absolute bottom-2.5 right-2.5 w-6 h-6 border-b-2 border-r-2 border-gold pointer-events-none z-20" />
+
+        {/* Hardware-Accelerated Video Element */}
+        <video
+          ref={videoRef}
+          src="/videos/krista_quinceanera_video.mp4"
+          poster="/images/krista_portrait_1.jpg"
+          playsInline
+          preload="auto"
+          style={{ transform: 'translateZ(0)', willChange: 'transform' }}
+          onTimeUpdate={handleTimeUpdate}
+          onEnded={handleSkipOrFinish}
+          onClick={handleTogglePlay}
+          className="absolute inset-0 w-full h-full object-cover cursor-pointer transform-gpu"
+        />
+
+        {/* Start / Play Clean Overlay */}
+        {!hasStarted && (
+          <div
+            onClick={handleStartPlay}
+            className="absolute inset-0 z-20 bg-black/45 hover:bg-black/35 flex flex-col items-center justify-center p-6 text-center cursor-pointer group transition-all"
+          >
+            <div className="relative flex flex-col items-center justify-center gap-3">
+              <div className="relative flex items-center justify-center">
+                <div className="absolute w-24 h-24 rounded-full bg-gold/30 blur-2xl animate-pulse-glow" />
+                <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-full border-2 border-gold bg-gradient-to-tr from-gold-dark via-gold to-gold-light flex items-center justify-center shadow-2xl group-hover:scale-110 active:scale-95 transition-transform text-text-main">
+                  <svg className="w-8 h-8 ml-1 fill-current" viewBox="0 0 24 24">
+                    <polygon points="5 3 19 12 5 21 5 3" />
+                  </svg>
+                </div>
+              </div>
+              <span className="text-xs uppercase tracking-[0.25em] font-montserrat text-gold-light font-bold drop-shadow">
+                Toca para Iniciar
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Bottom Control Bar during playback */}
+        <div className={`absolute bottom-0 inset-x-0 z-20 p-3 pt-6 bg-gradient-to-t from-black/95 via-black/70 to-transparent flex flex-col gap-2 transition-opacity duration-300 pointer-events-auto ${hasStarted ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          <div
+            onClick={handleProgressClick}
+            className="relative w-full h-1.5 hover:h-2 bg-white/20 rounded-full cursor-pointer overflow-hidden transition-all"
+            title="Avanzar o retroceder"
+          >
+            <div
+              ref={progressFillRef}
+              className="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-gold-light via-gold to-gold-dark rounded-full transition-none w-0"
+            />
+          </div>
+
+          <div className="flex items-center justify-between text-white text-xs">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleTogglePlay}
+                className="w-7 h-7 rounded-full border border-gold/60 bg-gold/20 flex items-center justify-center text-gold-light hover:bg-gold/40 transition-colors cursor-pointer text-xs"
+              >
+                {isPlaying ? '⏸' : '▶'}
+              </button>
+              <button
+                onClick={toggleMute}
+                className="text-white/80 hover:text-white transition-colors cursor-pointer text-xs"
+              >
+                {isMuted ? '🔇' : '🔊'}
+              </button>
+              <span ref={timeDisplayRef} className="text-[9px] font-montserrat text-white/90">
+                0:00 / 0:36
+              </span>
+            </div>
+
+            <button
+              onClick={handleSkipOrFinish}
+              className="px-2.5 py-1 rounded-full bg-gradient-to-r from-gold to-gold-dark text-text-main text-[9px] font-montserrat uppercase tracking-wider font-bold hover:brightness-110 transition-all flex items-center gap-1 cursor-pointer"
+            >
+              <span>Abrir Sobre</span>
+              <span>✉️</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Luxury 3D Interactive Envelope Modal ─────────────────────────────────────
 function EnvelopeModal({
   isOpen,
   onClose,
@@ -1338,6 +1759,7 @@ function EnvelopeModal({
   if (!isOpen) return null
 
   const handleOpen = () => {
+    if (opening) return
     setOpening(true)
     setFlash(true)
 
@@ -1345,55 +1767,186 @@ function EnvelopeModal({
 
     setTimeout(() => {
       onClose()
-    }, 1200)
+    }, 1300)
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-cream/95 backdrop-blur-xl flex items-center justify-center p-4 transition-all duration-1000">
+    <div className="fixed inset-0 z-50 bg-[#0F0B14]/92 backdrop-blur-2xl flex flex-col items-center justify-center p-4 select-none animate-fade-in overflow-hidden">
+      {/* Warm golden ambient glow */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-gold/20 rounded-full blur-[140px]" />
+      </div>
+
       {flash && (
         <div
           className="fixed inset-0 pointer-events-none z-50 animate-fade-in"
           style={{
-            background: 'radial-gradient(circle at center, rgba(255, 245, 184, 0.95) 0%, rgba(247, 197, 212, 0.6) 40%, transparent 75%)',
-            animationDuration: '1.2s',
+            background: 'radial-gradient(circle at center, rgba(255, 245, 184, 0.98) 0%, rgba(212, 175, 55, 0.7) 45%, transparent 75%)',
+            animationDuration: '1.3s',
           }}
         />
       )}
 
-      <div className="relative w-full max-w-sm sm:max-w-md flex flex-col items-center">
-        <ParallaxCard
-          className={`relative w-full aspect-[4/3] rounded-3xl glass-card border-2 border-gold/50 p-6 flex flex-col items-center justify-between cursor-pointer group shadow-2xl transition-all duration-1000 ${
-            opening ? 'scale-125 opacity-0 rotate-3 filter blur-sm' : 'hover:scale-[1.02]'
-          }`}
-        >
-          <div
-            onClick={handleOpen}
-            className="w-full h-full flex flex-col items-center justify-between"
-          >
-            <div className="absolute top-3 left-3 w-6 h-6 md:w-8 md:h-8 border-t-2 border-l-2 border-gold rounded-tl-lg" />
-            <div className="absolute top-3 right-3 w-6 h-6 md:w-8 md:h-8 border-t-2 border-r-2 border-gold rounded-tr-lg" />
-            <div className="absolute bottom-3 left-3 w-6 h-6 md:w-8 md:h-8 border-b-2 border-l-2 border-gold rounded-bl-lg" />
-            <div className="absolute bottom-3 right-3 w-6 h-6 md:w-8 md:h-8 border-b-2 border-r-2 border-gold rounded-br-lg" />
+      {/* Main Envelope Container */}
+      <div className="relative z-10 w-full max-w-[440px] flex flex-col items-center">
+        {/* Subtle Top Invitation Label */}
+        <p className="text-[10px] uppercase tracking-[0.35em] text-gold-light font-montserrat font-bold mb-3 text-center drop-shadow">
+          Invitación de Gala · XV Años
+        </p>
 
-            <div className="text-center mt-2 md:mt-4">
-              <p className="text-[9px] md:text-[10px] uppercase tracking-[0.35em] text-gold-dark font-montserrat font-bold">
-                Invitación de Gala Exclusiva
-              </p>
-              <h3 className="font-greatvibes text-3xl md:text-5xl text-gold-dark mt-1">
-                XV Años de Krista Mariel
+        {/* 3D Realistic Royal Envelope */}
+        <div
+          onClick={handleOpen}
+          className={`relative w-full aspect-[1.48/1] rounded-2xl cursor-pointer group shadow-[0_25px_60px_rgba(0,0,0,0.8),0_0_50px_rgba(212,175,55,0.35)] transition-all duration-1000 ${
+            opening ? 'scale-110 opacity-0 translate-y-4' : 'hover:scale-[1.02]'
+          }`}
+          style={{ perspective: '1200px' }}
+        >
+          {/* Base Envelope Paper Texture & Double Gold Border */}
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[#FFFDF9] via-[#FAF3E6] to-[#F1E4CE] border-2 border-gold/80 overflow-hidden shadow-2xl">
+            {/* Fine Paper Watermark subtle grid */}
+            <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(#D4AF37_1px,transparent_1px)] [background-size:16px_16px]" />
+
+            {/* Inner Gold Inlay Trim */}
+            <div className="absolute inset-2.5 rounded-xl border border-gold/40 pointer-events-none" />
+
+            {/* Filigree Gold Corners */}
+            <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-gold pointer-events-none" />
+            <div className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-gold pointer-events-none" />
+            <div className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-gold pointer-events-none" />
+            <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-gold pointer-events-none" />
+
+            {/* Inside Peeking Card (Slides up when opening) */}
+            <div
+              className={`absolute inset-x-6 top-6 bottom-6 bg-gradient-to-b from-white via-cream to-[#FDF8EE] rounded-xl border border-gold/60 p-4 flex flex-col items-center justify-between text-center transition-transform duration-1000 ${
+                opening ? '-translate-y-20 scale-105 shadow-2xl' : 'translate-y-0'
+              }`}
+            >
+              <span className="text-[8px] uppercase tracking-[0.3em] font-montserrat font-bold text-gold-dark">
+                Krista Mariel Sandoval Caldera
+              </span>
+              <h3 className="font-greatvibes text-2xl sm:text-3xl text-gold-dark leading-tight">
+                Mis Quince Años
               </h3>
+              <span className="text-[9px] font-montserrat text-text-sub font-semibold tracking-wider">
+                17 de Octubre, 2026
+              </span>
             </div>
 
-            {/* Giant Golden 3D Animated Butterfly Seal */}
-            <GiantGoldenButterflySeal isOpening={opening} />
+            {/* Realistic Envelope Folds (Bottom & Side Flaps) */}
+            <svg
+              className="absolute inset-0 w-full h-full pointer-events-none"
+              viewBox="0 0 440 297"
+              fill="none"
+              preserveAspectRatio="none"
+            >
+              <defs>
+                <linearGradient id="foldGradientLeft" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#FAF3E6" stopOpacity="0.95" />
+                  <stop offset="100%" stopColor="#EAD8BC" stopOpacity="0.9" />
+                </linearGradient>
+                <linearGradient id="foldGradientRight" x1="1" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#FAF3E6" stopOpacity="0.95" />
+                  <stop offset="100%" stopColor="#EAD8BC" stopOpacity="0.9" />
+                </linearGradient>
+                <linearGradient id="foldGradientBottom" x1="0" y1="1" x2="0" y2="0">
+                  <stop offset="0%" stopColor="#EAD8BC" stopOpacity="0.98" />
+                  <stop offset="100%" stopColor="#FAF3E6" stopOpacity="0.95" />
+                </linearGradient>
+                <filter id="foldShadow" x="-10%" y="-10%" width="120%" height="120%">
+                  <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#9A7B38" floodOpacity="0.25" />
+                </filter>
+              </defs>
 
-            <div className="text-center mb-1">
-              <p className="text-[11px] md:text-xs font-montserrat text-text-sub tracking-wider font-semibold">
-                Toca la mariposa de oro para abrir la invitación 🦋✨
-              </p>
+              {/* Left Triangular Flap */}
+              <path
+                d="M 0 0 L 220 155 L 0 297 Z"
+                fill="url(#foldGradientLeft)"
+                stroke="#D4AF37"
+                strokeWidth="0.75"
+                filter="url(#foldShadow)"
+              />
+
+              {/* Right Triangular Flap */}
+              <path
+                d="M 440 0 L 220 155 L 440 297 Z"
+                fill="url(#foldGradientRight)"
+                stroke="#D4AF37"
+                strokeWidth="0.75"
+                filter="url(#foldShadow)"
+              />
+
+              {/* Bottom Triangular Flap */}
+              <path
+                d="M 0 297 L 220 155 L 440 297 Z"
+                fill="url(#foldGradientBottom)"
+                stroke="#D4AF37"
+                strokeWidth="1"
+                filter="url(#foldShadow)"
+              />
+            </svg>
+
+            {/* Top Triangular Flap (Solapa Superior que sella el sobre) */}
+            <div
+              className={`absolute top-0 left-0 right-0 h-[158px] origin-top transition-all duration-700 pointer-events-none ${
+                opening ? '-rotate-x-180 opacity-0' : 'rotate-x-0'
+              }`}
+              style={{ transformStyle: 'preserve-3d' }}
+            >
+              <svg
+                className="w-full h-full"
+                viewBox="0 0 440 158"
+                fill="none"
+                preserveAspectRatio="none"
+              >
+                <defs>
+                  <linearGradient id="topFlapGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#FFFDF9" />
+                    <stop offset="60%" stopColor="#FAF2E3" />
+                    <stop offset="100%" stopColor="#EFE0C6" />
+                  </linearGradient>
+                  <filter id="topFlapShadow" x="-10%" y="-10%" width="120%" height="130%">
+                    <feDropShadow dx="0" dy="5" stdDeviation="5" floodColor="#2D1F38" floodOpacity="0.45" />
+                  </filter>
+                </defs>
+                <path
+                  d="M 0 0 L 220 155 L 440 0 Z"
+                  fill="url(#topFlapGradient)"
+                  stroke="#D4AF37"
+                  strokeWidth="1.5"
+                  filter="url(#topFlapShadow)"
+                />
+                {/* Gold Inner Flap Line */}
+                <path
+                  d="M 20 5 L 220 142 L 420 5"
+                  stroke="#D4AF37"
+                  strokeWidth="0.8"
+                  strokeDasharray="4 2"
+                  fill="none"
+                  opacity="0.8"
+                />
+              </svg>
             </div>
           </div>
-        </ParallaxCard>
+
+          {/* Golden 3D Butterfly Seal positioned right over the flap apex */}
+          <div className="absolute top-[52%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
+            <GiantGoldenButterflySeal isOpening={opening} />
+          </div>
+        </div>
+
+        {/* Bottom Helper Indicator */}
+        <div className="mt-5 flex flex-col items-center gap-2 text-center">
+          <p className="text-xs font-montserrat text-gold-light tracking-wider font-semibold animate-pulse">
+            ✨ Toca la mariposa dorada para abrir el sobre ✨
+          </p>
+          <button
+            onClick={handleOpen}
+            className="text-[11px] text-gold/70 hover:text-gold uppercase tracking-widest font-montserrat underline underline-offset-4 transition-colors cursor-pointer"
+          >
+            Entrar directo a la invitación →
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -1566,6 +2119,12 @@ END:VCALENDAR`
         </div>
 
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-xs sm:max-w-none px-4">
+          <a
+            href="#video-especial"
+            className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-text-main text-[11px] font-montserrat uppercase tracking-wider font-bold shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
+          >
+            <span>🎬</span> Ver Video Especial <span>🦋</span>
+          </a>
           <button
             onClick={() => handleCalendar('google')}
             className="w-full sm:w-auto px-5 py-2.5 rounded-full border-2 border-gold/40 glass-card text-[11px] font-montserrat uppercase tracking-wider text-gold-dark hover:bg-gold/15 transition-all flex items-center justify-center gap-2 font-bold shadow-sm"
@@ -1745,22 +2304,11 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
       icon: "🎂",
     },
     {
-      id: 9,
-      time: "7:30 PM – 7:45 PM",
-      tag: "Serenata",
-      title: "PIANO EN VIVO",
-      subtitle: "Canciones especiales en piano",
-      name: VENUE_NAME,
-      address: VENUE_ADDRESS,
-      maps: VENUE_MAPS,
-      icon: "🎹",
-    },
-    {
       id: 10,
-      time: "7:45 PM – 8:00 PM",
+      time: "7:30 PM – 8:00 PM",
       tag: "Gran Show",
       title: "BAILE SORPRESA",
-      subtitle: "Cambio de vestuario y presentación (15-20 minutos)",
+      subtitle: "Cambio de vestuario y presentación especial",
       name: VENUE_NAME,
       address: VENUE_ADDRESS,
       maps: VENUE_MAPS,
@@ -2227,6 +2775,487 @@ function PhotoFrameCreator({ onTriggerToast }: { onTriggerToast: (msg: string) =
   )
 }
 
+// ─── Live Photo Wall & Shared Album Section ─────────────────────────────────────
+interface SharedPhotoItem {
+  id: string
+  guestName: string
+  caption: string
+  src: string
+  timeAgo: string
+  likes: number
+  isGuestUpload?: boolean
+}
+
+const INITIAL_SHARED_PHOTOS: SharedPhotoItem[] = [
+  {
+    id: 'p1',
+    guestName: 'Familia Sandoval Caldera',
+    caption: '¡Nuestra niña hermosa lista para su gran noche de gala! Que Dios ilumine cada paso de tu vida.',
+    src: '/images/krista_portrait_1.jpg',
+    timeAgo: 'Foto de Gala Oficial',
+    likes: 54,
+  },
+  {
+    id: 'p2',
+    guestName: 'Valentina & Amigas',
+    caption: '¡Amiga hermosa! Contando los días para bailar toda la noche contigo 💖',
+    src: '/images/krista_butterfly_balloon.jpg',
+    timeAgo: 'Pre-XV Años',
+    likes: 68,
+  },
+  {
+    id: 'p3',
+    guestName: 'Tíos y Primos Silva',
+    caption: '¡Felicidades Krista Mariel! Eres un orgullo y una bendición para toda la familia.',
+    src: '/images/krista_yellow_roses.jpg',
+    timeAgo: 'Sesión de Rosas',
+    likes: 41,
+  },
+  {
+    id: 'p4',
+    guestName: 'Padrinos de Honor',
+    caption: 'Una tarde soñada en Quinta Maria Teresa. ¡Todo lucirá espectacular!',
+    src: '/images/krista_sitting_garden.png',
+    timeAgo: 'Quinta Maria Teresa',
+    likes: 47,
+  },
+]
+
+function LivePhotoWallSection({
+  onTriggerToast,
+  onTriggerBurst,
+}: {
+  onTriggerToast: (msg: string) => void
+  onTriggerBurst?: () => void
+}) {
+  const [photos, setPhotos] = useState<SharedPhotoItem[]>(INITIAL_SHARED_PHOTOS)
+  const [selectedPhoto, setSelectedPhoto] = useState<SharedPhotoItem | null>(null)
+  const [showQRModal, setShowQRModal] = useState(false)
+  const [uploadPreview, setUploadPreview] = useState<string | null>(null)
+  const [guestName, setGuestName] = useState('')
+  const [caption, setCaption] = useState('')
+  const [isUploading, setIsUploading] = useState(false)
+  const [filter, setFilter] = useState<'all' | 'popular'>('all')
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (evt) => {
+        if (evt.target?.result) {
+          setUploadPreview(evt.target.result as string)
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handlePublishPhoto = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!uploadPreview) {
+      onTriggerToast("Por favor selecciona o toma una foto primero 📸")
+      return
+    }
+    if (!guestName.trim()) {
+      onTriggerToast("Por favor escribe tu nombre o el de tu familia ✍️")
+      return
+    }
+
+    setIsUploading(true)
+    if (onTriggerBurst) onTriggerBurst()
+
+    setTimeout(() => {
+      const newPhoto: SharedPhotoItem = {
+        id: `guest-${Date.now()}`,
+        guestName: guestName.trim(),
+        caption: caption.trim() || '¡Celebrando los XV Años de Krista Mariel! 🎉',
+        src: uploadPreview,
+        timeAgo: 'Justo ahora',
+        likes: 1,
+        isGuestUpload: true,
+      }
+
+      setPhotos(prev => [newPhoto, ...prev])
+      setUploadPreview(null)
+      setGuestName('')
+      setCaption('')
+      setIsUploading(false)
+      onTriggerToast("¡Tu foto ha sido publicada en el Muro en Vivo de Krista! 📸🦋")
+    }, 600)
+  }
+
+  const handleLike = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setPhotos(prev =>
+      prev.map(p => (p.id === id ? { ...p, likes: p.likes + 1 } : p))
+    )
+    if (selectedPhoto && selectedPhoto.id === id) {
+      setSelectedPhoto(prev => prev ? { ...prev, likes: prev.likes + 1 } : null)
+    }
+    onTriggerToast("¡Te gusta este recuerdo! ❤️")
+  }
+
+  const openWhatsAppShare = () => {
+    const text = encodeURIComponent(`¡Hola! Quiero compartirte mis fotos y recuerdos de los XV Años de ${QUINCE_NAME} 📸🦋`)
+    window.open(`https://wa.me/${WHATSAPP_PHONE}?text=${text}`, '_blank')
+  }
+
+  const openGoogleDrive = () => {
+    window.open(GOOGLE_DRIVE_PHOTOS_URL, '_blank')
+    onTriggerToast("Abriendo carpeta compartida de fotos 📁")
+  }
+
+  const displayedPhotos = filter === 'popular'
+    ? [...photos].sort((a, b) => b.likes - a.likes)
+    : photos
+
+  return (
+    <section id="muro-fotos" className="relative py-16 md:py-24 px-4 md:px-6">
+      <div className="section-sep mb-16 md:mb-20" />
+      <div className="max-w-5xl mx-auto">
+        <SectionHeader tag="Recuerdos en Tiempo Real" title="Muro de Fotos en Vivo · Álbum de la Fiesta" />
+
+        {/* Intro Banner */}
+        <div className="glass-card p-6 md:p-8 rounded-3xl border-2 border-gold/40 shadow-2xl text-center flex flex-col items-center gap-5 mb-10 bg-gradient-to-b from-cream/95 to-pastel-beige/40">
+          <div className="w-14 h-14 rounded-full border-2 border-gold bg-gold/15 flex items-center justify-center text-2xl shadow-inner">
+            📸
+          </div>
+          <div className="max-w-2xl">
+            <h3 className="font-playfair text-2xl md:text-3xl text-text-main font-bold mb-2">
+              ¡Ayúdanos a capturar cada instante mágico!
+            </h3>
+            <p className="font-montserrat text-xs md:text-sm text-text-sub leading-relaxed font-medium">
+              Durante la misa, la recepción y la fiesta en Quinta Maria Teresa, sube aquí tus selfies, fotos con Krista Mariel y videos. Todas quedarán guardadas para siempre en el álbum oficial de recuerdos.
+            </p>
+          </div>
+
+          {/* Quick Action Buttons */}
+          <div className="flex flex-wrap items-center justify-center gap-3 w-full max-w-3xl mt-1">
+            <button
+              type="button"
+              onClick={openGoogleDrive}
+              className="px-5 py-3 rounded-2xl bg-gradient-to-r from-gold-light via-gold to-gold-dark text-text-main font-montserrat font-bold text-xs uppercase tracking-wider shadow-md hover:brightness-110 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <span>📁</span>
+              <span>Subir a Google Drive</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={openWhatsAppShare}
+              className="px-5 py-3 rounded-2xl border-2 border-[#25D366]/60 bg-[#25D366]/15 hover:bg-[#25D366]/25 text-[#128C7E] font-montserrat font-bold text-xs uppercase tracking-wider shadow-sm active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <span>💬</span>
+              <span>Enviar por WhatsApp</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowQRModal(true)}
+              className="px-5 py-3 rounded-2xl border-2 border-gold/50 bg-gold/10 hover:bg-gold/20 text-gold-dark font-montserrat font-bold text-xs uppercase tracking-wider shadow-sm active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <span>📲</span>
+              <span>Código QR para Mesas</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Live Upload Card + Mosaic Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Uploader Form */}
+          <form
+            onSubmit={handlePublishPhoto}
+            className="lg:col-span-5 glass-card p-6 md:p-7 rounded-3xl border-2 border-gold/40 shadow-xl flex flex-col gap-4 sticky top-24"
+          >
+            <div className="flex items-center gap-2.5 pb-2 border-b border-gold/30">
+              <span className="text-xl">✨</span>
+              <h4 className="font-playfair text-lg text-gold-dark font-bold">
+                Publicar Foto en el Muro
+              </h4>
+            </div>
+
+            {/* Upload preview / Dropzone */}
+            {!uploadPreview ? (
+              <label className="w-full aspect-[4/3] rounded-2xl border-2 border-dashed border-gold/60 bg-white/40 hover:bg-gold/10 transition-all flex flex-col items-center justify-center gap-3 cursor-pointer p-4 group">
+                <div className="w-12 h-12 rounded-full border border-gold flex items-center justify-center text-2xl bg-gold/15 group-hover:scale-110 transition-transform">
+                  📷
+                </div>
+                <div className="text-center">
+                  <p className="text-xs font-montserrat font-bold text-gold-dark">
+                    Toca para Tomar Foto o Elegir de tu Galería
+                  </p>
+                  <p className="text-[10px] font-montserrat text-text-muted mt-0.5">
+                    Selfies, fotos de grupo o del salón
+                  </p>
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+              </label>
+            ) : (
+              <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden border-2 border-gold shadow-md">
+                <img
+                  src={uploadPreview}
+                  alt="Vista previa"
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => setUploadPreview(null)}
+                  className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-black/70 text-white flex items-center justify-center text-xs hover:bg-black transition-colors"
+                  title="Cambiar imagen"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
+            {/* Guest Name input */}
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">
+                Tu Nombre o Familia *
+              </label>
+              <input
+                type="text"
+                required
+                value={guestName}
+                onChange={e => setGuestName(e.target.value)}
+                placeholder="Ej. Tía Sofia & Familia"
+                className="w-full bg-cream border border-gold/40 focus:border-gold rounded-2xl px-3.5 py-2.5 text-xs text-text-main placeholder:text-text-muted outline-none font-medium"
+              />
+            </div>
+
+            {/* Dedication Caption */}
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">
+                Mensaje o Momento (Opcional)
+              </label>
+              <textarea
+                rows={2}
+                value={caption}
+                onChange={e => setCaption(e.target.value)}
+                placeholder="Ej. ¡Bailando el vals con Krista Mariel! ✨"
+                className="w-full bg-cream border border-gold/40 focus:border-gold rounded-2xl px-3.5 py-2.5 text-xs text-text-main placeholder:text-text-muted outline-none font-medium resize-none"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isUploading || !uploadPreview}
+              className="py-3 rounded-2xl bg-gradient-to-r from-gold-light via-gold to-gold-dark text-text-main font-montserrat font-bold text-xs uppercase tracking-wider shadow-md hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 cursor-pointer mt-1"
+            >
+              {isUploading ? 'Publicando...' : 'Publicar en el Muro en Vivo 🦋'}
+            </button>
+          </form>
+
+          {/* Photo Stream Grid */}
+          <div className="lg:col-span-7 flex flex-col gap-4">
+            {/* Header controls & filter */}
+            <div className="flex items-center justify-between px-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-montserrat text-text-sub font-semibold">
+                  Mostrando <strong className="text-gold-dark">{photos.length}</strong> recuerdos
+                </span>
+              </div>
+
+              <div className="flex items-center gap-1.5 p-1 rounded-xl bg-gold/10 border border-gold/30">
+                <button
+                  type="button"
+                  onClick={() => setFilter('all')}
+                  className={`px-3 py-1 rounded-lg text-[10px] font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                    filter === 'all'
+                      ? 'bg-cream text-gold-dark shadow-sm'
+                      : 'text-text-sub hover:text-gold-dark'
+                  }`}
+                >
+                  Recientes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFilter('popular')}
+                  className={`px-3 py-1 rounded-lg text-[10px] font-montserrat font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                    filter === 'popular'
+                      ? 'bg-cream text-gold-dark shadow-sm'
+                      : 'text-text-sub hover:text-gold-dark'
+                  }`}
+                >
+                  ❤️ Populares
+                </button>
+              </div>
+            </div>
+
+            {/* Grid of Polaroid Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {displayedPhotos.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => setSelectedPhoto(item)}
+                  className="glass-card rounded-2xl p-3 border-2 border-gold/40 shadow-lg flex flex-col gap-2.5 group cursor-pointer hover:border-gold hover:shadow-2xl transition-all relative overflow-hidden bg-cream/80"
+                >
+                  {/* Polaroid Frame Image */}
+                  <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-black/10 border border-gold/30">
+                    <img
+                      src={item.src}
+                      alt={item.caption}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-sm text-[9px] font-montserrat text-gold-light font-semibold border border-gold/40">
+                      {item.timeAgo}
+                    </div>
+                  </div>
+
+                  {/* Card Info */}
+                  <div className="flex flex-col gap-1 px-1">
+                    <div className="flex items-center justify-between">
+                      <h5 className="font-playfair text-sm text-text-main font-bold truncate">
+                        {item.guestName}
+                      </h5>
+                      <button
+                        type="button"
+                        onClick={e => handleLike(item.id, e)}
+                        className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gold/15 hover:bg-gold/30 border border-gold/40 text-[10px] text-gold-dark font-bold transition-all cursor-pointer"
+                        title="Dar Me Gusta"
+                      >
+                        <span>❤️</span>
+                        <span>{item.likes}</span>
+                      </button>
+                    </div>
+                    <p className="text-[11px] font-montserrat text-text-sub line-clamp-2 italic">
+                      "{item.caption}"
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Lightbox Modal for Fullscreen Photo View */}
+      {selectedPhoto && (
+        <div
+          className="fixed inset-0 z-50 bg-cream/95 backdrop-blur-2xl flex items-center justify-center p-3 sm:p-6 animate-fade-in"
+          onClick={() => setSelectedPhoto(null)}
+        >
+          <button
+            type="button"
+            onClick={() => setSelectedPhoto(null)}
+            className="absolute top-4 right-4 w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-gold text-gold-dark text-lg md:text-xl flex items-center justify-center glass-card hover:bg-gold/20 z-10 font-bold cursor-pointer"
+          >
+            ✕
+          </button>
+
+          <div
+            onClick={e => e.stopPropagation()}
+            className="relative max-w-2xl w-full rounded-3xl overflow-hidden border-2 border-gold glass-card p-3 shadow-2xl bg-cream/95 flex flex-col gap-3"
+          >
+            <div className="relative max-h-[65vh] rounded-2xl overflow-hidden bg-black/10 border border-gold/30 flex items-center justify-center">
+              <img
+                src={selectedPhoto.src}
+                alt={selectedPhoto.caption}
+                className="max-h-[65vh] w-auto rounded-2xl object-contain mx-auto"
+              />
+            </div>
+
+            <div className="p-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">🦋</span>
+                  <p className="font-playfair text-lg text-gold-dark font-bold truncate">
+                    {selectedPhoto.guestName}
+                  </p>
+                  <span className="text-[10px] text-text-muted">· {selectedPhoto.timeAgo}</span>
+                </div>
+                <p className="text-xs font-montserrat text-text-main italic mt-0.5">
+                  "{selectedPhoto.caption}"
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={e => handleLike(selectedPhoto.id, e)}
+                className="px-4 py-2 rounded-full border-2 border-gold bg-gradient-to-r from-gold to-gold-dark text-text-main text-xs font-montserrat font-bold flex items-center gap-1.5 shadow-md hover:brightness-110 active:scale-95 transition-all cursor-pointer shrink-0"
+              >
+                <span>❤️</span>
+                <span>{selectedPhoto.likes} Me Gusta</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Table QR Card Modal (para colocar en las mesas) */}
+      {showQRModal && (
+        <div
+          className="fixed inset-0 z-50 bg-cream/90 backdrop-blur-2xl flex items-center justify-center p-4 animate-fade-in"
+          onClick={() => setShowQRModal(false)}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="glass-card p-6 md:p-8 rounded-3xl max-w-sm w-full text-center flex flex-col items-center gap-4 border-2 border-gold/60 shadow-2xl relative bg-cream/98"
+          >
+            <button
+              type="button"
+              onClick={() => setShowQRModal(false)}
+              className="absolute top-4 right-4 text-gold-dark hover:text-gold text-lg font-bold cursor-pointer"
+            >
+              ✕
+            </button>
+
+            <div className="text-center">
+              <span className="text-xs uppercase tracking-[0.3em] text-gold-dark font-bold font-montserrat">
+                Quinta Maria Teresa · Mesas
+              </span>
+              <h3 className="font-greatvibes text-4xl gold-text-gradient mt-1">
+                Sube tus Fotos de la Fiesta
+              </h3>
+            </div>
+
+            {/* QR Card Graphic */}
+            <div className="p-4 bg-white rounded-2xl shadow-xl border-4 border-gold/40 relative">
+              <svg width="170" height="170" viewBox="0 0 180 180" fill="none">
+                <rect width="180" height="180" fill="white" />
+                <path d="M10 10 H70 V70 H10 Z M20 20 V60 H60 V20 Z M30 30 H50 V50 H30 Z" fill="#2D1F38" />
+                <path d="M110 10 H170 V70 H110 Z M120 20 V60 H160 V20 Z M130 30 H150 V50 H130 Z" fill="#2D1F38" />
+                <path d="M10 110 H70 V170 H10 Z M20 120 V160 H60 V120 Z M30 130 H50 V150 H30 Z" fill="#2D1F38" />
+                <rect x="80" y="20" width="20" height="20" fill="#D4AF37" />
+                <rect x="80" y="80" width="20" height="20" fill="#2D1F38" />
+                <rect x="20" y="80" width="40" height="10" fill="#2D1F38" />
+                <rect x="120" y="90" width="40" height="20" fill="#D4AF37" />
+                <rect x="90" y="120" width="30" height="40" fill="#2D1F38" />
+                <rect x="140" y="130" width="30" height="30" fill="#2D1F38" />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-cream border-2 border-gold flex items-center justify-center font-cinzel text-gold-dark font-bold text-sm shadow-md">
+                  📸
+                </div>
+              </div>
+            </div>
+
+            <p className="text-xs font-montserrat text-text-sub font-medium">
+              Coloca este código en cada mesa para que los invitados escaneen directamente con su cámara y suban todas sus fotos a la carpeta de Krista Mariel.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                window.print()
+                onTriggerToast("Abriendo diálogo para imprimir cartel de mesa 🖨️")
+              }}
+              className="w-full py-3 rounded-2xl bg-gradient-to-r from-gold to-gold-dark text-text-main font-montserrat font-bold text-xs uppercase tracking-wider shadow-md hover:brightness-110 cursor-pointer"
+            >
+              Imprimir Cartel para Mesas 🖨️
+            </button>
+          </div>
+        </div>
+      )}
+    </section>
+  )
+}
+
 // ─── Dress Code & Gifts Section ─────────────────────────────────────────────────
 function DressGiftsSection({ onTriggerToast }: { onTriggerToast: (msg: string) => void }) {
   const copyClabe = () => {
@@ -2253,18 +3282,28 @@ function DressGiftsSection({ onTriggerToast }: { onTriggerToast: (msg: string) =
                 </div>
               </div>
 
-              <p className="font-montserrat text-xs text-text-sub leading-relaxed mb-5 font-medium">
+              <p className="font-montserrat text-xs text-text-sub leading-relaxed mb-4 font-medium">
                 Te pedimos acompañarnos con tu mejor atuendo de gala. Vestido largo para las damas y traje formal para los caballeros.
               </p>
 
-              <p className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark mb-3 font-bold">
-                Paleta Sugerida de Colores Pasteles & Dorado:
+              <div className="p-3.5 rounded-2xl border border-gold/40 bg-gold/10 mb-4 flex items-start gap-3">
+                <span className="text-xl shrink-0 mt-0.5">🎨</span>
+                <p className="text-xs font-montserrat text-text-main font-semibold leading-relaxed">
+                  <strong>¡Libertad de color para invitados!</strong> Puedes ir de <strong>cualquier color de tu elección</strong>, a excepción de los tonos reservados que vestirán la festejada, su hermana y la corte.
+                </p>
+              </div>
+
+              <p className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark mb-3 font-bold flex items-center gap-1.5">
+                <span>🚫</span> Tonos Exclusivos Reservados (Evitar en tu atuendo):
               </p>
-              <div className="flex flex-wrap justify-center sm:justify-start gap-3 mb-5">
-                {DRESS_PALETTE.map(({ color, label }) => (
+              <div className="flex flex-wrap justify-center sm:justify-start gap-3 mb-2">
+                {DRESS_RESERVED_COLORS.map(({ color, label, role }) => (
                   <div key={label} className="flex flex-col items-center gap-1">
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-gold shadow-md" style={{ backgroundColor: color }} />
-                    <span className="text-[9px] font-montserrat text-text-sub font-bold">{label}</span>
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-gold shadow-md relative flex items-center justify-center" style={{ backgroundColor: color }}>
+                      <span className="text-[10px] text-gray-500 font-bold opacity-60">✕</span>
+                    </div>
+                    <span className="text-[9px] font-montserrat text-text-sub font-bold text-center leading-tight">{label}</span>
+                    <span className="text-[8px] font-montserrat text-gold-dark font-medium">{role}</span>
                   </div>
                 ))}
               </div>
@@ -2273,7 +3312,7 @@ function DressGiftsSection({ onTriggerToast }: { onTriggerToast: (msg: string) =
             <div className="p-3.5 rounded-2xl border border-gold/40 bg-pastel-yellow/30 flex items-center gap-3">
               <span className="text-xl shrink-0">🦋</span>
               <p className="text-xs font-montserrat text-text-main font-semibold leading-snug">
-                El color blanco, marfil y vestuario con mariposas principales están reservados con cariño para la Quinceañera Krista Mariel.
+                El color blanco, marfil y vestuario con mariposas principales están reservados con especial cariño para Krista Mariel.
               </p>
             </div>
           </div>
@@ -2326,13 +3365,10 @@ function DressGiftsSection({ onTriggerToast }: { onTriggerToast: (msg: string) =
   )
 }
 
-// ─── Photo Gallery Section ─────────────────────────────────────────────────────
+// ─── Photo Gallery Section (Fotos Reales de Krista Mariel) ───────────────────
 function GallerySection() {
-  const [filter, setFilter] = useState<'all' | 'pre-xv' | 'decor'>('all')
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
-  const [likes, setLikes] = useState<Record<number, number>>({ 1: 215, 2: 189, 3: 240, 4: 176 })
-
-  const filtered = GALLERY_ITEMS.filter(item => filter === 'all' || item.category === filter)
+  const [likes, setLikes] = useState<Record<number, number>>({ 1: 245, 2: 218, 3: 262, 4: 289 })
 
   const handleLike = (id: number, e: React.MouseEvent) => {
     e.stopPropagation()
@@ -2343,34 +3379,17 @@ function GallerySection() {
     <section id="galeria" className="relative py-16 md:py-24 px-4 md:px-6">
       <div className="section-sep mb-16 md:mb-20" />
       <div className="max-w-5xl mx-auto">
-        <SectionHeader tag="Momentos Inolvidables" title="Galería de Krista Mariel" />
+        <SectionHeader tag="Momentos Inolvidables" title="Galería Oficial de Krista Mariel" />
+        <p className="text-center font-montserrat text-xs md:text-sm text-text-sub max-w-lg mx-auto -mt-4 mb-8 md:mb-10 font-medium">
+          Fotografías oficiales de la sesión de quince años de Krista Mariel.
+        </p>
 
-        <div className="flex flex-wrap justify-center gap-2 md:gap-3 mb-8 md:mb-10">
-          {[
-            { id: 'all', label: 'Todas las Fotos' },
-            { id: 'pre-xv', label: 'Sesión Pre-XV' },
-            { id: 'decor', label: 'Detalles & Mariposas' },
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setFilter(tab.id as 'all' | 'pre-xv' | 'decor')}
-              className={`px-4 md:px-5 py-2 rounded-full text-xs font-montserrat uppercase tracking-wider transition-all font-bold ${
-                filter === tab.id
-                  ? 'bg-gradient-to-r from-gold to-gold-dark text-text-main shadow-md'
-                  : 'glass-card text-text-sub hover:text-gold-dark border border-gold/30'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-          {filtered.map((item, idx) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          {GALLERY_ITEMS.map((item, idx) => (
             <div
               key={item.id}
               onClick={() => setLightboxIndex(idx)}
-              className={`relative ${item.aspect} rounded-3xl overflow-hidden glass-card glass-card-hover cursor-pointer group border-2 border-gold/30`}
+              className="relative aspect-[3/4] rounded-3xl overflow-hidden glass-card glass-card-hover cursor-pointer group border-2 border-gold/40 shadow-xl"
             >
               <img
                 src={item.src}
@@ -2378,10 +3397,10 @@ function GallerySection() {
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-cream/90 via-cream/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 md:p-6 flex flex-col justify-end">
-                <p className="font-playfair text-base md:text-lg text-text-main font-bold">{item.title}</p>
+              <div className="absolute inset-0 bg-gradient-to-t from-cream/95 via-cream/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-end">
+                <p className="font-playfair text-sm text-text-main font-bold leading-snug">{item.title}</p>
                 <div className="flex justify-between items-center mt-2">
-                  <span className="text-[9px] md:text-[10px] font-montserrat uppercase tracking-widest text-gold-dark font-bold">Ver Pantalla Completa</span>
+                  <span className="text-[8px] font-montserrat uppercase tracking-widest text-gold-dark font-bold">Ver Pantalla Completa</span>
                   <button
                     onClick={e => handleLike(item.id, e)}
                     className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/90 border border-gold/40 text-xs text-gold-dark font-bold shadow-sm"
@@ -2398,12 +3417,12 @@ function GallerySection() {
 
       {lightboxIndex !== null && (
         <div
-          className="fixed inset-0 z-50 bg-cream/95 backdrop-blur-2xl flex items-center justify-center p-3 sm:p-4"
+          className="fixed inset-0 z-50 bg-cream/95 backdrop-blur-2xl flex items-center justify-center p-3 sm:p-4 animate-fade-in"
           onClick={() => setLightboxIndex(null)}
         >
           <button
             onClick={() => setLightboxIndex(null)}
-            className="absolute top-4 right-4 w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-gold text-gold-dark text-lg md:text-xl flex items-center justify-center glass-card hover:bg-gold/20 z-10 font-bold"
+            className="absolute top-4 right-4 w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-gold text-gold-dark text-lg md:text-xl flex items-center justify-center glass-card hover:bg-gold/20 z-10 font-bold cursor-pointer"
           >
             ✕
           </button>
@@ -2413,18 +3432,18 @@ function GallerySection() {
             className="relative max-w-3xl max-h-[85vh] rounded-3xl overflow-hidden border-2 border-gold glass-card p-2 shadow-2xl"
           >
             <img
-              src={filtered[lightboxIndex].src}
-              alt={filtered[lightboxIndex].title}
+              src={GALLERY_ITEMS[lightboxIndex].src}
+              alt={GALLERY_ITEMS[lightboxIndex].title}
               className="max-h-[70vh] md:max-h-[75vh] w-auto rounded-2xl object-contain mx-auto"
             />
             <div className="p-3 md:p-4 flex justify-between items-center">
-              <p className="font-playfair text-base md:text-xl text-gold-dark font-bold">{filtered[lightboxIndex].title}</p>
+              <p className="font-playfair text-base md:text-xl text-gold-dark font-bold">{GALLERY_ITEMS[lightboxIndex].title}</p>
               <button
-                onClick={e => handleLike(filtered[lightboxIndex].id, e)}
+                onClick={e => handleLike(GALLERY_ITEMS[lightboxIndex].id, e)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gold bg-gold/15 text-gold-dark text-xs md:text-sm font-bold"
               >
                 <span>❤️</span>
-                <span>{likes[filtered[lightboxIndex].id]} Me Gusta</span>
+                <span>{likes[GALLERY_ITEMS[lightboxIndex].id]} Me Gusta</span>
               </button>
             </div>
           </div>
@@ -2953,6 +3972,397 @@ function KristaLetterSection() {
   )
 }
 
+// ─── Special Video Section (Cine VIP de Krista Mariel - Alta Performance) ──────
+function SpecialVideoSection({
+  onTriggerToast,
+  onTriggerBurst,
+}: {
+  onTriggerToast: (msg: string) => void
+  onTriggerBurst?: () => void
+}) {
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [isMuted, setIsMuted] = useState(false)
+  const [hasStarted, setHasStarted] = useState(false)
+  const [isEnded, setIsEnded] = useState(false)
+  const [isCinemaModalOpen, setIsCinemaModalOpen] = useState(false)
+  const [showControls, setShowControls] = useState(true)
+
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const modalVideoRef = useRef<HTMLVideoElement | null>(null)
+  const progressFillRef = useRef<HTMLDivElement | null>(null)
+  const timeDisplayRef = useRef<HTMLSpanElement | null>(null)
+  const hideControlsTimeout = useRef<number | null>(null)
+
+  const formatSec = (sec: number) => {
+    const s = Math.floor(sec)
+    const m = Math.floor(s / 60)
+    const rem = s % 60
+    return `${m}:${rem < 10 ? '0' : ''}${rem}`
+  }
+
+  const handlePlay = () => {
+    const video = videoRef.current
+    if (!video) return
+
+    // Pausar música de fondo y pausar el loop del canvas de mariposas para liberar 100% de CPU/GPU
+    window.dispatchEvent(new CustomEvent('pause-bg-music'))
+    window.dispatchEvent(new CustomEvent('pause-butterflies'))
+
+    if (onTriggerBurst && !hasStarted) {
+      onTriggerBurst()
+    }
+
+    video.play().then(() => {
+      setIsPlaying(true)
+      setHasStarted(true)
+      setIsEnded(false)
+      onTriggerToast("🎬 Reproduciendo Video Especial de Krista Mariel ✨")
+    }).catch(err => {
+      console.warn("Play error", err)
+    })
+  }
+
+  const handlePause = () => {
+    const video = videoRef.current
+    if (!video) return
+    video.pause()
+    setIsPlaying(false)
+    window.dispatchEvent(new CustomEvent('resume-bg-music'))
+    window.dispatchEvent(new CustomEvent('resume-butterflies'))
+  }
+
+  const togglePlay = () => {
+    if (isPlaying) {
+      handlePause()
+    } else {
+      handlePlay()
+    }
+  }
+
+  const handleEnded = () => {
+    setIsPlaying(false)
+    setIsEnded(true)
+    window.dispatchEvent(new CustomEvent('resume-bg-music'))
+    window.dispatchEvent(new CustomEvent('resume-butterflies'))
+    onTriggerToast("✨ ¡Gracias por disfrutar el video de Krista Mariel! 🦋")
+  }
+
+  // Actualización ultra-ligera sin re-renderizar React (Direct DOM update a 60fps)
+  const handleTimeUpdate = () => {
+    const video = videoRef.current
+    if (!video) return
+    const cur = video.currentTime
+    const dur = video.duration || 36
+    const pct = Math.min(100, (cur / dur) * 100)
+
+    if (progressFillRef.current) {
+      progressFillRef.current.style.width = `${pct}%`
+    }
+    if (timeDisplayRef.current) {
+      timeDisplayRef.current.textContent = `${formatSec(cur)} / ${formatSec(dur)}`
+    }
+  }
+
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const video = videoRef.current
+    if (!video) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    const clickX = e.clientX - rect.left
+    const pct = Math.max(0, Math.min(1, clickX / rect.width))
+    const targetTime = pct * (video.duration || 36)
+    video.currentTime = targetTime
+    if (progressFillRef.current) {
+      progressFillRef.current.style.width = `${pct * 100}%`
+    }
+    if (timeDisplayRef.current) {
+      timeDisplayRef.current.textContent = `${formatSec(targetTime)} / ${formatSec(video.duration || 36)}`
+    }
+  }
+
+  const toggleMute = () => {
+    const video = videoRef.current
+    if (video) {
+      const nextMuted = !isMuted
+      video.muted = nextMuted
+      setIsMuted(nextMuted)
+    }
+  }
+
+  const handleMouseMoveControls = () => {
+    if (!showControls) setShowControls(true)
+    if (hideControlsTimeout.current) clearTimeout(hideControlsTimeout.current)
+    if (isPlaying) {
+      hideControlsTimeout.current = window.setTimeout(() => {
+        setShowControls(false)
+      }, 3500)
+    }
+  }
+
+  const openCinemaModal = () => {
+    handlePause()
+    setIsCinemaModalOpen(true)
+    window.dispatchEvent(new CustomEvent('pause-bg-music'))
+    window.dispatchEvent(new CustomEvent('pause-butterflies'))
+  }
+
+  const closeCinemaModal = () => {
+    if (modalVideoRef.current) {
+      modalVideoRef.current.pause()
+    }
+    setIsCinemaModalOpen(false)
+    window.dispatchEvent(new CustomEvent('resume-bg-music'))
+    window.dispatchEvent(new CustomEvent('resume-butterflies'))
+  }
+
+  const shareVideo = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Video Especial de Quince Años · Krista Mariel',
+          text: '¡Mira el video especial de los Quince Años de Krista Mariel!',
+          url: window.location.href,
+        })
+      } catch (err) {
+        console.warn("Share cancelled", err)
+      }
+    } else {
+      navigator.clipboard.writeText(window.location.href)
+      onTriggerToast("¡Enlace de la invitación copiado para compartir! 📲")
+    }
+  }
+
+  return (
+    <section id="video-especial" className="relative py-16 md:py-24 px-4 md:px-6">
+      <div className="section-sep mb-16 md:mb-20" />
+      <div className="max-w-4xl mx-auto flex flex-col items-center">
+        <SectionHeader tag="Momento Estelar" title="Video Especial de Krista Mariel" />
+
+        <p className="font-playfair italic text-text-main text-center text-sm md:text-base max-w-xl -mt-6 mb-8 px-2 font-medium">
+          "Un instante irrepetible capturado en video, lleno de luz, emoción y la alegría de celebrar mis 15 años."
+        </p>
+
+        {/* Ambient Glow & Cinema Frame Container */}
+        <div className="relative w-full max-w-[350px] sm:max-w-[380px] mx-auto group">
+          {/* Hardware-Accelerated Ambient Backlight Glow */}
+          <div
+            className="absolute -inset-4 sm:-inset-6 rounded-[38px] bg-gradient-to-tr from-gold/30 via-[#FFE57F]/20 to-gold-dark/30 blur-xl pointer-events-none opacity-60 transform-gpu"
+            style={{ transform: 'translateZ(0)', willChange: 'opacity' }}
+          />
+
+          {/* Luxury Filigree Reel Container */}
+          <div
+            onMouseMove={handleMouseMoveControls}
+            className="relative w-full aspect-[9/16] rounded-3xl overflow-hidden border-2 border-gold/70 bg-[#120F0D] shadow-[0_20px_60px_-10px_rgba(212,175,55,0.4)] flex flex-col justify-between select-none"
+          >
+            {/* Ornate Gold Filigree Corner Accents */}
+            <div className="absolute top-2.5 left-2.5 w-6 h-6 border-t-2 border-l-2 border-gold pointer-events-none z-20" />
+            <div className="absolute top-2.5 right-2.5 w-6 h-6 border-t-2 border-r-2 border-gold pointer-events-none z-20" />
+            <div className="absolute bottom-2.5 left-2.5 w-6 h-6 border-b-2 border-l-2 border-gold pointer-events-none z-20" />
+            <div className="absolute bottom-2.5 right-2.5 w-6 h-6 border-b-2 border-r-2 border-gold pointer-events-none z-20" />
+
+            {/* Top VIP Reel Header Bar */}
+            <div className="relative z-20 p-3 sm:p-4 flex items-center justify-between bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-auto">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+                <span className="text-[9px] uppercase tracking-[0.25em] font-montserrat font-bold text-gold-light">
+                  {isPlaying ? 'EN REPRODUCCIÓN' : 'VIDEO EXCLUSIVO'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[9px] font-montserrat uppercase tracking-widest text-white/80 bg-white/10 px-2 py-0.5 rounded-full border border-gold/40 font-semibold">
+                  HD · 0:36
+                </span>
+                <button
+                  onClick={openCinemaModal}
+                  className="p-1 rounded-full text-gold-light hover:text-white transition-colors cursor-pointer"
+                  title="Ver en Modo Cine VIP"
+                >
+                  ⛶
+                </button>
+              </div>
+            </div>
+
+            {/* Hardware-Accelerated Video Element */}
+            <video
+              ref={videoRef}
+              src="/videos/krista_quinceanera_video.mp4"
+              poster="/images/krista_portrait_1.jpg"
+              playsInline
+              preload="auto"
+              style={{ transform: 'translateZ(0)', willChange: 'transform' }}
+              onTimeUpdate={handleTimeUpdate}
+              onEnded={handleEnded}
+              onClick={togglePlay}
+              className="absolute inset-0 w-full h-full object-cover cursor-pointer transform-gpu"
+            />
+
+            {/* Luxury Poster / Start Screen Overlay */}
+            {!hasStarted && (
+              <div
+                onClick={handlePlay}
+                className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-black/25 to-black/50 flex flex-col items-center justify-center p-6 text-center cursor-pointer group/overlay transition-all"
+              >
+                {/* Golden Animated Circular Play Button */}
+                <div className="relative my-auto flex items-center justify-center">
+                  <div className="absolute w-24 h-24 rounded-full bg-gold/30 blur-xl animate-pulse-glow" />
+                  <div className="w-20 h-20 rounded-full border-2 border-gold bg-gradient-to-tr from-gold-dark via-gold to-gold-light flex items-center justify-center shadow-2xl group-hover/overlay:scale-110 transition-transform active:scale-95 text-text-main">
+                    <svg className="w-8 h-8 ml-1 fill-current" viewBox="0 0 24 24">
+                      <polygon points="5 3 19 12 5 21 5 3" />
+                    </svg>
+                  </div>
+                </div>
+
+                <div className="mt-auto flex flex-col items-center gap-1 pb-4">
+                  <span className="text-xs uppercase tracking-[0.3em] font-montserrat text-gold-light font-bold">
+                    Toca para Reproducir
+                  </span>
+                  <p className="text-[10px] font-montserrat text-white/80 font-medium">
+                    (El vals se pausará automáticamente para escuchar el video 🎵)
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Finished Video Overlay */}
+            {isEnded && (
+              <div
+                onClick={handlePlay}
+                className="absolute inset-0 z-10 bg-black/85 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center animate-fade-in cursor-pointer"
+              >
+                <div className="w-16 h-16 rounded-full border-2 border-gold flex items-center justify-center text-3xl bg-gold/15 shadow-xl mb-3">
+                  🦋
+                </div>
+                <h4 className="font-greatvibes text-3xl gold-text-gradient mb-1">
+                  ¡Gracias por acompañarme!
+                </h4>
+                <p className="font-playfair italic text-xs text-white/90 max-w-xs mb-4">
+                  Nos vemos este 17 de Octubre en Quinta Maria Teresa para celebrar juntos.
+                </p>
+                <button
+                  onClick={e => { e.stopPropagation(); handlePlay(); }}
+                  className="px-5 py-2 rounded-full bg-gradient-to-r from-gold to-gold-dark text-text-main font-montserrat text-xs font-bold uppercase tracking-wider shadow-lg flex items-center gap-1.5 cursor-pointer hover:brightness-110"
+                >
+                  <span>🔄</span> Volver a ver
+                </button>
+              </div>
+            )}
+
+            {/* Bottom Cinema Controls Bar */}
+            <div
+              className={`relative z-20 p-3 sm:p-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent flex flex-col gap-2 transition-opacity duration-300 pointer-events-auto ${
+                hasStarted && !isEnded && showControls ? 'opacity-100' : hasStarted && !isEnded ? 'opacity-0 pointer-events-none' : 'opacity-100'
+              }`}
+            >
+              {/* Ultra-Smooth Zero-Re-Render Progress Bar */}
+              <div
+                onClick={handleProgressClick}
+                className="relative w-full h-2 bg-white/20 hover:h-2.5 rounded-full cursor-pointer overflow-hidden transition-all group/bar"
+                title="Avanzar o retroceder"
+              >
+                <div
+                  ref={progressFillRef}
+                  className="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-gold-light via-gold to-gold-dark rounded-full transition-none w-0"
+                />
+              </div>
+
+              {/* Controls and Timer Row */}
+              <div className="flex items-center justify-between text-white text-xs">
+                <div className="flex items-center gap-2.5">
+                  <button
+                    onClick={togglePlay}
+                    className="w-8 h-8 rounded-full border border-gold/60 bg-gold/20 flex items-center justify-center text-gold-light hover:bg-gold/40 transition-colors cursor-pointer"
+                    title={isPlaying ? "Pausar" : "Reproducir"}
+                  >
+                    {isPlaying ? '⏸' : '▶'}
+                  </button>
+
+                  <button
+                    onClick={toggleMute}
+                    className="text-white/80 hover:text-white transition-colors cursor-pointer"
+                    title={isMuted ? "Activar Audio" : "Silenciar Audio"}
+                  >
+                    {isMuted ? '🔇' : '🔊'}
+                  </button>
+
+                  <span ref={timeDisplayRef} className="text-[10px] font-montserrat font-semibold text-white/90">
+                    0:00 / 0:36
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={openCinemaModal}
+                    className="px-2.5 py-1 rounded-full bg-white/10 border border-gold/40 text-[9px] font-montserrat uppercase tracking-wider text-gold-light font-bold hover:bg-gold/25 transition-all flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>🎬</span> Modo Cine
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Action Badges Under Video */}
+        <div className="mt-6 flex flex-wrap justify-center gap-3 w-full max-w-md">
+          <button
+            onClick={openCinemaModal}
+            className="px-5 py-2.5 rounded-full glass-card border border-gold/50 text-gold-dark text-xs font-montserrat font-bold flex items-center gap-2 shadow-sm hover:scale-105 active:scale-95 transition-all cursor-pointer"
+          >
+            <span>🎬</span> Pantalla Completa VIP
+          </button>
+          <button
+            onClick={shareVideo}
+            className="px-5 py-2.5 rounded-full glass-card border border-gold/50 text-gold-dark text-xs font-montserrat font-bold flex items-center gap-2 shadow-sm hover:scale-105 active:scale-95 transition-all cursor-pointer"
+          >
+            <span>📲</span> Compartir con Familia
+          </button>
+        </div>
+      </div>
+
+      {/* Full-Screen Cinema VIP Theater Modal */}
+      {isCinemaModalOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center p-3 sm:p-6 animate-fade-in"
+          onClick={closeCinemaModal}
+        >
+          {/* Close Cinema Button */}
+          <button
+            onClick={closeCinemaModal}
+            className="fixed top-4 right-4 z-[60] px-4 py-2.5 rounded-full border-2 border-gold/70 bg-black/80 backdrop-blur-md text-gold-light text-xs uppercase tracking-widest font-montserrat font-bold hover:bg-gold/20 flex items-center gap-2 shadow-2xl cursor-pointer"
+          >
+            <span>✕</span> Cerrar Cine VIP
+          </button>
+
+          <div
+            onClick={e => e.stopPropagation()}
+            className="relative w-full max-w-sm sm:max-w-md aspect-[9/16] rounded-3xl overflow-hidden border-2 border-gold shadow-[0_0_80px_rgba(212,175,55,0.4)] bg-black flex flex-col"
+          >
+            <video
+              ref={modalVideoRef}
+              src="/videos/krista_quinceanera_video.mp4"
+              controls
+              autoPlay
+              playsInline
+              preload="auto"
+              style={{ transform: 'translateZ(0)', willChange: 'transform' }}
+              className="w-full h-full object-cover transform-gpu"
+            />
+          </div>
+
+          <div className="mt-4 text-center">
+            <p className="font-greatvibes text-2xl sm:text-3xl gold-text-gradient">
+              XV Años de Krista Mariel
+            </p>
+            <p className="text-[10px] uppercase tracking-widest font-montserrat text-gold/80 font-bold">
+              17 de Octubre, 2026 · Quinta Maria Teresa
+            </p>
+          </div>
+        </div>
+      )}
+    </section>
+  )
+}
+
 // ─── Virtual Hugs Counter Component ───────────────────────────────────────────
 function VirtualHugsSection({ onTriggerSwarm, onTriggerToast }: { onTriggerSwarm: () => void; onTriggerToast: (msg: string) => void }) {
   const [hugs, setHugs] = useState(384)
@@ -3295,6 +4705,7 @@ function ARCameraModal({ isOpen, onClose, onTriggerToast }: { isOpen: boolean; o
 // ─── Navbar Component with Clean Luxury Design & Options Popover ───────────────
 function Navbar({
   onOpenEnvelope,
+  onOpenIntroVideo,
   onOpenQR,
   onOpenCamera,
   isNightMode,
@@ -3304,6 +4715,7 @@ function Navbar({
   onSpeakDetails,
 }: {
   onOpenEnvelope: () => void
+  onOpenIntroVideo?: () => void
   onOpenQR: () => void
   onOpenCamera: () => void
   isNightMode: boolean
@@ -3335,6 +4747,7 @@ function Navbar({
 
   const mainNavLinks = [
     { href: '#inicio', label: 'Inicio' },
+    { href: '#video-especial', label: 'Video Especial' },
     { href: '#padres', label: 'Familia' },
     { href: '#itinerario', label: 'Protocolo' },
     { href: '#coordinacion-outfits', label: 'Outfits' },
@@ -3344,6 +4757,7 @@ function Navbar({
 
   const allNavLinks = [
     { href: '#inicio', label: 'Inicio' },
+    { href: '#video-especial', label: 'Video Especial 🎬' },
     { href: '#padres', label: 'Familia' },
     { href: '#itinerario', label: 'Protocolo' },
     { href: '#coordinacion-outfits', label: 'Outfits' },
@@ -3352,6 +4766,7 @@ function Navbar({
     { href: '#galeria', label: 'Galería' },
     { href: '#linea-tiempo', label: 'Historia' },
     { href: '#marco-foto', label: 'Marco Stories' },
+    { href: '#muro-fotos', label: 'Muro de Fotos 📸' },
     { href: '#deseos', label: 'Deseos' },
     { href: '#playlist', label: 'DJ Playlist' },
     { href: '#rsvp', label: 'RSVP' },
@@ -3410,6 +4825,20 @@ function Navbar({
                 </p>
 
                 <button
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('open-music-selector'))
+                    setOptionsOpen(false)
+                  }}
+                  className="flex items-center gap-3 p-2 rounded-xl hover:bg-gold/15 transition-colors text-left text-xs font-montserrat font-bold text-text-main"
+                >
+                  <span className="w-7 h-7 rounded-lg border border-gold/40 flex items-center justify-center bg-gold/10 text-gold-dark">🎵</span>
+                  <div>
+                    <div>Elegir Melodía de Fondo</div>
+                    <div className="text-[10px] text-text-sub font-normal">Vals, Piano Romántico o Arpa</div>
+                  </div>
+                </button>
+
+                <button
                   onClick={() => { onToggleFontScale(); setOptionsOpen(false); }}
                   className="flex items-center gap-3 p-2 rounded-xl hover:bg-gold/15 transition-colors text-left text-xs font-montserrat font-bold text-text-main"
                 >
@@ -3463,6 +4892,19 @@ function Navbar({
                     <div className="text-[10px] text-text-sub font-normal">Enviar invitación fácil</div>
                   </div>
                 </button>
+
+                {onOpenIntroVideo && (
+                  <button
+                    onClick={() => { onOpenIntroVideo(); setOptionsOpen(false); }}
+                    className="flex items-center gap-3 p-2 rounded-xl hover:bg-gold/15 transition-colors text-left text-xs font-montserrat font-bold text-text-main"
+                  >
+                    <span className="w-7 h-7 rounded-lg border border-gold/40 flex items-center justify-center bg-gold/10 text-gold-dark">🎬</span>
+                    <div>
+                      <div>Ver Video de Inicio</div>
+                      <div className="text-[10px] text-text-sub font-normal">Repetir video introductorio</div>
+                    </div>
+                  </button>
+                )}
 
                 <button
                   onClick={() => { onOpenEnvelope(); setOptionsOpen(false); }}
@@ -3521,7 +4963,8 @@ function Navbar({
 
 // ─── Main Application Component ───────────────────────────────────────────────
 export default function App() {
-  const [envelopeOpen, setEnvelopeOpen] = useState(true)
+  const [introVideoOpen, setIntroVideoOpen] = useState(true)
+  const [envelopeOpen, setEnvelopeOpen] = useState(false)
   const [qrOpen, setQrOpen] = useState(false)
   const [cameraOpen, setCameraOpen] = useState(false)
   const [isNightMode, setIsNightMode] = useState(false)
@@ -3614,6 +5057,13 @@ export default function App() {
     }
   }
 
+  const handleFinishIntroVideo = () => {
+    setIntroVideoOpen(false)
+    setEnvelopeOpen(true)
+    triggerExplosiveBurst()
+    setToastMessage("💌 ¡Toca la mariposa dorada para abrir tu sobre oficial! 🦋")
+  }
+
   const handleCloseEnvelope = () => {
     setEnvelopeOpen(false)
     if (playTriggerRef.current) {
@@ -3661,6 +5111,13 @@ export default function App() {
         </button>
       </div>
 
+      {/* Intro Cinema Video Modal (Se muestra primero al entrar) */}
+      <IntroVideoModal
+        isOpen={introVideoOpen}
+        onFinish={handleFinishIntroVideo}
+        onTriggerBurst={triggerExplosiveBurst}
+      />
+
       {/* Interactive Envelope Entrance Modal with Explosive Butterfly Burst */}
       <EnvelopeModal
         isOpen={envelopeOpen}
@@ -3680,7 +5137,14 @@ export default function App() {
 
       {/* Navigation */}
       <Navbar
-        onOpenEnvelope={() => setEnvelopeOpen(true)}
+        onOpenEnvelope={() => {
+          setIntroVideoOpen(false)
+          setEnvelopeOpen(true)
+        }}
+        onOpenIntroVideo={() => {
+          setEnvelopeOpen(false)
+          setIntroVideoOpen(true)
+        }}
         onOpenQR={() => setQrOpen(true)}
         onOpenCamera={() => setCameraOpen(true)}
         isNightMode={isNightMode}
@@ -3694,14 +5158,14 @@ export default function App() {
       <PostPartyThanksBanner isManualPostParty={false} />
 
       {/* Floating Wish Butterflies (Max 2 glass bubbles) */}
-      <FloatingWishButterflies wishes={INITIAL_WISHES} />
+      <FloatingWishButterflies />
 
       {/* Main Sections */}
       <main className="relative z-20">
         <HeroSection onTriggerToast={setToastMessage} />
         <ParentsSection />
         <KristaLetterSection />
-        <BeforeAfterSlider />
+        <SpecialVideoSection onTriggerToast={setToastMessage} onTriggerBurst={triggerExplosiveBurst} />
         <VirtualCheersSection onTriggerSwarm={handleRSVPSubmitWithConfetti} onTriggerToast={setToastMessage} />
         <VirtualHugsSection onTriggerSwarm={handleRSVPSubmitWithConfetti} onTriggerToast={setToastMessage} />
         <ItinerarySection onTriggerToast={setToastMessage} />
@@ -3714,6 +5178,7 @@ export default function App() {
         <TimelineSection />
         <TimeCapsuleSection onTriggerToast={setToastMessage} />
         <PhotoFrameCreator onTriggerToast={setToastMessage} />
+        <LivePhotoWallSection onTriggerToast={setToastMessage} onTriggerBurst={triggerExplosiveBurst} />
         <WishbookSection onTriggerSwarm={handleRSVPSubmitWithConfetti} onTriggerToast={setToastMessage} />
         <DJPlaylistSection onTriggerToast={setToastMessage} />
         <RSVPSection onTriggerSwarm={handleRSVPSubmitWithConfetti} />
