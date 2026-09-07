@@ -5,10 +5,10 @@ const QUINCE_NAME = "Krista Mariel"
 const QUINCE_FULL_NAME = "Krista Mariel Sandoval Caldera"
 const EVENT_DATE = new Date('2026-10-17T13:00:00') // 17 de Octubre, 2026 a la 1:00 PM
 const BIRTHDAY_DATE = "15 de Octubre"
-const FATHER_NAME = "Carlos Alberto Sandoval"
-const MOTHER_NAME = "Elena Isabel Caldera"
-const GODFATHER_NAME = "Roberto Antonio Silva"
-const GODMOTHER_NAME = "Lucía Patricia Caldera"
+const FATHER_NAME = "Roberto Sandoval Santoyo"
+const MOTHER_NAME = "María Gabriela Caldera Arroyo"
+const GODMOTHER_NAME = "Lola Carlos"
+const GODFATHER_NAME = "Saúl Sandoval Santoyo"
 
 const CHURCH_TIME = "1:00 PM - 2:00 PM"
 const CHURCH_NAME = "Parroquia Nuestra Señora del Carmen"
@@ -16,8 +16,8 @@ const CHURCH_ADDRESS = "Calle Principal #123, Centro Histórico"
 const CHURCH_MAPS = "https://maps.google.com/?q=Parroquia+Nuestra+Señora+del+Carmen"
 
 const VENUE_TIME = "3:00 PM"
-const VENUE_NAME = "Quinta Maria Teresa"
-const VENUE_ADDRESS = "Quinta Maria Teresa"
+const VENUE_NAME = "Salón Quinta María Teresa"
+const VENUE_ADDRESS = "Salón Quinta María Teresa"
 const VENUE_MAPS = "https://maps.google.com/?q=Quinta+Maria+Teresa"
 
 const WHATSAPP_PHONE = "5212345678901" // Reemplazar con el número real de WhatsApp
@@ -602,7 +602,7 @@ function speakEventDetails(onTriggerToast: (msg: string) => void) {
     return
   }
   window.speechSynthesis.cancel()
-  const text = `¡Hola! Te invitamos cordialmente a celebrar los Quince Años de Krista Mariel Sandoval Caldera. La ceremonia religiosa de acción de gracias se llevará a cabo el sábado 17 de Octubre a la 1:00 de la tarde en la Parroquia Nuestra Señora del Carmen. La gran fiesta de recepción comenzará a las 3:00 de la tarde en la Quinta María Teresa. ¡Te esperamos para compartir juntos este día inolvidable!`
+  const text = `¡Hola! Con la bendición de Dios y el amor de sus padres Roberto Sandoval Santoyo y María Gabriela Caldera Arroyo, y sus padrinos Lola Carlos y Saúl Sandoval Santoyo, te invitamos con gran alegría a celebrar los Quince Años de Krista Mariel Sandoval Caldera. La ceremonia religiosa será el sábado 17 de Octubre a la 1:00 de la tarde en la Parroquia Nuestra Señora del Carmen. La recepción y comida iniciarán a las 3:00 de la tarde en el Salón Quinta María Teresa, seguido de Mariachi y Grupo Versátil. ¡Gracias por formar parte de este momento tan especial!`
 
   const utterance = new SpeechSynthesisUtterance(text)
   utterance.lang = 'es-MX'
@@ -2168,8 +2168,8 @@ function ParentsSection() {
                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="#9A7B38" strokeWidth="1.8" fill="none" />
               </svg>
             </div>
-            <p className="text-[10px] md:text-xs uppercase tracking-[0.25em] md:tracking-[0.3em] font-montserrat text-gold-dark font-bold">
-              Con la bendición de mis Padres
+            <p className="text-[11px] md:text-xs uppercase tracking-[0.3em] font-montserrat text-gold-dark font-bold flex items-center gap-1.5">
+              <span>MIS PADRES</span> <span className="text-gold-dark">♡</span>
             </p>
             <h3 className="font-playfair text-xl md:text-2xl text-text-main font-bold">
               {FATHER_NAME}
@@ -2186,15 +2186,15 @@ function ParentsSection() {
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="#9A7B38" strokeWidth="1.8" fill="none" />
               </svg>
             </div>
-            <p className="text-[10px] md:text-xs uppercase tracking-[0.25em] md:tracking-[0.3em] font-montserrat text-gold-dark font-bold">
-              Mis Queridos Padrinos
+            <p className="text-[11px] md:text-xs uppercase tracking-[0.3em] font-montserrat text-gold-dark font-bold flex items-center gap-1.5">
+              <span>MIS PADRINOS</span> <span className="text-gold-dark">♡</span>
             </p>
             <h3 className="font-playfair text-xl md:text-2xl text-text-main font-bold">
-              {GODFATHER_NAME}
+              {GODMOTHER_NAME}
             </h3>
             <span className="text-gold-dark font-greatvibes text-2xl md:text-3xl">&</span>
             <h3 className="font-playfair text-xl md:text-2xl text-text-main font-bold">
-              {GODMOTHER_NAME}
+              {GODFATHER_NAME}
             </h3>
           </div>
         </div>
@@ -2358,6 +2358,50 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
       <div className="section-sep mb-16 md:mb-20" />
       <div className="max-w-4xl mx-auto">
         <SectionHeader tag="Protocolo Oficial" title="Itinerario de Mis XV Años" />
+
+        {/* Exact Printed Card Timeline Strip */}
+        <div className="glass-card p-6 md:p-8 rounded-3xl border-2 border-gold/50 shadow-2xl mb-10 text-center bg-gradient-to-b from-cream via-cream/90 to-pastel-beige/40">
+          <p className="text-[10px] uppercase tracking-[0.3em] font-montserrat text-gold-dark font-bold mb-4 flex items-center justify-center gap-2">
+            <span>🦋</span> SÁBADO 17 DE OCTUBRE, 2026 <span>🦋</span>
+          </p>
+
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 md:gap-4 py-3 border-y border-gold/30 my-2">
+            <div className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white/50 border border-gold/30 shadow-sm">
+              <span className="text-3xl">⛪</span>
+              <span className="font-playfair text-gold-dark font-bold text-sm md:text-base">1:00 PM</span>
+              <span className="text-[10px] uppercase tracking-wider font-montserrat font-bold text-text-main">Misa</span>
+            </div>
+
+            <div className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white/50 border border-gold/30 shadow-sm">
+              <span className="text-3xl">🥂</span>
+              <span className="font-playfair text-gold-dark font-bold text-sm md:text-base">3:00 PM</span>
+              <span className="text-[10px] uppercase tracking-wider font-montserrat font-bold text-text-main">Recepción</span>
+            </div>
+
+            <div className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white/50 border border-gold/30 shadow-sm">
+              <span className="text-3xl">🍽️</span>
+              <span className="font-playfair text-gold-dark font-bold text-sm md:text-base">3:00 PM</span>
+              <span className="text-[10px] uppercase tracking-wider font-montserrat font-bold text-text-main">Comida</span>
+            </div>
+
+            <div className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white/50 border border-gold/30 shadow-sm">
+              <span className="text-3xl">🎺</span>
+              <span className="font-playfair text-gold-dark font-bold text-sm md:text-base">4:00 PM</span>
+              <span className="text-[10px] uppercase tracking-wider font-montserrat font-bold text-text-main">Mariachi</span>
+            </div>
+
+            <div className="col-span-2 sm:col-span-1 flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white/50 border border-gold/30 shadow-sm">
+              <span className="text-3xl">🪩</span>
+              <span className="font-playfair text-gold-dark font-bold text-sm md:text-base">Después</span>
+              <span className="text-[10px] uppercase tracking-wider font-montserrat font-bold text-text-main">Grupo Versátil</span>
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-col sm:flex-row items-center justify-center gap-1.5">
+            <span className="text-xs uppercase tracking-[0.25em] font-montserrat text-gold-dark font-bold">SALÓN</span>
+            <h4 className="font-greatvibes text-3xl md:text-4xl text-gold-dark font-bold">Quinta María Teresa</h4>
+          </div>
+        </div>
 
         <div className="flex flex-col gap-4 md:gap-6 relative">
           {events.map((ev) => (
@@ -3319,45 +3363,115 @@ function DressGiftsSection({ onTriggerToast }: { onTriggerToast: (msg: string) =
 
           <div className="glass-card glass-card-hover p-6 md:p-8 rounded-3xl flex flex-col justify-between gap-5 border-2 border-gold/40">
             <div>
-              <div className="flex items-center gap-3 md:gap-4 mb-4">
-                <div className="w-12 h-12 rounded-full border-2 border-gold flex items-center justify-center text-2xl bg-gold/10 shrink-0">
+              <div className="flex items-center gap-3 md:gap-4 mb-3">
+                <div className="w-12 h-12 rounded-full border-2 border-gold flex items-center justify-center text-2xl bg-gold/10 shrink-0 shadow-inner">
                   🎁
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">Mesa de Regalos</p>
-                  <h3 className="font-playfair text-xl md:text-2xl text-text-main font-bold">Lluvia de Sobres</h3>
+                  <p className="text-[10px] uppercase tracking-[0.3em] font-montserrat text-gold-dark font-bold">Detalle con Cariño</p>
+                  <h3 className="font-playfair text-xl md:text-2xl text-text-main font-bold">Regalos Opcionales</h3>
                 </div>
               </div>
 
-              <p className="font-montserrat text-xs text-text-sub leading-relaxed mb-5 font-medium">
-                Tu presencia en este día tan especial es mi mayor regalo. Si deseas hacerme un presente en efectivo, contaremos con un buzón para lluvia de sobres en el evento o puedes realizar una transferencia:
+              <p className="font-montserrat text-xs md:text-sm text-text-sub leading-relaxed mb-5 font-medium">
+                Tu presencia es mi mejor regalo, pero si deseas tener un detalle conmigo, puedes hacerlo a través de:
               </p>
 
-              <div className="p-4 md:p-5 rounded-2xl border border-gold/40 bg-cream flex flex-col gap-2.5 shadow-sm">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-montserrat text-text-sub font-semibold">Banco:</span>
-                  <span className="font-playfair font-bold text-text-main">{BANK_NAME}</span>
+              {/* The 3 Official Gift Channels from Printed Card */}
+              <div className="grid grid-cols-1 gap-3 mb-4">
+                {/* 1. Liverpool Gift Registry */}
+                <div className="p-3.5 rounded-2xl border-2 border-[#D80075]/30 bg-white/60 hover:bg-[#D80075]/5 transition-all flex items-center justify-between gap-3 shadow-sm">
+                  <div className="flex items-center gap-3 min-w-0">
+                    {/* Liverpool official geometric ribbon logo */}
+                    <div className="w-10 h-10 rounded-xl bg-[#D80075] flex items-center justify-center p-2 shrink-0 shadow-sm">
+                      <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+                        <path d="M20 20 H80 V80 H20 Z" stroke="white" strokeWidth="12" fill="none" />
+                        <path d="M35 35 H65 V65 H35 Z" stroke="white" strokeWidth="10" fill="none" />
+                      </svg>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-montserrat font-bold text-xs uppercase tracking-wider text-[#D80075]">
+                        Mesa de Regalos Liverpool
+                      </p>
+                      <p className="text-[10px] font-montserrat text-text-sub truncate">
+                        Evento: Krista Mariel Sandoval Caldera
+                      </p>
+                    </div>
+                  </div>
+                  <a
+                    href="https://mesaderegalos.liverpool.com.mx/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3 py-1.5 rounded-xl bg-[#D80075] text-white text-[10px] font-montserrat font-bold uppercase tracking-wider hover:brightness-110 active:scale-95 transition-all shrink-0"
+                  >
+                    Ver Mesa 🛍️
+                  </a>
                 </div>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-montserrat text-text-sub font-semibold">Beneficiario:</span>
-                  <span className="font-playfair font-bold text-text-main">{BANK_BENEFICIARY}</span>
+
+                {/* 2. Sobre (Lluvia de sobres y transferencia) */}
+                <div className="p-3.5 rounded-2xl border border-gold/40 bg-white/60 flex flex-col gap-2.5 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-xl">✉️</span>
+                      <div>
+                        <p className="font-montserrat font-bold text-xs uppercase tracking-wider text-gold-dark">
+                          Sobre
+                        </p>
+                        <p className="text-[10px] font-montserrat text-text-sub">
+                          Buzón en el salón o transferencia digital
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-montserrat font-bold text-gold-dark bg-gold/15 px-2 py-0.5 rounded-full border border-gold/30">
+                      Tradicional
+                    </span>
+                  </div>
+
+                  {/* Bank info box */}
+                  <div className="p-3 rounded-xl bg-cream border border-gold/30 flex flex-col gap-1.5 text-[11px]">
+                    <div className="flex justify-between">
+                      <span className="text-text-sub font-semibold">Banco:</span>
+                      <span className="font-bold text-text-main">{BANK_NAME}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-text-sub font-semibold">Beneficiario:</span>
+                      <span className="font-bold text-text-main">{BANK_BENEFICIARY}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-text-sub font-semibold">CLABE:</span>
+                      <span className="font-mono font-bold text-gold-dark">{BANK_CLABE}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={copyClabe}
+                      className="mt-1 py-1.5 rounded-lg border border-gold/40 bg-gold/15 hover:bg-gold/25 text-gold-dark text-[10px] font-montserrat font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                    >
+                      Copiar CLABE Bancaria 📋
+                    </button>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-montserrat text-text-sub font-semibold">CLABE:</span>
-                  <span className="font-playfair font-bold text-gold-dark tracking-wider text-[11px] sm:text-xs">{BANK_CLABE}</span>
+
+                {/* 3. Lo que gustes */}
+                <div className="p-3.5 rounded-2xl border border-gold/30 bg-white/60 flex items-center gap-3 shadow-sm">
+                  <span className="text-2xl text-gold-dark">♡</span>
+                  <div>
+                    <p className="font-montserrat font-bold text-xs uppercase tracking-wider text-text-main">
+                      Lo que gustes
+                    </p>
+                    <p className="text-[10px] font-montserrat text-text-sub">
+                      Cualquier detalle o muestra de cariño que desees brindar
+                    </p>
+                  </div>
                 </div>
-                <button
-                  onClick={copyClabe}
-                  className="mt-2 py-2.5 rounded-xl border border-gold/50 bg-gold/15 hover:bg-gold/25 text-gold-dark text-xs font-montserrat font-bold transition-colors"
-                >
-                  Copiar CLABE Bancaria
-                </button>
               </div>
             </div>
 
-            <p className="text-center text-[11px] font-playfair italic text-text-sub mt-2 font-medium">
-              "Cualquier detalle será atesorado en mi corazón por siempre."
-            </p>
+            <div className="text-center pt-2 border-t border-gold/20 flex flex-col items-center gap-1">
+              <p className="text-xs font-playfair italic text-text-main font-semibold">
+                "Gracias por formar parte de este momento tan especial."
+              </p>
+              <span className="text-sm text-gold-dark">♡</span>
+            </div>
           </div>
         </div>
       </div>
@@ -4460,13 +4574,13 @@ function VIPPassSection({ onTriggerToast }: { onTriggerToast: (msg: string) => v
     ctx.fillStyle = '#2E6B34'
     ctx.font = 'bold 14px "Montserrat", sans-serif'
     ctx.fillText(`INVITADO(A): ${guestName.toUpperCase()}`, 50, 145)
-    ctx.fillText(`PASES CONFIRMADOR: ${passCount} PERSONA(S)`, 50, 175)
+    ctx.fillText(`PASES CONFIRMADOS: ${passCount} PERSONA(S)`, 50, 175)
 
     ctx.fillStyle = '#6E531E'
     ctx.font = '12px "Montserrat", sans-serif'
     ctx.fillText('📅 SÁBADO 17 DE OCTUBRE, 2026', 50, 225)
     ctx.fillText('⛪ MISA: 1:00 PM · PARROQUIA NTRA. SRA. DEL CARMEN', 50, 250)
-    ctx.fillText('📍 RECEPCIÓN: 3:00 PM · QUINTA MARIA TERESA', 50, 275)
+    ctx.fillText('📍 RECEPCIÓN: 3:00 PM · SALÓN QUINTA MARÍA TERESA', 50, 275)
 
     // Monogram Stamp
     ctx.fillStyle = '#D4AF37'
