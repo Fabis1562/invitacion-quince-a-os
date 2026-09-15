@@ -256,17 +256,21 @@ body.night-mode img {
   animation: toast-in 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
 }
 
-/* ─── Scroll Reveal Animations ─── */
+/* ─── Scroll Reveal Animations & Anchor Margins ─── */
+section[id] {
+  scroll-margin-top: 5rem;
+}
+
 .reveal-on-scroll {
   opacity: 0;
-  transform: translateY(35px);
-  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(24px);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
 .reveal-visible {
-  opacity: 1;
-  transform: translateY(0);
+  opacity: 1 !important;
+  transform: translateY(0) !important;
 }
 
 /* ─── Accessibility & Font Scale Modes ─── */
