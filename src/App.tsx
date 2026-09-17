@@ -68,10 +68,13 @@ const DRESS_RESERVED_COLORS = [
 
 // ─── Photo Gallery Data (Fotos Reales de Krista Mariel) ───────────────────────
 const GALLERY_ITEMS = [
+  // Sesión XV Años
   {
     id: 1,
     category: "pre-xv",
+    categoryLabel: "Sesión XV Años",
     title: "Retrato Sonriente de Krista Mariel",
+    subtitle: "Sesión Oficial XV Años",
     src: "/images/krista_portrait_1.jpg",
     aspect: "aspect-[3/4]",
     likes: 245,
@@ -79,7 +82,9 @@ const GALLERY_ITEMS = [
   {
     id: 2,
     category: "pre-xv",
+    categoryLabel: "Sesión XV Años",
     title: "Tarde Mágica en el Jardín",
+    subtitle: "Sesión Oficial XV Años",
     src: "/images/krista_sitting_garden.png",
     aspect: "aspect-[4/3]",
     likes: 218,
@@ -87,7 +92,9 @@ const GALLERY_ITEMS = [
   {
     id: 3,
     category: "pre-xv",
+    categoryLabel: "Sesión XV Años",
     title: "Rosas Amarillas & Ilusión",
+    subtitle: "Sesión Oficial XV Años",
     src: "/images/krista_yellow_roses.jpg",
     aspect: "aspect-[3/4]",
     likes: 262,
@@ -95,10 +102,53 @@ const GALLERY_ITEMS = [
   {
     id: 4,
     category: "pre-xv",
+    categoryLabel: "Sesión XV Años",
     title: "Globo Mariposa · 17.10.2026",
+    subtitle: "Sesión Oficial XV Años",
     src: "/images/krista_butterfly_balloon.jpg",
     aspect: "aspect-[3/4]",
     likes: 289,
+  },
+  // Baúl de Recuerdos e Infancia
+  {
+    id: 5,
+    category: "infancia",
+    categoryLabel: "Baúl de Recuerdos",
+    title: "El Ángel que Llegó a Nuestras Vidas",
+    subtitle: "Recién Nacida · Octubre 2011",
+    src: "/images/krista_bebe_amarillo_durmiendo.jpg",
+    aspect: "aspect-[4/3]",
+    likes: 312,
+  },
+  {
+    id: 6,
+    category: "infancia",
+    categoryLabel: "Baúl de Recuerdos",
+    title: "Ternura y Dulzura Infinita",
+    subtitle: "Primeros Meses · Krista Mariel",
+    src: "/images/krista_bebe_primeros_meses.png",
+    aspect: "aspect-[16/9]",
+    likes: 295,
+  },
+  {
+    id: 7,
+    category: "infancia",
+    categoryLabel: "Baúl de Recuerdos",
+    title: "Sonrisas y Caritas Pizpiretas",
+    subtitle: "Collage Tierno con Gorrito Rosa",
+    src: "/images/krista_bebe_gorrito_rosa.jpg",
+    aspect: "aspect-[4/3]",
+    likes: 340,
+  },
+  {
+    id: 8,
+    category: "infancia",
+    categoryLabel: "Baúl de Recuerdos",
+    title: "La Alegría de Crecer Feliz",
+    subtitle: "Primeros Años · Sonrisa Radiante",
+    src: "/images/krista_infancia_sonrisa.png",
+    aspect: "aspect-[4/3]",
+    likes: 358,
   },
 ]
 
@@ -4160,43 +4210,112 @@ function DressGiftsSection({ onTriggerToast }: { onTriggerToast: (msg: string) =
 
 // ─── Photo Gallery Section (Fotos Reales de Krista Mariel) ───────────────────
 function GallerySection() {
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
-  const [likes, setLikes] = useState<Record<number, number>>({ 1: 245, 2: 218, 3: 262, 4: 289 })
+  const [selectedCategory, setSelectedCategory] = useState<'all' | 'pre-xv' | 'infancia'>('all')
+  const [lightboxItem, setLightboxItem] = useState<(typeof GALLERY_ITEMS)[0] | null>(null)
+  const [likes, setLikes] = useState<Record<number, number>>({
+    1: 245,
+    2: 218,
+    3: 262,
+    4: 289,
+    5: 312,
+    6: 295,
+    7: 340,
+    8: 358,
+  })
 
   const handleLike = (id: number, e: React.MouseEvent) => {
     e.stopPropagation()
     setLikes(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }))
   }
 
+  const filteredItems = selectedCategory === 'all'
+    ? GALLERY_ITEMS
+    : GALLERY_ITEMS.filter(item => item.category === selectedCategory)
+
   return (
     <section id="galeria" className="relative py-16 md:py-24 px-4 md:px-6">
       <div className="section-sep mb-16 md:mb-20" />
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <SectionHeader tag="Momentos Inolvidables" title="Galería Oficial de Krista Mariel" />
-        <p className="text-center font-montserrat text-xs md:text-sm text-text-sub max-w-lg mx-auto -mt-4 mb-8 md:mb-10 font-medium">
-          Fotografías oficiales de la sesión de quince años de Krista Mariel.
+        <p className="text-center font-montserrat text-xs md:text-sm text-text-sub max-w-xl mx-auto -mt-4 mb-8 md:mb-10 font-medium">
+          Revive cada sonrisa: desde sus recuerdos más tiernos de bebé e infancia hasta su hermosa sesión oficial de Quince Años.
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-          {GALLERY_ITEMS.map((item, idx) => (
+        {/* Filter Tabs */}
+        <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-3 mb-10">
+          <button
+            type="button"
+            onClick={() => setSelectedCategory('all')}
+            className={`px-4 py-2 rounded-full text-xs sm:text-sm font-montserrat font-bold transition-all duration-300 shadow-sm cursor-pointer ${
+              selectedCategory === 'all'
+                ? 'bg-gradient-to-r from-gold to-gold-dark text-white shadow-gold/30 shadow-md scale-105'
+                : 'glass-card text-text-main hover:bg-gold/15 border border-gold/40'
+            }`}
+          >
+            📸 Todos los Recuerdos ({GALLERY_ITEMS.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedCategory('pre-xv')}
+            className={`px-4 py-2 rounded-full text-xs sm:text-sm font-montserrat font-bold transition-all duration-300 shadow-sm cursor-pointer ${
+              selectedCategory === 'pre-xv'
+                ? 'bg-gradient-to-r from-gold to-gold-dark text-white shadow-gold/30 shadow-md scale-105'
+                : 'glass-card text-text-main hover:bg-gold/15 border border-gold/40'
+            }`}
+          >
+            👑 Sesión XV Años (4)
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedCategory('infancia')}
+            className={`px-4 py-2 rounded-full text-xs sm:text-sm font-montserrat font-bold transition-all duration-300 shadow-sm cursor-pointer ${
+              selectedCategory === 'infancia'
+                ? 'bg-gradient-to-r from-gold to-gold-dark text-white shadow-gold/30 shadow-md scale-105'
+                : 'glass-card text-text-main hover:bg-gold/15 border border-gold/40'
+            }`}
+          >
+            🧸 Baúl de Recuerdos & Infancia (4)
+          </button>
+        </div>
+
+        {/* Gallery Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
+          {filteredItems.map(item => (
             <div
               key={item.id}
-              onClick={() => setLightboxIndex(idx)}
-              className="relative aspect-[3/4] rounded-3xl overflow-hidden glass-card glass-card-hover cursor-pointer group border-2 border-gold/40 shadow-xl"
+              onClick={() => setLightboxItem(item)}
+              className="relative aspect-[3/4] rounded-3xl overflow-hidden glass-card glass-card-hover cursor-pointer group border-2 border-gold/40 shadow-xl flex flex-col justify-between"
             >
               <img
                 src={item.src}
                 alt={item.title}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                loading="lazy"
               />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-cream/95 via-cream/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-end">
-                <p className="font-playfair text-sm text-text-main font-bold leading-snug">{item.title}</p>
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-[8px] font-montserrat uppercase tracking-widest text-gold-dark font-bold">Ver Pantalla Completa</span>
+              {/* Top Category Badge */}
+              <div className="absolute top-3 left-3 z-10">
+                <span className="text-[10px] font-montserrat font-bold px-2.5 py-1 rounded-full bg-cream/90 backdrop-blur-md text-gold-dark border border-gold/30 shadow-sm">
+                  {item.category === 'infancia' ? '🧸 Infancia' : '✨ XV Años'}
+                </span>
+              </div>
+
+              {/* Hover & Bottom Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-cream/95 via-cream/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-end z-10">
+                <span className="text-[9px] font-montserrat uppercase tracking-wider text-gold-dark font-bold">
+                  {item.subtitle}
+                </span>
+                <p className="font-playfair text-sm sm:text-base text-text-main font-bold leading-snug mt-0.5">
+                  {item.title}
+                </p>
+                <div className="flex justify-between items-center mt-3 pt-2 border-t border-gold/20">
+                  <span className="text-[9px] font-montserrat uppercase tracking-widest text-gold-dark font-bold">
+                    Ver Foto 🔍
+                  </span>
                   <button
+                    type="button"
                     onClick={e => handleLike(item.id, e)}
-                    className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/90 border border-gold/40 text-xs text-gold-dark font-bold shadow-sm"
+                    className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 border border-gold/40 text-xs text-gold-dark font-bold shadow-sm hover:scale-105 transition-transform"
                   >
                     <span>❤️</span>
                     <span>{likes[item.id]}</span>
@@ -4208,35 +4327,48 @@ function GallerySection() {
         </div>
       </div>
 
-      {lightboxIndex !== null && (
+      {/* Lightbox Modal */}
+      {lightboxItem && (
         <div
           className="fixed inset-0 z-50 bg-cream/95 backdrop-blur-2xl flex items-center justify-center p-3 sm:p-4 animate-fade-in"
-          onClick={() => setLightboxIndex(null)}
+          onClick={() => setLightboxItem(null)}
         >
           <button
-            onClick={() => setLightboxIndex(null)}
-            className="absolute top-4 right-4 w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-gold text-gold-dark text-lg md:text-xl flex items-center justify-center glass-card hover:bg-gold/20 z-10 font-bold cursor-pointer"
+            type="button"
+            onClick={() => setLightboxItem(null)}
+            className="absolute top-4 right-4 w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-gold text-gold-dark text-lg md:text-xl flex items-center justify-center glass-card hover:bg-gold/20 z-20 font-bold cursor-pointer transition-transform hover:scale-105"
+            aria-label="Cerrar"
           >
             ✕
           </button>
 
           <div
             onClick={e => e.stopPropagation()}
-            className="relative max-w-3xl max-h-[85vh] rounded-3xl overflow-hidden border-2 border-gold glass-card p-2 shadow-2xl"
+            className="relative max-w-3xl w-full max-h-[90vh] rounded-3xl overflow-hidden border-2 border-gold glass-card p-3 md:p-4 shadow-2xl flex flex-col"
           >
-            <img
-              src={GALLERY_ITEMS[lightboxIndex].src}
-              alt={GALLERY_ITEMS[lightboxIndex].title}
-              className="max-h-[70vh] md:max-h-[75vh] w-auto rounded-2xl object-contain mx-auto"
-            />
-            <div className="p-3 md:p-4 flex justify-between items-center">
-              <p className="font-playfair text-base md:text-xl text-gold-dark font-bold">{GALLERY_ITEMS[lightboxIndex].title}</p>
+            <div className="relative flex items-center justify-center overflow-hidden rounded-2xl bg-cream/50 max-h-[72vh]">
+              <img
+                src={lightboxItem.src}
+                alt={lightboxItem.title}
+                className="max-h-[70vh] w-auto max-w-full object-contain rounded-xl mx-auto shadow-md"
+              />
+            </div>
+            <div className="p-3 md:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <div>
+                <span className="text-[10px] font-montserrat uppercase tracking-wider text-gold-dark font-bold bg-gold/15 px-2.5 py-0.5 rounded-full border border-gold/30">
+                  {lightboxItem.subtitle}
+                </span>
+                <p className="font-playfair text-base sm:text-xl text-text-main font-bold mt-1">
+                  {lightboxItem.title}
+                </p>
+              </div>
               <button
-                onClick={e => handleLike(GALLERY_ITEMS[lightboxIndex].id, e)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gold bg-gold/15 text-gold-dark text-xs md:text-sm font-bold"
+                type="button"
+                onClick={e => handleLike(lightboxItem.id, e)}
+                className="flex items-center gap-2 px-4 py-2 rounded-full border border-gold bg-gradient-to-r from-gold/20 to-gold/30 text-gold-dark text-xs sm:text-sm font-bold shadow-sm hover:scale-105 transition-transform"
               >
-                <span>❤️</span>
-                <span>{likes[GALLERY_ITEMS[lightboxIndex].id]} Me Gusta</span>
+                <span>❤️ Me Encanta</span>
+                <span>({likes[lightboxItem.id]})</span>
               </button>
             </div>
           </div>
@@ -4248,30 +4380,44 @@ function GallerySection() {
 
 // ─── Timeline Section (Infancia a XV Años) ───────────────────────────────────
 function TimelineSection() {
+  const [selectedPhoto, setSelectedPhoto] = useState<{ src: string; title: string; subtitle: string } | null>(null)
+
   const milestones = [
     {
       year: "2011",
       title: "El Nacimiento de Nuestra Princesa",
-      desc: "Llega a nuestras vidas Krista Mariel llena de luz, ternura y sonrisas que iluminaron a toda la familia.",
-      icon: "🍼"
+      desc: "Llega a nuestras vidas Krista Mariel llena de luz, ternura y sonrisas que iluminaron y transformaron para siempre a toda la familia.",
+      icon: "🍼",
+      image: "/images/krista_bebe_amarillo_durmiendo.jpg",
+      caption: "Octubre 2011 · Su llegada al mundo durmiendo como un angelito",
+      tag: "Recién Nacida"
+    },
+    {
+      year: "2012 - 2014",
+      title: "Primeras Sonrisas & Caritas Pizpiretas",
+      desc: "Sus primeros balbuceos, sus gestos tiernos y esa sonrisa tan alegre que conquistó el corazón de todos con su gorrito rosa y ositos.",
+      icon: "🎀",
+      image: "/images/krista_bebe_gorrito_rosa.jpg",
+      caption: "Primeros meses llenos de ternura, risas y picardía",
+      tag: "Primeros Meses"
     },
     {
       year: "2016",
-      title: "Niñez & Primeros Sueños",
-      desc: "Años inolvidables de juegos, risas contagiosas y el florecer de una niña alegre y amorosa.",
-      icon: "🎈"
-    },
-    {
-      year: "2021",
-      title: "Amor por el Arte y las Mariposas",
-      desc: "Una hermosa etapa descubriendo pasiones, amistades verdaderas y una personalidad brillante.",
-      icon: "🦋"
+      title: "Niñez, Juegos & Primeros Sueños",
+      desc: "Años inolvidables de risas, su blusita blanca bordada y el florecer de una niña alegre, soñadora, noble y cariñosa.",
+      icon: "🎈",
+      image: "/images/krista_infancia_sonrisa.png",
+      caption: "Krista Mariel iluminando el día con su sonrisa más pura",
+      tag: "Niñez Feliz"
     },
     {
       year: "2026",
       title: "El Gran Día de Gala en Quinta Maria Teresa",
-      desc: "17 de Octubre de 2026: Abre sus alas como una hermosa mariposa para celebrar sus Quince Años.",
-      icon: "👑"
+      desc: "17 de Octubre de 2026: Abre sus alas como una hermosa mariposa para celebrar sus Quince Años rodeada del amor de su familia y amigos.",
+      icon: "👑",
+      image: "/images/krista_sitting_garden.png",
+      caption: "Sesión Oficial XV Años · Lista para vivir su gran noche mágica",
+      tag: "Mis XV Años"
     },
   ]
 
@@ -4280,28 +4426,97 @@ function TimelineSection() {
       <div className="section-sep mb-16 md:mb-20" />
       <div className="max-w-4xl mx-auto">
         <SectionHeader tag="Nuestra Historia" title="De Infancia a Mis XV Años" />
+        <p className="text-center font-montserrat text-xs md:text-sm text-text-sub max-w-lg mx-auto -mt-4 mb-10 md:mb-12 font-medium">
+          Un viaje en el tiempo recordando los momentos y fotografías más bellas que han marcado el camino de Krista Mariel.
+        </p>
 
-        <div className="relative border-l-2 border-gold/40 ml-4 md:ml-32 space-y-8 md:space-y-12">
+        <div className="relative border-l-2 border-gold/40 ml-4 md:ml-28 space-y-8 md:space-y-12">
           {milestones.map((m, idx) => (
-            <div key={idx} className="relative pl-8 md:pl-10">
-              <div className="absolute -left-[17px] top-1 w-8 h-8 rounded-full border-2 border-gold bg-cream flex items-center justify-center text-sm shadow-md">
+            <div key={idx} className="relative pl-7 md:pl-10">
+              <div className="absolute -left-[17px] top-2 w-8 h-8 rounded-full border-2 border-gold bg-cream flex items-center justify-center text-sm shadow-md z-10">
                 {m.icon}
               </div>
 
-              <div className="glass-card p-5 md:p-7 rounded-3xl border-2 border-gold/30 flex flex-col gap-2">
-                <div className="flex justify-between items-center">
+              <div className="glass-card p-5 md:p-7 rounded-3xl border-2 border-gold/30 flex flex-col gap-4 shadow-lg hover:shadow-xl transition-shadow">
+                <div className="flex flex-wrap justify-between items-center gap-2">
                   <span className="text-xs uppercase font-montserrat tracking-widest text-gold-dark font-bold bg-gold/15 px-3 py-1 rounded-full border border-gold/30">
                     {m.year}
                   </span>
-                  <span className="text-xs font-montserrat text-text-sub font-semibold">Recuerdo Especial</span>
+                  <span className="text-xs font-montserrat text-gold-dark font-semibold bg-cream/70 px-2.5 py-0.5 rounded-full border border-gold/20">
+                    {m.tag}
+                  </span>
                 </div>
-                <h3 className="font-playfair text-xl md:text-2xl text-text-main font-bold mt-1">{m.title}</h3>
-                <p className="font-montserrat text-xs md:text-sm text-text-sub leading-relaxed font-medium">{m.desc}</p>
+
+                <div>
+                  <h3 className="font-playfair text-xl md:text-2xl text-text-main font-bold">{m.title}</h3>
+                  <p className="font-montserrat text-xs md:text-sm text-text-sub leading-relaxed font-medium mt-1.5">{m.desc}</p>
+                </div>
+
+                {/* Milestone Photo Card */}
+                <div 
+                  onClick={() => setSelectedPhoto({ src: m.image, title: m.title, subtitle: `${m.year} · ${m.tag}` })}
+                  className="mt-1 relative rounded-2xl overflow-hidden border-2 border-gold/35 group cursor-pointer shadow-md bg-cream/40"
+                >
+                  <div className="aspect-[16/10] sm:aspect-[16/9] w-full overflow-hidden">
+                    <img
+                      src={m.image}
+                      alt={m.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="p-3 bg-gradient-to-t from-cream/95 via-cream/80 to-cream/60 flex items-center justify-between border-t border-gold/20">
+                    <span className="font-montserrat text-[11px] sm:text-xs text-text-main font-medium italic">
+                      "{m.caption}"
+                    </span>
+                    <span className="text-[10px] uppercase tracking-wider font-montserrat font-bold text-gold-dark whitespace-nowrap ml-2 flex items-center gap-1 group-hover:underline">
+                      Ampliar 🔍
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           ))}
         </div>
       </div>
+
+      {/* Milestone Photo Lightbox */}
+      {selectedPhoto && (
+        <div
+          className="fixed inset-0 z-50 bg-cream/95 backdrop-blur-2xl flex items-center justify-center p-3 sm:p-4 animate-fade-in"
+          onClick={() => setSelectedPhoto(null)}
+        >
+          <button
+            type="button"
+            onClick={() => setSelectedPhoto(null)}
+            className="absolute top-4 right-4 w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-gold text-gold-dark text-lg md:text-xl flex items-center justify-center glass-card hover:bg-gold/20 z-20 font-bold cursor-pointer transition-transform hover:scale-105"
+            aria-label="Cerrar"
+          >
+            ✕
+          </button>
+
+          <div
+            onClick={e => e.stopPropagation()}
+            className="relative max-w-2xl w-full rounded-3xl overflow-hidden border-2 border-gold glass-card p-3 sm:p-4 shadow-2xl"
+          >
+            <div className="overflow-hidden rounded-2xl bg-cream/60 max-h-[75vh] flex items-center justify-center">
+              <img
+                src={selectedPhoto.src}
+                alt={selectedPhoto.title}
+                className="max-h-[72vh] w-auto max-w-full object-contain rounded-xl mx-auto shadow-md"
+              />
+            </div>
+            <div className="p-3 text-center">
+              <span className="text-[10px] font-montserrat uppercase tracking-wider text-gold-dark font-bold bg-gold/15 px-2.5 py-0.5 rounded-full border border-gold/30">
+                {selectedPhoto.subtitle}
+              </span>
+              <p className="font-playfair text-lg text-text-main font-bold mt-1">
+                {selectedPhoto.title}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   )
 }
