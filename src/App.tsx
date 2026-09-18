@@ -3626,148 +3626,6 @@ function GallerySection() {
   )
 }
 
-// ─── Timeline Section (Infancia a XV Años) ───────────────────────────────────
-function TimelineSection() {
-  const [selectedPhoto, setSelectedPhoto] = useState<{ src: string; title: string; subtitle: string } | null>(null)
-
-  const milestones = [
-    {
-      year: "2011",
-      title: "El Nacimiento de Nuestra Princesa",
-      desc: "Llega a nuestras vidas Krista Mariel llena de luz, ternura y sonrisas que iluminaron y transformaron para siempre a toda la familia.",
-      icon: "🍼",
-      image: "/images/krista_bebe_amarillo_durmiendo.jpg",
-      caption: "Octubre 2011 · Su llegada al mundo durmiendo como un angelito",
-      tag: "Recién Nacida"
-    },
-    {
-      year: "2012 - 2014",
-      title: "Primeras Sonrisas & Caritas Pizpiretas",
-      desc: "Sus primeros balbuceos, sus gestos tiernos y esa sonrisa tan alegre que conquistó el corazón de todos con su gorrito rosa y ositos.",
-      icon: "🎀",
-      image: "/images/krista_bebe_gorrito_rosa.jpg",
-      caption: "Primeros meses llenos de ternura, risas y picardía",
-      tag: "Primeros Meses"
-    },
-    {
-      year: "2016",
-      title: "Niñez, Juegos & Primeros Sueños",
-      desc: "Años inolvidables de risas, su blusita blanca bordada y el florecer de una niña alegre, soñadora, noble y cariñosa.",
-      icon: "🎈",
-      image: "/images/krista_infancia_sonrisa.png",
-      caption: "Krista Mariel iluminando el día con su sonrisa más pura",
-      tag: "Niñez Feliz"
-    },
-    {
-      year: "2026",
-      title: "El Gran Día de Gala en Quinta Maria Teresa",
-      desc: "17 de Octubre de 2026: Abre sus alas como una hermosa mariposa para celebrar sus Quince Años rodeada del amor de su familia y amigos.",
-      icon: "👑",
-      image: "/images/krista_sitting_garden.png",
-      caption: "Sesión Oficial XV Años · Lista para vivir su gran noche mágica",
-      tag: "Mis XV Años"
-    },
-  ]
-
-  return (
-    <section id="linea-tiempo" className="relative py-16 md:py-24 px-4 md:px-6">
-      <div className="section-sep mb-16 md:mb-20" />
-      <div className="max-w-4xl mx-auto">
-        <SectionHeader tag="Nuestra Historia" title="De Infancia a Mis XV Años" />
-        <p className="text-center font-montserrat text-xs md:text-sm text-text-sub max-w-lg mx-auto -mt-4 mb-10 md:mb-12 font-medium">
-          Un viaje en el tiempo recordando los momentos y fotografías más bellas que han marcado el camino de Krista Mariel.
-        </p>
-
-        <div className="relative border-l-2 border-gold/40 ml-4 md:ml-28 space-y-8 md:space-y-12">
-          {milestones.map((m, idx) => (
-            <div key={idx} className="relative pl-7 md:pl-10">
-              <div className="absolute -left-[17px] top-2 w-8 h-8 rounded-full border-2 border-gold bg-cream flex items-center justify-center text-sm shadow-md z-10">
-                {m.icon}
-              </div>
-
-              <div className="glass-card p-5 md:p-7 rounded-3xl border-2 border-gold/30 flex flex-col gap-4 shadow-lg hover:shadow-xl transition-shadow">
-                <div className="flex flex-wrap justify-between items-center gap-2">
-                  <span className="text-xs uppercase font-montserrat tracking-widest text-gold-dark font-bold bg-gold/15 px-3 py-1 rounded-full border border-gold/30">
-                    {m.year}
-                  </span>
-                  <span className="text-xs font-montserrat text-gold-dark font-semibold bg-cream/70 px-2.5 py-0.5 rounded-full border border-gold/20">
-                    {m.tag}
-                  </span>
-                </div>
-
-                <div>
-                  <h3 className="font-playfair text-xl md:text-2xl text-text-main font-bold">{m.title}</h3>
-                  <p className="font-montserrat text-xs md:text-sm text-text-sub leading-relaxed font-medium mt-1.5">{m.desc}</p>
-                </div>
-
-                {/* Milestone Photo Card */}
-                <div 
-                  onClick={() => setSelectedPhoto({ src: m.image, title: m.title, subtitle: `${m.year} · ${m.tag}` })}
-                  className="mt-1 relative rounded-2xl overflow-hidden border-2 border-gold/35 group cursor-pointer shadow-md bg-cream/40"
-                >
-                  <div className="aspect-[16/10] sm:aspect-[16/9] w-full overflow-hidden">
-                    <img
-                      src={m.image}
-                      alt={m.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className="p-3 bg-gradient-to-t from-cream/95 via-cream/80 to-cream/60 flex items-center justify-between border-t border-gold/20">
-                    <span className="font-montserrat text-[11px] sm:text-xs text-text-main font-medium italic">
-                      "{m.caption}"
-                    </span>
-                    <span className="text-[10px] uppercase tracking-wider font-montserrat font-bold text-gold-dark whitespace-nowrap ml-2 flex items-center gap-1 group-hover:underline">
-                      Ampliar 🔍
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Milestone Photo Lightbox */}
-      {selectedPhoto && (
-        <div
-          className="fixed inset-0 z-50 bg-cream/95 backdrop-blur-2xl flex items-center justify-center p-3 sm:p-4 animate-fade-in"
-          onClick={() => setSelectedPhoto(null)}
-        >
-          <button
-            type="button"
-            onClick={() => setSelectedPhoto(null)}
-            className="absolute top-4 right-4 w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-gold text-gold-dark text-lg md:text-xl flex items-center justify-center glass-card hover:bg-gold/20 z-20 font-bold cursor-pointer transition-transform hover:scale-105"
-            aria-label="Cerrar"
-          >
-            ✕
-          </button>
-
-          <div
-            onClick={e => e.stopPropagation()}
-            className="relative max-w-2xl w-full rounded-3xl overflow-hidden border-2 border-gold glass-card p-3 sm:p-4 shadow-2xl"
-          >
-            <div className="overflow-hidden rounded-2xl bg-cream/60 max-h-[75vh] flex items-center justify-center">
-              <img
-                src={selectedPhoto.src}
-                alt={selectedPhoto.title}
-                className="max-h-[72vh] w-auto max-w-full object-contain rounded-xl mx-auto shadow-md"
-              />
-            </div>
-            <div className="p-3 text-center">
-              <span className="text-[10px] font-montserrat uppercase tracking-wider text-gold-dark font-bold bg-gold/15 px-2.5 py-0.5 rounded-full border border-gold/30">
-                {selectedPhoto.subtitle}
-              </span>
-              <p className="font-playfair text-lg text-text-main font-bold mt-1">
-                {selectedPhoto.title}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-    </section>
-  )
-}
 
 // ─── RSVP Section ──────────────────────────────────────────────────────────────
 function RSVPSection({ onTriggerSwarm }: { onTriggerSwarm: () => void }) {
@@ -4797,7 +4655,6 @@ function Navbar({
     { href: '#color-reservado', label: 'Guía de Color' },
     { href: '#vestimenta', label: 'Sugerencia de Regalos' },
     { href: '#galeria', label: 'Galería' },
-    { href: '#linea-tiempo', label: 'Historia' },
     { href: '#rsvp', label: 'RSVP' },
   ]
 
@@ -5220,7 +5077,6 @@ export default function App() {
         <VIPPassSection onTriggerToast={setToastMessage} />
         <DressGiftsSection onTriggerToast={setToastMessage} />
         <GallerySection />
-        <TimelineSection />
         <RSVPSection onTriggerSwarm={handleRSVPSubmitWithConfetti} />
       </main>
 
