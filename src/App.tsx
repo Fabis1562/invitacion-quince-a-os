@@ -78,38 +78,10 @@ const DRESS_RESERVED_COLORS = [
 
 // ─── Photo Gallery Data (Fotos Oficiales de Krista Mariel - Fotos2) ───────────
 const GALLERY_ITEMS = [
-  {
-    id: 1,
-    title: "Luz Dorada en el Jardín",
-    subtitle: "Sesión Oficial XV Años",
-    src: "/fotos2/krista_sesion_1.png",
-    aspect: "aspect-[2/3]",
-    likes: 278,
-  },
-  {
-    id: 2,
-    title: "Sendero de Ensueño & Rosas Amarillas",
-    subtitle: "Sesión Oficial XV Años",
-    src: "/fotos2/krista_sesion_2.png",
-    aspect: "aspect-[2/3]",
-    likes: 315,
-  },
-  {
-    id: 3,
-    title: "Mirada de Ilusión & Gratitud",
-    subtitle: "Sesión Oficial XV Años",
-    src: "/fotos2/krista_sesion_3.png",
-    aspect: "aspect-[2/3]",
-    likes: 342,
-  },
-  {
-    id: 4,
-    title: "Atardecer Mágico en el Prado",
-    subtitle: "Sesión Oficial XV Años",
-    src: "/fotos2/krista_sesion_4.png",
-    aspect: "aspect-[3/2]",
-    likes: 358,
-  },
+  { id: 1, src: "/fotos2/krista_sesion_1.png" },
+  { id: 2, src: "/fotos2/krista_sesion_2.png" },
+  { id: 3, src: "/fotos2/krista_sesion_3.png" },
+  { id: 4, src: "/fotos2/krista_sesion_4.png" },
 ]
 
 // ─── Initial Wishes Data ───────────────────────────────────────────────────────
@@ -3584,17 +3556,6 @@ function DressGiftsSection({ onTriggerToast }: { onTriggerToast: (msg: string) =
 
 function GallerySection() {
   const [lightboxItem, setLightboxItem] = useState<(typeof GALLERY_ITEMS)[0] | null>(null)
-  const [likes, setLikes] = useState<Record<number, number>>({
-    1: 278,
-    2: 315,
-    3: 342,
-    4: 358,
-  })
-
-  const handleLike = (id: number, e: React.MouseEvent) => {
-    e.stopPropagation()
-    setLikes(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }))
-  }
 
   return (
     <section id="galeria" className="relative py-16 md:py-24 px-4 md:px-6">
@@ -3609,59 +3570,22 @@ function GallerySection() {
           }
         />
 
-        {/* Gallery Grid - Fotos Oficiales de Fotos2 */}
+        {/* Gallery Grid - Fotos Oficiales de Fotos2 sin texto */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 mt-2 mb-4">
           {GALLERY_ITEMS.map(item => (
             <div
               key={item.id}
               onClick={() => setLightboxItem(item)}
-              className="rounded-3xl overflow-hidden glass-card glass-card-hover cursor-pointer group border-2 border-gold/40 shadow-xl flex flex-col justify-between p-3 sm:p-4 transition-all duration-300 hover:border-gold hover:shadow-2xl"
+              className="rounded-3xl overflow-hidden glass-card glass-card-hover cursor-pointer group border-2 border-gold/40 shadow-xl p-2.5 sm:p-3 transition-all duration-300 hover:border-gold hover:shadow-2xl hover:scale-[1.02]"
             >
-              {/* Photo Frame Container - Shows 100% of the image without ANY cropping */}
-              <div className="relative w-full h-64 sm:h-72 rounded-2xl overflow-hidden bg-gradient-to-b from-[#FFFDF9] via-[#FAF6EE] to-[#F3EAD8] flex items-center justify-center p-2 border border-gold/30 shadow-inner">
+              {/* Photo Frame Container - Shows 100% of the image without ANY cropping and NO text */}
+              <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-gradient-to-b from-[#FFFDF9] via-[#FAF6EE] to-[#F3EAD8] flex items-center justify-center p-1.5 border border-gold/30 shadow-inner">
                 <img
                   src={item.src}
-                  alt={item.title}
+                  alt="Fotografía Oficial Krista Mariel"
                   className="max-h-full max-w-full object-contain rounded-xl drop-shadow-md transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
                 />
-
-                {/* Top Badge */}
-                <div className="absolute top-2 left-2 z-10">
-                  <span className="text-[10px] font-montserrat font-bold px-2.5 py-1 rounded-full bg-cream/95 backdrop-blur-md text-gold-dark border border-gold/30 shadow-xs">
-                    ✨ Sesión Oficial
-                  </span>
-                </div>
-
-                {/* Zoom icon pill */}
-                <div className="absolute bottom-2 right-2 z-10 opacity-80 group-hover:opacity-100 transition-opacity">
-                  <span className="px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-xs border border-gold/40 text-[10px] font-montserrat font-bold text-gold-dark flex items-center gap-1 shadow-xs">
-                    🔍 Ver
-                  </span>
-                </div>
-              </div>
-
-              {/* Caption and interactive info */}
-              <div className="pt-3 px-1 flex flex-col gap-1.5">
-                <span className="text-[10px] font-montserrat uppercase tracking-wider text-gold-dark font-bold truncate">
-                  {item.subtitle}
-                </span>
-                <p className="font-playfair text-sm sm:text-base text-text-main font-bold leading-snug line-clamp-2 group-hover:text-gold-dark transition-colors">
-                  {item.title}
-                </p>
-                <div className="flex justify-between items-center mt-2 pt-2 border-t border-gold/20">
-                  <span className="text-[10px] font-montserrat uppercase tracking-wider text-gold-dark font-bold flex items-center gap-1">
-                    🔍 Foto Completa
-                  </span>
-                  <button
-                    type="button"
-                    onClick={e => handleLike(item.id, e)}
-                    className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 border border-gold/40 text-xs text-gold-dark font-bold shadow-2xs hover:scale-105 active:scale-95 transition-transform cursor-pointer"
-                  >
-                    <span>❤️</span>
-                    <span>{likes[item.id] || 0}</span>
-                  </button>
-                </div>
               </div>
             </div>
           ))}
@@ -3685,32 +3609,14 @@ function GallerySection() {
 
           <div
             onClick={e => e.stopPropagation()}
-            className="relative max-w-4xl w-full max-h-[92vh] rounded-3xl overflow-hidden border-2 border-gold bg-[#FAF6EE] p-3 md:p-5 shadow-2xl flex flex-col"
+            className="relative max-w-3xl w-full max-h-[92vh] rounded-3xl overflow-hidden border-2 border-gold bg-[#FAF6EE] p-2.5 sm:p-4 shadow-2xl flex flex-col items-center justify-center"
           >
-            <div className="relative flex items-center justify-center overflow-hidden rounded-2xl bg-white/70 border border-gold/20 max-h-[75vh] p-2">
+            <div className="relative flex items-center justify-center overflow-hidden rounded-2xl bg-white/70 border border-gold/20 max-h-[85vh] p-2 w-full">
               <img
                 src={lightboxItem.src}
-                alt={lightboxItem.title}
-                className="max-h-[70vh] w-auto max-w-full object-contain rounded-xl mx-auto shadow-md"
+                alt="Fotografía Oficial Krista Mariel"
+                className="max-h-[80vh] w-auto max-w-full object-contain rounded-xl mx-auto shadow-md"
               />
-            </div>
-            <div className="p-3 md:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-              <div>
-                <span className="text-[10px] font-montserrat uppercase tracking-wider text-gold-dark font-bold bg-gold/15 px-2.5 py-0.5 rounded-full border border-gold/30">
-                  {lightboxItem.subtitle}
-                </span>
-                <p className="font-playfair text-base sm:text-xl text-text-main font-bold mt-1">
-                  {lightboxItem.title}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={e => handleLike(lightboxItem.id, e)}
-                className="flex items-center gap-2 px-4 py-2 rounded-full border border-gold bg-gradient-to-r from-gold/20 to-gold/30 text-gold-dark text-xs sm:text-sm font-bold shadow-sm hover:scale-105 transition-transform cursor-pointer"
-              >
-                <span>❤️ Me Encanta</span>
-                <span>({likes[lightboxItem.id]})</span>
-              </button>
             </div>
           </div>
         </div>,
