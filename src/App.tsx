@@ -3788,7 +3788,7 @@ function RSVPSection({ onTriggerSwarm }: { onTriggerSwarm: () => void }) {
     // Guardar en Google Sheets de forma transparente
     sendToGoogleSheets('rsvp', {
       name: name.trim(),
-      guests,
+      guests: attendance === 'yes' ? guests : '0',
       attendance: statusText,
       note
     })
@@ -3797,7 +3797,7 @@ function RSVPSection({ onTriggerSwarm }: { onTriggerSwarm: () => void }) {
       `Hola ${QUINCE_NAME}! Confirmo mi respuesta para tus Quince Años del 17 de Octubre:\n\n` +
       `👤 *Nombre:* ${name.trim()}\n` +
       `✨ *Asistencia:* ${statusText}\n` +
-      `👥 *Invitados:* ${guests} persona(s)\n` +
+      (attendance === 'yes' ? `👥 *Invitados:* ${guests} persona(s)\n` : '') +
       (note ? `💬 *Mensaje:* ${note}\n` : '') +
       `\n¡Nos vemos pronto!`
     )
@@ -3810,29 +3810,59 @@ function RSVPSection({ onTriggerSwarm }: { onTriggerSwarm: () => void }) {
     <section id="rsvp" className="relative py-16 md:py-24 px-4 md:px-6">
       <div className="section-sep mb-16 md:mb-20" />
       <div className="max-w-xl mx-auto">
-        <SectionHeader tag="Confirmación de Asistencia" title="¿Nos Acompañas?" />
+        {/* Header exacto como en la imagen */}
+        <div className="text-center mb-6 px-2">
+          <p className="text-[11px] sm:text-xs uppercase tracking-[0.25em] font-montserrat text-[#7A5B30] mb-2 font-bold flex items-center justify-center gap-2.5">
+            <GoldButterfly size={16} />
+            <span>CONFIRMACIÓN DE ASISTENCIA</span>
+            <GoldButterfly size={16} />
+          </p>
+
+          <h2 className="text-5xl sm:text-6xl md:text-7xl font-script text-[#6D5127] py-1 leading-tight">
+            ¿Nos Acompañas?
+          </h2>
+
+          <div className="text-[#8C6D3B] text-xs my-2">✦</div>
+
+          <div className="font-playfair text-[#5C4524] text-sm sm:text-base leading-relaxed max-w-lg mx-auto space-y-3 px-2 mb-8">
+            <p>
+              Tu confirmación es muy importante para nosotros.<br />
+              Nos ayuda a contemplar tu lugar y tu comodidad<br />
+              al acompañarnos en este momento tan especial.
+            </p>
+            <p className="text-xs sm:text-sm text-[#7A5B30]">
+              Por favor, confirma tu asistencia<br />
+              completando la siguiente información.
+            </p>
+          </div>
+        </div>
 
         {submitted ? (
-          <div className="glass-card p-8 md:p-10 rounded-3xl text-center flex flex-col items-center gap-5 animate-fade-in-up border-2 border-gold">
-            <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-gold flex items-center justify-center bg-gold/15 shadow-md">
-              <GoldButterfly size={36} />
+          <div className="max-w-md w-full mx-auto bg-[#FAF6EE] border border-[#D9CABA] rounded-3xl p-8 text-center flex flex-col items-center gap-4 shadow-xl shadow-[#8C6D3B]/5 animate-fade-in-up">
+            <div className="w-16 h-16 rounded-full border border-[#937136] flex items-center justify-center bg-gradient-to-b from-[#CDB27E] via-[#BA975C] to-[#A47F42] text-[#2E1F0B] shadow-md">
+              <GoldButterfly size={32} />
             </div>
-            <h3 className="font-greatvibes text-4xl md:text-5xl gold-text-gradient">¡Gracias por Confirmar!</h3>
-            <p className="font-playfair italic text-text-main text-base md:text-lg font-semibold">
-              Tu respuesta ha sido registrada y enviada a WhatsApp.
+            <h3 className="font-script text-4xl sm:text-5xl text-[#6D5127]">¡Gracias por Confirmar!</h3>
+            <p className="font-playfair italic text-[#5C4524] text-sm leading-relaxed">
+              Tu respuesta ha sido registrada con éxito. ¡Esperamos verte en este día tan especial!
             </p>
             <button
+              type="button"
               onClick={() => setSubmitted(false)}
-              className="text-xs uppercase tracking-widest text-gold-dark underline hover:text-gold font-bold mt-2"
+              className="text-xs uppercase tracking-widest text-[#8C6D3B] underline hover:text-[#5C4524] font-montserrat font-bold mt-2 cursor-pointer"
             >
               Enviar otra confirmación
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="glass-card p-6 md:p-10 rounded-3xl flex flex-col gap-5 md:gap-6 border-2 border-gold/40 shadow-xl">
+          <form
+            onSubmit={handleSubmit}
+            className="max-w-md w-full mx-auto bg-[#FAF6EE]/95 backdrop-blur-sm border border-[#D9CABA] rounded-3xl p-5 sm:p-7 md:p-8 shadow-xl shadow-[#8C6D3B]/5 flex flex-col gap-5"
+          >
+            {/* Nombre Completo */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">
-                Nombre Completo *
+              <label className="text-[10px] sm:text-[11px] uppercase tracking-[0.18em] font-montserrat text-[#6D5229] font-bold">
+                NOMBRE COMPLETO *
               </label>
               <input
                 type="text"
@@ -3840,97 +3870,101 @@ function RSVPSection({ onTriggerSwarm }: { onTriggerSwarm: () => void }) {
                 value={name}
                 onChange={e => setName(e.target.value)}
                 placeholder="Ej. María Fernanda López"
-                className="w-full bg-cream border border-gold/40 focus:border-gold rounded-2xl px-4 py-3.5 text-base md:text-sm text-text-main placeholder:text-text-muted outline-none transition-colors font-medium"
+                className="w-full bg-[#FFFDF9] border border-[#D9CABA] focus:border-[#AA874C] rounded-2xl px-4 py-3.5 text-sm sm:text-base text-[#3E2B16] placeholder:text-[#9F8C76]/70 outline-none transition-colors font-medium shadow-inner shadow-black/[0.02]"
               />
             </div>
 
+            {/* Asistencia */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">
-                ¿Asistirás al Evento?
+              <label className="text-[10px] sm:text-[11px] uppercase tracking-[0.18em] font-montserrat text-[#6D5229] font-bold">
+                ¿ASISTIRÁS AL EVENTO?
               </label>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => setAttendance('yes')}
-                  className={`py-3 rounded-2xl border-2 text-xs font-montserrat uppercase tracking-wider font-bold transition-all ${
+                  className={`py-3 px-2 rounded-2xl text-xs sm:text-sm font-montserrat uppercase tracking-wider font-bold transition-all cursor-pointer ${
                     attendance === 'yes'
-                      ? 'border-gold bg-gold/25 text-gold-dark shadow-md'
-                      : 'border-gold/30 text-text-sub hover:border-gold/50'
+                      ? 'bg-gradient-to-b from-[#CDB27E] via-[#BA975C] to-[#A47F42] text-[#2E1F0B] border border-[#937136] shadow-md'
+                      : 'bg-[#FFFDF9] border border-[#D9CABA] text-[#5C4524] hover:border-[#AA874C]'
                   }`}
                 >
-                  ¡Sí, asistiré! ✨
+                  SÍ, ASISTIRÉ
                 </button>
                 <button
                   type="button"
                   onClick={() => setAttendance('no')}
-                  className={`py-3 rounded-2xl border-2 text-xs font-montserrat uppercase tracking-wider font-bold transition-all ${
+                  className={`py-3 px-2 rounded-2xl text-xs sm:text-sm font-montserrat uppercase tracking-wider font-bold transition-all cursor-pointer ${
                     attendance === 'no'
-                      ? 'border-gold bg-gold/25 text-gold-dark shadow-md'
-                      : 'border-gold/30 text-text-sub hover:border-gold/50'
+                      ? 'bg-gradient-to-b from-[#CDB27E] via-[#BA975C] to-[#A47F42] text-[#2E1F0B] border border-[#937136] shadow-md'
+                      : 'bg-[#FFFDF9] border border-[#D9CABA] text-[#5C4524] hover:border-[#AA874C]'
                   }`}
                 >
-                  No podré asistir 💔
+                  NO PODRÉ ASISTIR
                 </button>
               </div>
             </div>
 
-            {attendance === 'yes' && (
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">
-                  Número de Personas que Asistirán
-                </label>
-                <div className="flex gap-2">
-                  {['1', '2', '3', '4', '5+'].map(num => (
-                    <button
-                      key={num}
-                      type="button"
-                      onClick={() => setGuests(num)}
-                      className={`flex-1 py-3 rounded-2xl border-2 text-sm font-playfair font-bold transition-all ${
-                        guests === num
-                          ? 'border-gold bg-gradient-to-r from-gold to-gold-dark text-text-main shadow-md'
-                          : 'border-gold/30 text-text-sub hover:border-gold/50'
-                      }`}
-                    >
-                      {num}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
+            {/* Número de personas */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">
-                Mensaje para Krista Mariel / Restricciones Alimentarias
+              <label className="text-[10px] sm:text-[11px] uppercase tracking-[0.18em] font-montserrat text-[#6D5229] font-bold">
+                NÚMERO DE PERSONAS QUE ASISTIRÁN
+              </label>
+              <div className="grid grid-cols-5 gap-2">
+                {['1', '2', '3', '4', '5+'].map(num => (
+                  <button
+                    key={num}
+                    type="button"
+                    onClick={() => setGuests(num)}
+                    className={`py-2.5 sm:py-3 rounded-2xl text-sm sm:text-base font-montserrat font-bold transition-all cursor-pointer ${
+                      guests === num
+                        ? 'bg-gradient-to-b from-[#CDB27E] via-[#BA975C] to-[#A47F42] text-[#2E1F0B] border border-[#937136] shadow-md'
+                        : 'bg-[#FFFDF9] border border-[#D9CABA] text-[#5C4524] hover:border-[#AA874C]'
+                    }`}
+                  >
+                    {num}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Mensaje */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] sm:text-[11px] uppercase tracking-[0.18em] font-montserrat text-[#6D5229] font-bold">
+                MENSAJE PARA KRISTA MARIEL / RESTRICCIONES
               </label>
               <textarea
                 rows={3}
                 value={note}
                 onChange={e => setNote(e.target.value)}
-                placeholder="Escribe aquí un lindo deseo para la quinceañera..."
-                className="w-full bg-cream border border-gold/40 focus:border-gold rounded-2xl px-4 py-3.5 text-base md:text-sm text-text-main placeholder:text-text-muted outline-none transition-colors resize-none font-medium"
+                placeholder="Escribe aquí un mensaje especial para la quinceañera..."
+                className="w-full bg-[#FFFDF9] border border-[#D9CABA] focus:border-[#AA874C] rounded-2xl px-4 py-3.5 text-sm sm:text-base text-[#3E2B16] placeholder:text-[#9F8C76]/70 outline-none transition-colors resize-none font-medium shadow-inner shadow-black/[0.02]"
               />
             </div>
 
+            {/* Botón Confirmar Asistencia */}
             <button
               type="submit"
-              className="py-4 rounded-2xl bg-gradient-to-r from-gold-light via-gold to-gold-dark text-text-main font-montserrat font-bold text-sm md:text-base uppercase tracking-wider shadow-xl hover:brightness-110 active:scale-[0.98] transition-all mt-2 cursor-pointer"
+              className="w-full py-3.5 sm:py-4 rounded-2xl bg-gradient-to-b from-[#D4B680] via-[#C29E60] to-[#A88040] text-[#2C1D0B] font-montserrat font-bold text-xs sm:text-sm uppercase tracking-[0.2em] shadow-lg shadow-[#A88040]/25 hover:brightness-105 active:scale-[0.99] transition-all cursor-pointer border border-[#9E7B3D] mt-2"
             >
-              Confirmar por WhatsApp ✨
+              CONFIRMAR ASISTENCIA
             </button>
           </form>
         )}
-      </div>
 
-      <footer className="mt-16 md:mt-24 text-center flex flex-col items-center gap-3">
-        <GoldDivider />
-        <h3 className="font-greatvibes text-4xl md:text-5xl gold-text-gradient">{QUINCE_FULL_NAME}</h3>
-        <p className="text-[9px] md:text-[10px] uppercase tracking-[0.45em] font-montserrat text-gold-dark font-bold">
-          17 · OCTUBRE · 2026 ✦
-        </p>
-      </footer>
+        {/* Cierre final idéntico a la imagen */}
+        <div className="mt-8 text-center">
+          <span className="text-[#8C6D3B] text-xs block mb-3">✦</span>
+          <p className="font-playfair italic text-[#6D5229] text-xs sm:text-sm leading-relaxed max-w-sm mx-auto px-4 pb-4">
+            Tu confirmación nos ayudará a tener todo listo<br />
+            para recibirte con la mejor atención.
+          </p>
+        </div>
+      </div>
     </section>
   )
 }
+
 
 // ─── Carta Especial de Krista Mariel (Lámina 2 Oficial) ───────────────────────
 function KristaLetterSection() {
