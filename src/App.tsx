@@ -2788,6 +2788,66 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
   );
 }
 
+// ─── El Color de la Quinceañera Está Reservado (Lámina Oficial Exclusiva) ─────
+function QuinceaneraColorSection() {
+  const [modalOpen, setModalOpen] = useState(false)
+
+  return (
+    <section id="color-quinceanera" className="relative py-14 md:py-20 px-4 md:px-6">
+      <div className="section-sep mb-14 md:mb-18" />
+      <div className="max-w-4xl mx-auto flex flex-col items-center">
+        {/* Tarjeta Oficial Impresa con Efecto de Enmarcado Dorado de Lujo */}
+        <div
+          onClick={() => setModalOpen(true)}
+          className="relative w-full max-w-md sm:max-w-lg mx-auto rounded-[28px] sm:rounded-[36px] overflow-hidden border-2 border-gold/40 shadow-2xl bg-[#FAF5EC] p-2.5 sm:p-3.5 cursor-pointer group hover:border-gold hover:scale-[1.01] transition-all duration-300"
+        >
+          <img
+            src="/fotos/color_reservado.png"
+            alt="El Color de la Quinceañera Está Reservado - Krista Mariel"
+            className="w-full h-auto rounded-[20px] sm:rounded-[28px] shadow-sm object-contain"
+            loading="lazy"
+          />
+
+          {/* Botón flotante para ver en grande */}
+          <div className="absolute bottom-5 right-5 z-10 opacity-80 group-hover:opacity-100 transition-opacity">
+            <span className="px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-xs border border-gold/40 text-[11px] font-montserrat font-bold text-gold-dark flex items-center gap-1.5 shadow-md">
+              🔍 Ampliar Tarjeta
+            </span>
+          </div>
+        </div>
+
+        {/* Modal Lightbox */}
+        {modalOpen && typeof document !== 'undefined' && createPortal(
+          <div
+            className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-fade-in"
+            onClick={() => setModalOpen(false)}
+          >
+            <button
+              type="button"
+              onClick={() => setModalOpen(false)}
+              className="absolute top-4 right-4 w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-gold text-gold-dark text-lg md:text-xl flex items-center justify-center bg-white/90 hover:bg-white z-20 font-bold cursor-pointer transition-transform hover:scale-105 shadow-lg"
+              aria-label="Cerrar"
+            >
+              ✕
+            </button>
+            <div
+              onClick={e => e.stopPropagation()}
+              className="relative max-w-lg w-full max-h-[92vh] rounded-3xl overflow-hidden border-2 border-gold bg-[#FAF6EE] p-2.5 sm:p-3 shadow-2xl flex flex-col items-center justify-center"
+            >
+              <img
+                src="/fotos/color_reservado.png"
+                alt="El Color de la Quinceañera Está Reservado - Krista Mariel"
+                className="max-h-[85vh] w-auto max-w-full object-contain rounded-2xl mx-auto shadow-md"
+              />
+            </div>
+          </div>,
+          document.body
+        )}
+      </div>
+    </section>
+  )
+}
+
 // ─── Reserved Color Section (Lámina Oficial 1: GUÍA DE COLOR PARA INVITADOS) ───
 function ReservedColorSection({ onTriggerToast: _onTriggerToast }: { onTriggerToast: (msg: string) => void }) {
   return (
@@ -4652,6 +4712,7 @@ function Navbar({
     { href: '#video-especial', label: 'Video Especial 🎬' },
     { href: '#itinerario', label: 'Protocolo' },
     { href: '#llegada', label: 'Ubicación & Mapas 📍' },
+    { href: '#color-quinceanera', label: 'Color Reservado ✨' },
     { href: '#color-reservado', label: 'Guía de Color' },
     { href: '#vestimenta', label: 'Sugerencia de Regalos' },
     { href: '#galeria', label: 'Galería' },
@@ -5072,6 +5133,7 @@ export default function App() {
         <ParentsSection />
         <SpecialVideoSection onTriggerToast={setToastMessage} onTriggerBurst={triggerExplosiveBurst} />
         <ItinerarySection onTriggerToast={setToastMessage} />
+        <QuinceaneraColorSection />
         <ReservedColorSection onTriggerToast={setToastMessage} />
         <ArrivalGuideSection onTriggerToast={setToastMessage} />
         <VIPPassSection onTriggerToast={setToastMessage} />
