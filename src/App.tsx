@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import QRCode from 'qrcode'
 
 // ─── Event Configuration ───────────────────────────────────────────────────────
@@ -19,10 +20,11 @@ const CHURCH_MAPS = "https://maps.google.com/?q=Parroquia+Nuestra+Señora+del+Ca
 
 const VENUE_TIME = "3:00 PM"
 const VENUE_NAME = "Salón Quinta María Teresa"
-const VENUE_ADDRESS = "Salón Quinta María Teresa"
-const VENUE_MAPS = "https://maps.google.com/?q=Quinta+Maria+Teresa"
+const VENUE_COORDINATES = "23°10'30.7\"N 102°54'27.6\"W"
+const VENUE_ADDRESS = "23°10'30.7\"N 102°54'27.6\"W"
+const VENUE_MAPS = "https://www.google.com/maps/place/23%C2%B010'30.7%22N+102%C2%B054'27.6%22W/@23.1752309,-102.9085838,291m/data=!3m1!1e3!4m4!3m3!8m2!3d23.1751881!4d-102.9076614?hl=es&entry=ttu&g_ep=EgoyMDI2MDkxNS4wIKXMDSoASAFQAw%3D%3D"
 
-const WHATSAPP_PHONE = "5212345678901" // Reemplazar con el número real de WhatsApp
+const WHATSAPP_PHONE = "5214931141024" // +52 1 493 114 1024
 // 💡 Carpeta compartida de Google Drive / Google Photos para fotos de los invitados
 const GOOGLE_DRIVE_PHOTOS_URL = "https://drive.google.com/drive/folders/1_krista_mariel_quince_fotos_compartidas"
 // 💡 URL desplegada de Google Apps Script para sincronización automática en Google Sheets
@@ -57,6 +59,11 @@ async function fetchFromGoogleSheets(action: string) {
 const BANK_BENEFICIARY = "Krista Mariel Sandoval Caldera"
 const BANK_NAME = "BBVA México"
 const BANK_CLABE = "0121 8001 2345 6789 01"
+
+const LIVERPOOL_EVENT_NAME = "Mis xv Krista"
+const LIVERPOOL_EVENT_NUMBER = "60045186"
+const LIVERPOOL_EVENT_EXPIRY = "16/11/2026"
+const LIVERPOOL_URL = "https://mesaderegalos.liverpool.com.mx/"
 
 const DRESS_CODE = "Rigurosa Etiqueta · Gala Elegante"
 const DRESS_RESERVED_COLORS = [
@@ -179,10 +186,16 @@ const INITIAL_WISHES = [
 
 // ─── Initial Songs Data ────────────────────────────────────────────────────────
 const INITIAL_SONGS = [
-  { id: 1, title: "Pepas", artist: "Farruko", votes: 48 },
-  { id: 2, title: "Danza Kuduro", artist: "Don Omar", votes: 41 },
-  { id: 3, title: "Vivir Mi Vida", artist: "Marc Anthony", votes: 36 },
-  { id: 4, title: "Despacito", artist: "Luis Fonsi", votes: 32 },
+  { id: 1, title: "Love Story x Golden Brown", artist: "Andy Morris & Rob Landes", votes: 99, tag: "Canción Oficial de Gala ⭐" },
+  { id: 2, title: "golden hour", artist: "JVKE", votes: 84, tag: "Melodía de Entrada al Sobre 🌟" },
+  { id: 3, title: "ocean eyes", artist: "Billie Eilish", votes: 79, tag: "Favorita de Krista Mariel 🌊" },
+  { id: 4, title: "Beauty and the Beast (Instrumental)", artist: "Disney Gala / Alan Menken", votes: 72, tag: "Vals & Cuento de Hadas 🌹" },
+  { id: 5, title: "Suave", artist: "Luis Miguel", votes: 65, tag: "Gala & Pista de Baile 🎷" },
+  { id: 6, title: "No Sé Tú", artist: "Luis Miguel", votes: 61, tag: "Balada Romántica 💖" },
+  { id: 7, title: "BIRDS OF A FEATHER", artist: "Billie Eilish", votes: 58, tag: "Éxito Favorito 🕊️" },
+  { id: 8, title: "Pepas", artist: "Farruko", votes: 48 },
+  { id: 9, title: "Danza Kuduro", artist: "Don Omar", votes: 41 },
+  { id: 10, title: "Vivir Mi Vida", artist: "Marc Anthony", votes: 36 },
 ]
 
 // ─── Trivia Questions Data ─────────────────────────────────────────────────────
@@ -243,64 +256,83 @@ function ButterflyCanvas({ onSpawnRef, onExplosiveBurstRef }: ButterflyCanvasPro
   const particlesRef = useRef<ButterflyParticle[]>([])
   const mouseRef = useRef({ x: -1000, y: -1000 })
   const lastSpawnRef = useRef<number>(0)
+  const isPausedRef = useRef<boolean>(false)
+
+  const HUES = [
+    '#D4AF37', // Oro regio
+    '#F6C744', // Oro radiante
+    '#FFDF78', // Oro champaña
+    '#F7A8B8', // Rosa pastel
+    '#F48FB1', // Rosa rubor
+    '#DDA0DD', // Lavanda suave
+    '#E0B0FF', // Malva festivo
+    '#88D49E', // Menta sage
+  ]
 
   const createButterfly = useCallback((x?: number, y?: number, customVx?: number, customVy?: number): ButterflyParticle => {
     const width = window.innerWidth || 375
     const height = window.innerHeight || 667
-    const hues = ['#FFE57F', '#F5E6D3', '#FFFFFF', '#2E6B34', '#D4AF37', '#F9E79F']
     return {
       x: x ?? Math.random() * width,
       y: y ?? Math.random() * height,
-      vx: customVx ?? (Math.random() - 0.5) * 1.4,
-      vy: customVy ?? (-0.4 - Math.random() * 1.2),
-      size: (window.innerWidth < 640 ? 12 : 16) + Math.random() * 14,
+      vx: customVx ?? (Math.random() - 0.5) * 1.6,
+      vy: customVy ?? (-0.6 - Math.random() * 1.5),
+      size: (window.innerWidth < 640 ? 14 : 18) + Math.random() * 14,
       wingAngle: Math.random() * Math.PI * 2,
-      wingSpeed: 0.12 + Math.random() * 0.14,
-      hue: hues[Math.floor(Math.random() * hues.length)],
-      opacity: 0.85 + Math.random() * 0.15,
+      wingSpeed: 0.14 + Math.random() * 0.14,
+      hue: HUES[Math.floor(Math.random() * HUES.length)],
+      opacity: 0.88 + Math.random() * 0.12,
       sparkles: [],
     }
   }, [])
 
   const triggerSwarm = useCallback(() => {
+    isPausedRef.current = false
     const width = window.innerWidth || 375
     const height = window.innerHeight || 667
-    const maxAllowed = window.innerWidth < 640 ? 25 : 38
-    for (let i = 0; i < 15; i++) {
-      if (particlesRef.current.length < maxAllowed) {
-        particlesRef.current.push(createButterfly(Math.random() * width, height + 30))
+    const count = 4
+    for (let i = 0; i < count; i++) {
+      if (particlesRef.current.length < 10) {
+        particlesRef.current.push(
+          createButterfly(
+            Math.random() * width,
+            height + 15 + Math.random() * 30,
+            (Math.random() - 0.5) * 1.5,
+            -1.0 - Math.random() * 1.2
+          )
+        )
       }
     }
   }, [createButterfly])
 
   const triggerExplosiveBurst = useCallback(() => {
+    isPausedRef.current = false
     const width = window.innerWidth || 375
     const height = window.innerHeight || 667
     const centerX = width / 2
     const centerY = height / 2
 
-    const burstCount = window.innerWidth < 640 ? 20 : 35
+    const burstCount = 10
     for (let i = 0; i < burstCount; i++) {
       const angle = Math.random() * Math.PI * 2
-      const speed = 3 + Math.random() * 7
+      const speed = 2.5 + Math.random() * 4
       const vx = Math.cos(angle) * speed
-      const vy = Math.sin(angle) * speed - 1
+      const vy = Math.sin(angle) * speed - 1.0
 
-      const hues = ['#FFE57F', '#F5E6D3', '#FFFFFF', '#2E6B34', '#D4AF37']
       particlesRef.current.push({
         x: centerX + (Math.random() - 0.5) * 20,
         y: centerY + (Math.random() - 0.5) * 20,
         vx,
         vy,
-        size: (window.innerWidth < 640 ? 14 : 18) + Math.random() * 16,
+        size: 14 + Math.random() * 8,
         wingAngle: Math.random() * Math.PI * 2,
-        wingSpeed: 0.2 + Math.random() * 0.15,
-        hue: hues[Math.floor(Math.random() * hues.length)],
-        opacity: 1,
+        wingSpeed: 0.16 + Math.random() * 0.1,
+        hue: HUES[Math.floor(Math.random() * HUES.length)],
+        opacity: 0.85,
         sparkles: [],
       })
     }
-  }, [])
+  }, [createButterfly])
 
   useEffect(() => {
     if (onSpawnRef) onSpawnRef(triggerSwarm)
@@ -314,8 +346,8 @@ function ButterflyCanvas({ onSpawnRef, onExplosiveBurstRef }: ButterflyCanvasPro
     if (!ctx) return
 
     let animationFrameId: number
-    const maxParticles = window.innerWidth < 640 ? 25 : 38
-    const initialCount = Math.min(20, Math.floor((window.innerWidth || 400) / 40))
+    const maxParticles = 10
+    const initialCount = 6
 
     particlesRef.current = Array.from({ length: initialCount }, () => createButterfly())
 
@@ -326,69 +358,35 @@ function ButterflyCanvas({ onSpawnRef, onExplosiveBurstRef }: ButterflyCanvasPro
     handleResize()
     window.addEventListener('resize', handleResize)
 
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length > 0) {
-        const now = Date.now()
-        const x = e.touches[0].clientX
-        const y = e.touches[0].clientY
-        mouseRef.current = { x, y }
-
-        if (now - lastSpawnRef.current > 160 && particlesRef.current.length < maxParticles) {
-          lastSpawnRef.current = now
-          particlesRef.current.push(
-            createButterfly(x + (Math.random() - 0.5) * 15, y + (Math.random() - 0.5) * 15, (Math.random() - 0.5) * 1.5, -1)
-          )
-        }
-      }
-    }
-
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseRef.current = { x: e.clientX, y: e.clientY }
-      const now = Date.now()
-      if (now - lastSpawnRef.current > 180 && particlesRef.current.length < maxParticles) {
-        lastSpawnRef.current = now
-        particlesRef.current.push(
-          createButterfly(e.clientX + (Math.random() - 0.5) * 15, e.clientY + (Math.random() - 0.5) * 15, (Math.random() - 0.5) * 1.5, -1)
-        )
-      }
-    }
-
-    const handleClick = (e: MouseEvent) => {
-      if (particlesRef.current.length < maxParticles) {
-        for (let i = 0; i < 3; i++) {
-          particlesRef.current.push(
-            createButterfly(e.clientX + (Math.random() - 0.5) * 20, e.clientY + (Math.random() - 0.5) * 20)
-          )
-        }
-      }
-    }
-
-    window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('touchmove', handleTouchMove, { passive: true })
-    window.addEventListener('click', handleClick)
-
-    let isPaused = false
     const handlePauseButterflies = () => {
-      isPaused = true
+      isPausedRef.current = true
       ctx.clearRect(0, 0, canvas.width, canvas.height)
     }
     const handleResumeButterflies = () => {
-      isPaused = false
+      isPausedRef.current = false
+      if (particlesRef.current.length < initialCount) {
+        particlesRef.current = Array.from({ length: initialCount }, () => createButterfly())
+      }
     }
     window.addEventListener('pause-butterflies', handlePauseButterflies)
     window.addEventListener('resume-butterflies', handleResumeButterflies)
 
     const render = () => {
-      if (isPaused) {
+      if (isPausedRef.current) {
         animationFrameId = requestAnimationFrame(render)
         return
       }
 
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-      // Maintain max particle count limit to guarantee 60fps
+      // Maintain reasonable population
       while (particlesRef.current.length > maxParticles) {
         particlesRef.current.shift()
+      }
+
+      // Auto-replenish if population drops below initialCount
+      if (particlesRef.current.length < initialCount && Math.random() < 0.08) {
+        particlesRef.current.push(createButterfly(Math.random() * canvas.width, canvas.height + 25))
       }
 
       particlesRef.current.forEach((p) => {
@@ -398,41 +396,47 @@ function ButterflyCanvas({ onSpawnRef, onExplosiveBurstRef }: ButterflyCanvasPro
         const dx = mouseRef.current.x - p.x
         const dy = mouseRef.current.y - p.y
         const dist = Math.sqrt(dx * dx + dy * dy)
-        if (dist < 120) {
-          p.vx -= (dx / dist) * 0.3
-          p.vy -= (dy / dist) * 0.3
+        if (dist < 130) {
+          p.vx -= (dx / dist) * 0.35
+          p.vy -= (dy / dist) * 0.35
         }
 
         p.vx *= 0.98
         p.vy *= 0.98
 
-        p.vx += Math.sin(p.wingAngle * 0.5) * 0.04
+        p.vx += Math.sin(p.wingAngle * 0.5) * 0.05
         p.x += p.vx
         p.y += p.vy
 
-        if (p.y < -30) {
-          p.y = canvas.height + 20
+        // Wrap around screen boundaries
+        if (p.y < -40) {
+          p.y = canvas.height + 25
           p.x = Math.random() * canvas.width
+          p.vy = -0.6 - Math.random() * 1.5
+          p.vx = (Math.random() - 0.5) * 1.6
         }
-        if (p.x < -30) p.x = canvas.width + 20
-        if (p.x > canvas.width + 30) p.x = -20
+        if (p.x < -40) p.x = canvas.width + 30
+        if (p.x > canvas.width + 40) p.x = -30
 
-        if (Math.random() < 0.2) {
+        // Sparkle trail
+        if (Math.random() < 0.28) {
           p.sparkles.push({
-            x: p.x + (Math.random() - 0.5) * 6,
-            y: p.y + 5 + Math.random() * 6,
-            alpha: 0.85,
-            size: 1 + Math.random() * 2,
+            x: p.x + (Math.random() - 0.5) * 8,
+            y: p.y + 4 + Math.random() * 8,
+            alpha: 0.95,
+            size: 1 + Math.random() * 2.2,
           })
         }
 
         p.sparkles.forEach((sp, sIdx) => {
-          sp.y += 0.3
-          sp.alpha -= 0.04
+          sp.y += 0.35
+          sp.alpha -= 0.035
           if (sp.alpha > 0) {
             ctx.save()
             ctx.fillStyle = p.hue
-            ctx.globalAlpha = sp.alpha * 0.8
+            ctx.shadowColor = '#FFD700'
+            ctx.shadowBlur = 4
+            ctx.globalAlpha = sp.alpha * 0.9
             ctx.beginPath()
             ctx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2)
             ctx.fill()
@@ -442,82 +446,114 @@ function ButterflyCanvas({ onSpawnRef, onExplosiveBurstRef }: ButterflyCanvasPro
           }
         })
 
+        // Draw Butterfly
         ctx.save()
         ctx.translate(p.x, p.y)
         ctx.globalAlpha = p.opacity
 
         const angle = Math.atan2(p.vy, p.vx) + Math.PI / 2
-        ctx.rotate(angle * 0.2)
+        ctx.rotate(angle * 0.25 + Math.sin(p.wingAngle) * 0.08)
 
-        const wingScaleX = Math.abs(flap) * 0.8 + 0.2
+        const wingScaleX = Math.abs(flap) * 0.85 + 0.15
         const s = p.size
+
+        // Soft outer glow
+        ctx.shadowColor = p.hue
+        ctx.shadowBlur = 8
+
+        // Top Wings Gradient
+        const topGrad = ctx.createRadialGradient(0, 0, s * 0.2, 0, 0, s * 1.4)
+        topGrad.addColorStop(0, '#FFFDF0')
+        topGrad.addColorStop(0.55, p.hue)
+        topGrad.addColorStop(1, '#B8860B')
 
         // Left Top Wing
         ctx.save()
         ctx.scale(-wingScaleX, 1)
-        ctx.fillStyle = p.hue
+        ctx.fillStyle = topGrad
         ctx.beginPath()
         ctx.moveTo(0, 0)
-        ctx.bezierCurveTo(-s * 1.2, -s * 0.8, -s * 1.5, -s * 0.1, -s * 0.8, s * 0.6)
+        ctx.bezierCurveTo(-s * 1.25, -s * 0.85, -s * 1.55, -s * 0.1, -s * 0.85, s * 0.65)
         ctx.bezierCurveTo(-s * 0.4, s * 0.8, -s * 0.1, s * 0.4, 0, 0)
         ctx.fill()
-        ctx.strokeStyle = '#B8860B'
-        ctx.lineWidth = 0.5
+        ctx.strokeStyle = '#D4AF37'
+        ctx.lineWidth = 0.8
         ctx.stroke()
         ctx.restore()
 
         // Right Top Wing
         ctx.save()
         ctx.scale(wingScaleX, 1)
-        ctx.fillStyle = p.hue
+        ctx.fillStyle = topGrad
         ctx.beginPath()
         ctx.moveTo(0, 0)
-        ctx.bezierCurveTo(s * 1.2, -s * 0.8, s * 1.5, -s * 0.1, s * 0.8, s * 0.6)
+        ctx.bezierCurveTo(s * 1.25, -s * 0.85, s * 1.55, -s * 0.1, s * 0.85, s * 0.65)
         ctx.bezierCurveTo(s * 0.4, s * 0.8, s * 0.1, s * 0.4, 0, 0)
         ctx.fill()
-        ctx.strokeStyle = '#B8860B'
-        ctx.lineWidth = 0.5
+        ctx.strokeStyle = '#D4AF37'
+        ctx.lineWidth = 0.8
         ctx.stroke()
         ctx.restore()
+
+        // Bottom Wings Gradient
+        const botGrad = ctx.createRadialGradient(0, 0, s * 0.1, 0, s * 0.6, s * 1.1)
+        botGrad.addColorStop(0, '#FFFFFF')
+        botGrad.addColorStop(0.6, p.hue)
+        botGrad.addColorStop(1, '#996515')
 
         // Left Bottom Wing
         ctx.save()
         ctx.scale(-wingScaleX, 1)
-        ctx.fillStyle = p.hue
-        ctx.globalAlpha = p.opacity * 0.75
+        ctx.fillStyle = botGrad
+        ctx.globalAlpha = p.opacity * 0.82
         ctx.beginPath()
         ctx.moveTo(0, 0)
-        ctx.bezierCurveTo(-s * 0.9, s * 0.2, -s * 1.1, s * 1.1, -s * 0.4, s * 1.2)
+        ctx.bezierCurveTo(-s * 0.95, s * 0.2, -s * 1.15, s * 1.15, -s * 0.45, s * 1.25)
         ctx.bezierCurveTo(-s * 0.1, s * 1.2, 0, s * 0.6, 0, 0)
         ctx.fill()
+        ctx.strokeStyle = '#D4AF37'
+        ctx.lineWidth = 0.6
+        ctx.stroke()
         ctx.restore()
 
         // Right Bottom Wing
         ctx.save()
         ctx.scale(wingScaleX, 1)
-        ctx.fillStyle = p.hue
-        ctx.globalAlpha = p.opacity * 0.75
+        ctx.fillStyle = botGrad
+        ctx.globalAlpha = p.opacity * 0.82
         ctx.beginPath()
         ctx.moveTo(0, 0)
-        ctx.bezierCurveTo(s * 0.9, s * 0.2, s * 1.1, s * 1.1, s * 0.4, s * 1.2)
+        ctx.bezierCurveTo(s * 0.95, s * 0.2, s * 1.15, s * 1.15, s * 0.45, s * 1.25)
         ctx.bezierCurveTo(s * 0.1, s * 1.2, 0, s * 0.6, 0, 0)
         ctx.fill()
+        ctx.strokeStyle = '#D4AF37'
+        ctx.lineWidth = 0.6
+        ctx.stroke()
         ctx.restore()
 
-        // Body
-        ctx.fillStyle = '#6E531E'
+        // Reset shadow for body & antennae
+        ctx.shadowBlur = 0
+
+        // Golden-brown body
+        ctx.fillStyle = '#4A3510'
         ctx.beginPath()
-        ctx.ellipse(0, 0, s * 0.1, s * 0.45, 0, 0, Math.PI * 2)
+        ctx.ellipse(0, 0, s * 0.1, s * 0.48, 0, 0, Math.PI * 2)
         ctx.fill()
 
-        // Antennae
-        ctx.strokeStyle = '#9A7B38'
-        ctx.lineWidth = 0.7
+        // Tiny golden head
+        ctx.fillStyle = '#D4AF37'
         ctx.beginPath()
-        ctx.moveTo(-1, -s * 0.4)
-        ctx.quadraticCurveTo(-s * 0.4, -s * 0.8, -s * 0.5, -s * 0.9)
-        ctx.moveTo(1, -s * 0.4)
-        ctx.quadraticCurveTo(s * 0.4, -s * 0.8, s * 0.5, -s * 0.9)
+        ctx.arc(0, -s * 0.42, s * 0.09, 0, Math.PI * 2)
+        ctx.fill()
+
+        // Delicate curved antennae
+        ctx.strokeStyle = '#8B6914'
+        ctx.lineWidth = 0.8
+        ctx.beginPath()
+        ctx.moveTo(-1, -s * 0.42)
+        ctx.quadraticCurveTo(-s * 0.4, -s * 0.85, -s * 0.55, -s * 0.95)
+        ctx.moveTo(1, -s * 0.42)
+        ctx.quadraticCurveTo(s * 0.4, -s * 0.85, s * 0.55, -s * 0.95)
         ctx.stroke()
 
         ctx.restore()
@@ -530,9 +566,6 @@ function ButterflyCanvas({ onSpawnRef, onExplosiveBurstRef }: ButterflyCanvasPro
 
     return () => {
       window.removeEventListener('resize', handleResize)
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('touchmove', handleTouchMove)
-      window.removeEventListener('click', handleClick)
       window.removeEventListener('pause-butterflies', handlePauseButterflies)
       window.removeEventListener('resume-butterflies', handleResumeButterflies)
       cancelAnimationFrame(animationFrameId)
@@ -542,7 +575,7 @@ function ButterflyCanvas({ onSpawnRef, onExplosiveBurstRef }: ButterflyCanvasPro
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-10"
+      className="fixed inset-0 pointer-events-none z-0 opacity-40"
       style={{ touchAction: 'none' }}
     />
   )
@@ -666,51 +699,126 @@ function speakEventDetails(onTriggerToast: (msg: string) => void) {
 }
 
 
-// ─── Virtual Cheers & Toast Counter Section ─────────────────────────────────────
+// ─── Virtual Cheers & Toast Counter Section (Lámina 5 Oficial) ──────────────────
 function VirtualCheersSection({ onTriggerSwarm, onTriggerToast }: { onTriggerSwarm: () => void; onTriggerToast: (msg: string) => void }) {
   const [cheers, setCheers] = useState(540)
-  const [animating, setAnimating] = useState(false)
+  const [hugs, setHugs] = useState(384)
+  const [animatingCheers, setAnimatingCheers] = useState(false)
+  const [animatingHugs, setAnimatingHugs] = useState(false)
 
   const handleCheers = () => {
     setCheers(c => c + 1)
-    setAnimating(true)
-    setTimeout(() => setAnimating(false), 700)
-
+    setAnimatingCheers(true)
+    setTimeout(() => setAnimatingCheers(false), 700)
     onTriggerSwarm()
     sendToGoogleSheets('cheers', { count: cheers + 1 })
-    onTriggerToast("🥂 ¡Salud por Krista Mariel! ¡Brindis enviado con éxito!")
+    onTriggerToast("🥂 ¡Salud por Krista Mariel! ¡Brindis virtual enviado!")
+  }
+
+  const handleSendHug = () => {
+    setHugs(h => h + 1)
+    setAnimatingHugs(true)
+    setTimeout(() => setAnimatingHugs(false), 700)
+    onTriggerSwarm()
+    sendToGoogleSheets('hugs', { count: hugs + 1 })
+    onTriggerToast("¡Enviaste un Abrazo Virtual a Krista Mariel! 💖🦋")
   }
 
   return (
-    <section id="brindis" className="relative py-12 md:py-16 px-4 md:px-6">
-      <div className="max-w-2xl mx-auto text-center">
-        <div className="glass-card p-6 md:p-10 rounded-3xl border-2 border-gold/40 flex flex-col items-center gap-5 shadow-2xl relative overflow-hidden">
-          <div className={`w-16 h-16 rounded-full border-2 border-gold flex items-center justify-center text-3xl bg-gold/15 shadow-lg transition-transform duration-300 ${animating ? 'scale-125 rotate-12' : ''}`}>
+    <section id="brindis" className="relative py-12 md:py-20 px-4 md:px-6">
+      <div className="section-sep mb-12 md:mb-16" />
+      <StationeryPlate className="max-w-xl">
+        {/* Quick Action Pill Buttons matching image copy 4.png */}
+        <div className="flex flex-wrap justify-center gap-2.5 w-full mb-5">
+          <a
+            href="#video-especial"
+            className="px-5 py-2 rounded-full glass-card border border-gold/50 text-gold-dark text-[11px] font-cinzel font-bold flex items-center gap-1.5 shadow-sm hover:scale-105 active:scale-95 transition-all"
+          >
+            <span>🎬</span> Pantalla Completa VIP ✦
+          </a>
+          <button
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: 'Mis Quince Años · Krista Mariel',
+                  text: '¡Acompáñanos a celebrar los XV Años de Krista Mariel!',
+                  url: window.location.href,
+                }).catch(() => {})
+              } else {
+                navigator.clipboard.writeText(window.location.href)
+                onTriggerToast("¡Enlace de invitación copiado! 📱")
+              }
+            }}
+            className="px-5 py-2 rounded-full glass-card border border-gold/50 text-gold-dark text-[11px] font-cinzel font-bold flex items-center gap-1.5 shadow-sm hover:scale-105 active:scale-95 transition-all cursor-pointer"
+          >
+            <span>📱</span> Compartir con Familia ✦
+          </button>
+        </div>
+
+        {/* Card 1: MIS BRINDIS matching image copy 4.png */}
+        <div className="glass-card p-6 md:p-8 rounded-3xl border border-gold/40 flex flex-col items-center gap-3.5 shadow-sm w-full bg-cream/80 mb-5">
+          <div className={`w-14 h-14 rounded-full border border-gold/70 flex items-center justify-center text-2xl bg-gold/15 shadow-sm transition-transform duration-300 ${animatingCheers ? 'scale-125 rotate-12' : ''}`}>
             🥂
           </div>
 
-          <h3 className="font-greatvibes text-4xl sm:text-5xl gold-text-gradient">
-            Brindis Virtual por Krista Mariel
-          </h3>
+          <p className="text-[11px] uppercase tracking-[0.3em] font-cinzel text-gold-dark font-bold">
+            MIS BRINDIS
+          </p>
+          <span className="text-gold-dark text-xs -mt-2">✦</span>
 
-          <p className="font-montserrat text-xs md:text-sm text-text-sub font-medium leading-relaxed max-w-md">
+          <h3 className="font-script text-4xl sm:text-5xl text-gold-dark -mt-1">
+            Brindis Virtual
+          </h3>
+          <p className="font-cinzel text-base md:text-lg text-text-main font-bold -mt-2">
+            por Krista Mariel
+          </p>
+
+          <p className="font-playfair italic text-xs md:text-sm text-text-sub font-medium leading-relaxed max-w-md">
             ¡Levanta tu copa desde donde estés! Cada brindis llena de luz y buenos deseos la fiesta de Krista.
           </p>
 
-          <div className="px-6 py-2 rounded-full bg-gold/15 border border-gold/40 my-1">
-            <span className="font-playfair text-gold-dark font-bold text-lg md:text-2xl">
+          <div className="px-5 py-2 rounded-full bg-cream border border-gold/60 my-1 shadow-inner">
+            <span className="font-cinzel text-gold-dark font-bold text-xs sm:text-sm">
               🥂 {cheers.toLocaleString()} Brindis por Krista Mariel ✨
             </span>
           </div>
 
           <button
             onClick={handleCheers}
-            className="px-8 py-4 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-text-main font-montserrat font-bold text-xs md:text-sm uppercase tracking-wider shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+            className="w-full max-w-xs py-3 rounded-full bg-gradient-to-r from-[#E6D0A7] via-[#C9A871] to-[#9F7E47] text-[#332415] font-cinzel font-bold text-xs uppercase tracking-wider shadow-md hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
-            <span>🥂</span> ¡Brindar por Krista Mariel! <span>✨</span>
+            <span>🥂</span> ¡BRINDAR POR KRISTA MARIEL! <span>✦</span>
           </button>
         </div>
-      </div>
+
+        {/* Card 2: ABRAZO VIRTUAL matching image copy 4.png */}
+        <div className="glass-card p-6 md:p-8 rounded-3xl border border-gold/40 flex flex-col items-center gap-3.5 shadow-sm w-full bg-cream/80">
+          <div className={`w-14 h-14 rounded-full border border-gold/70 flex items-center justify-center text-2xl bg-gold/15 shadow-sm transition-transform duration-300 ${animatingHugs ? 'scale-125' : ''}`}>
+            💖
+          </div>
+
+          <h3 className="font-cinzel text-base md:text-lg text-text-main font-bold">
+            Envía un Abrazo Virtual a Krista Mariel
+          </h3>
+
+          <p className="font-playfair italic text-xs md:text-sm text-text-sub font-medium leading-relaxed max-w-md">
+            Cada abrazo llena de alegría el corazón de Krista Mariel en su camino hacia sus Quince Años.
+          </p>
+
+          <div className="px-5 py-2 rounded-full bg-cream border border-gold/60 my-1 shadow-inner">
+            <span className="font-cinzel text-gold-dark font-bold text-xs sm:text-sm">
+              🤍 {hugs.toLocaleString()} Abrazos Entregados ✦
+            </span>
+          </div>
+
+          <button
+            onClick={handleSendHug}
+            className="w-full max-w-xs py-3 rounded-full bg-gradient-to-r from-[#E6D0A7] via-[#C9A871] to-[#9F7E47] text-[#332415] font-cinzel font-bold text-xs uppercase tracking-wider shadow-md hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>🤍</span> ¡ENVIAR ABRAZO VIRTUAL! <span>✦</span>
+          </button>
+        </div>
+      </StationeryPlate>
     </section>
   )
 }
@@ -866,23 +974,118 @@ function PostPartyThanksBanner({ isManualPostParty }: { isManualPostParty: boole
 }
 
 // ─── Ambient Audio Synthesizer for Quinceañera Melodies ─────────────────────────
+type SynthMode = 'ocean-eyes' | 'beauty-beast' | 'suave' | 'piano' | 'harp'
+
 class AmbientQuinceSynth {
   private ctx: AudioContext | null = null
   private isRunning: boolean = false
   private timerId: any = null
-  private mode: 'piano' | 'harp' = 'piano'
+  private mode: SynthMode = 'ocean-eyes'
   private masterGain: GainNode | null = null
   private isMuted: boolean = false
 
-  // Harmonious progressions in D Major / G Major tailored for luxury gala
-  private chords = [
-    { root: 146.83, notes: [293.66, 369.99, 440.00, 587.33, 739.99] }, // D chord
-    { root: 110.00, notes: [220.00, 277.18, 329.63, 440.00, 554.37] }, // A chord
-    { root: 123.47, notes: [246.94, 293.66, 369.99, 493.88, 587.33] }, // Bm chord
-    { root: 98.00,  notes: [196.00, 246.94, 293.66, 392.00, 493.88] }, // G chord
-  ]
+  private profiles: Record<SynthMode, {
+    tempo: number
+    filterFreq: number
+    filterType: BiquadFilterType
+    oscType: OscillatorType
+    decay: number
+    gainLevel: number
+    chords: { root: number; notes: number[] }[]
+  }> = {
+    'ocean-eyes': {
+      tempo: 480,
+      filterFreq: 1500,
+      filterType: 'lowpass',
+      oscType: 'sine',
+      decay: 2.8,
+      gainLevel: 0.17,
+      chords: [
+        // C#m9 (moody, iconic piano intro of Ocean Eyes)
+        { root: 69.30, notes: [277.18, 329.63, 415.30, 493.88, 554.37, 659.25] },
+        // Bsus4
+        { root: 61.74, notes: [246.94, 329.63, 369.99, 493.88, 554.37, 622.25] },
+        // Amaj7
+        { root: 55.00, notes: [220.00, 277.18, 329.63, 415.30, 554.37, 659.25] },
+        // G#m7 / E
+        { root: 82.41, notes: [207.65, 246.94, 329.63, 415.30, 493.88, 622.25] },
+      ]
+    },
+    'beauty-beast': {
+      tempo: 450,
+      filterFreq: 2100,
+      filterType: 'lowpass',
+      oscType: 'triangle',
+      decay: 2.3,
+      gainLevel: 0.18,
+      chords: [
+        // D Major ("Tale as old as time")
+        { root: 73.42, notes: [293.66, 369.99, 440.00, 587.33, 739.99] },
+        // G/D ("True as it can be")
+        { root: 73.42, notes: [293.66, 392.00, 440.00, 493.88, 587.33] },
+        // F#m7 ("Barely even friends")
+        { root: 92.50, notes: [277.18, 369.99, 440.00, 554.37, 739.99] },
+        // G ("Then somebody bends")
+        { root: 98.00, notes: [196.00, 246.94, 293.66, 392.00, 493.88] },
+        // A7 ("Unexpectedly")
+        { root: 110.00, notes: [220.00, 293.66, 329.63, 440.00, 554.37] },
+        // Bm7 ("Beauty and the Beast")
+        { root: 123.47, notes: [246.94, 293.66, 369.99, 440.00, 587.33] },
+      ]
+    },
+    'suave': {
+      tempo: 330,
+      filterFreq: 2400,
+      filterType: 'lowpass',
+      oscType: 'sine',
+      decay: 1.5,
+      gainLevel: 0.19,
+      chords: [
+        // Bm9 (Luis Miguel smooth latin-pop groove)
+        { root: 61.74, notes: [246.94, 293.66, 369.99, 440.00, 554.37] },
+        // Em9
+        { root: 82.41, notes: [196.00, 246.94, 329.63, 392.00, 440.00] },
+        // A13
+        { root: 55.00, notes: [220.00, 277.18, 329.63, 440.00, 493.88] },
+        // Dmaj9
+        { root: 73.42, notes: [293.66, 369.99, 440.00, 554.37, 659.25] },
+        // Gmaj7
+        { root: 98.00, notes: [196.00, 246.94, 293.66, 369.99, 493.88] },
+        // F#7alt
+        { root: 92.50, notes: [185.00, 277.18, 369.99, 440.00, 466.16] },
+      ]
+    },
+    'piano': {
+      tempo: 440,
+      filterFreq: 1700,
+      filterType: 'lowpass',
+      oscType: 'sine',
+      decay: 2.5,
+      gainLevel: 0.16,
+      chords: [
+        { root: 146.83, notes: [293.66, 369.99, 440.00, 587.33, 739.99] },
+        { root: 110.00, notes: [220.00, 277.18, 329.63, 440.00, 554.37] },
+        { root: 123.47, notes: [246.94, 293.66, 369.99, 493.88, 587.33] },
+        { root: 98.00,  notes: [196.00, 246.94, 293.66, 392.00, 493.88] },
+      ]
+    },
+    'harp': {
+      tempo: 360,
+      filterFreq: 2400,
+      filterType: 'lowpass',
+      oscType: 'triangle',
+      decay: 2.0,
+      gainLevel: 0.17,
+      chords: [
+        { root: 146.83, notes: [293.66, 369.99, 440.00, 587.33, 739.99] },
+        { root: 110.00, notes: [220.00, 277.18, 329.63, 440.00, 554.37] },
+        { root: 123.47, notes: [246.94, 293.66, 369.99, 493.88, 587.33] },
+        { root: 98.00,  notes: [196.00, 246.94, 293.66, 392.00, 493.88] },
+      ]
+    }
+  }
 
-  start(mode: 'piano' | 'harp') {
+  start(mode: SynthMode) {
     this.mode = mode
     this.stop()
     const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
@@ -891,8 +1094,9 @@ class AmbientQuinceSynth {
     if (this.ctx.state === 'suspended') {
       this.ctx.resume()
     }
+    const profile = this.profiles[mode] || this.profiles['piano']
     this.masterGain = this.ctx.createGain()
-    this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : 0.16, this.ctx.currentTime)
+    this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : profile.gainLevel, this.ctx.currentTime)
     this.masterGain.connect(this.ctx.destination)
     this.isRunning = true
 
@@ -901,22 +1105,33 @@ class AmbientQuinceSynth {
 
     const tick = () => {
       if (!this.isRunning || !this.ctx || !this.masterGain) return
-      const curChord = this.chords[chordIdx]
+      const currentChords = profile.chords
+      const curChord = currentChords[chordIdx % currentChords.length]
       const noteFreq = curChord.notes[step % curChord.notes.length]
-      this.playNote(noteFreq, step === 0 ? curChord.root : undefined)
+      this.playNote(noteFreq, step === 0 ? curChord.root : undefined, profile)
 
       step++
-      if (step >= 6) {
+      if (step >= curChord.notes.length) {
         step = 0
-        chordIdx = (chordIdx + 1) % this.chords.length
+        chordIdx = (chordIdx + 1) % currentChords.length
       }
-      this.timerId = setTimeout(tick, this.mode === 'harp' ? 360 : 440)
+      this.timerId = setTimeout(tick, profile.tempo)
     }
 
     tick()
   }
 
-  playNote(freq: number, bassFreq?: number) {
+  playNote(
+    freq: number,
+    bassFreq: number | undefined,
+    profile: {
+      filterFreq: number
+      filterType: BiquadFilterType
+      oscType: OscillatorType
+      decay: number
+      gainLevel: number
+    }
+  ) {
     if (!this.ctx || !this.masterGain) return
     const now = this.ctx.currentTime
 
@@ -924,15 +1139,15 @@ class AmbientQuinceSynth {
     const noteGain = this.ctx.createGain()
     const filter = this.ctx.createBiquadFilter()
 
-    osc.type = this.mode === 'harp' ? 'triangle' : 'sine'
+    osc.type = profile.oscType
     osc.frequency.setValueAtTime(freq, now)
 
-    filter.type = 'lowpass'
-    filter.frequency.setValueAtTime(this.mode === 'harp' ? 2400 : 1700, now)
+    filter.type = profile.filterType
+    filter.frequency.setValueAtTime(profile.filterFreq, now)
 
-    const dur = this.mode === 'harp' ? 2.0 : 2.5
+    const dur = profile.decay
     noteGain.gain.setValueAtTime(0.001, now)
-    noteGain.gain.exponentialRampToValueAtTime(0.18, now + 0.04)
+    noteGain.gain.exponentialRampToValueAtTime(profile.gainLevel, now + 0.04)
     noteGain.gain.exponentialRampToValueAtTime(0.0001, now + dur)
 
     osc.connect(filter)
@@ -948,19 +1163,20 @@ class AmbientQuinceSynth {
       bassOsc.type = 'sine'
       bassOsc.frequency.setValueAtTime(bassFreq, now)
       bassGain.gain.setValueAtTime(0.001, now)
-      bassGain.gain.exponentialRampToValueAtTime(0.12, now + 0.08)
-      bassGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.8)
+      bassGain.gain.exponentialRampToValueAtTime(profile.gainLevel * 0.9, now + 0.08)
+      bassGain.gain.exponentialRampToValueAtTime(0.0001, now + dur + 0.5)
       bassOsc.connect(bassGain)
       bassGain.connect(this.masterGain)
       bassOsc.start(now)
-      bassOsc.stop(now + 2.8)
+      bassOsc.stop(now + dur + 0.5)
     }
   }
 
   setMuted(muted: boolean) {
     this.isMuted = muted
     if (!this.ctx || !this.masterGain) return
-    this.masterGain.gain.setValueAtTime(muted ? 0 : 0.16, this.ctx.currentTime)
+    const profile = this.profiles[this.mode] || this.profiles['piano']
+    this.masterGain.gain.setValueAtTime(muted ? 0 : profile.gainLevel, this.ctx.currentTime)
   }
 
   stop() {
@@ -982,37 +1198,89 @@ interface AmbientTrack {
   name: string
   tag: string
   icon: string
-  type: 'mp3' | 'synth-piano' | 'synth-harp'
+  type: 'audio' | 'synth'
+  synthMode?: SynthMode
+  src?: string
 }
 
 const AMBIENT_TRACKS: AmbientTrack[] = [
   {
-    id: 'vals',
-    name: 'Vals de Krista Mariel',
-    tag: 'Vals Oficial de Gala · Quinceañera',
-    icon: '👑',
-    type: 'mp3',
+    id: 'love-story-golden-brown',
+    name: 'Love Story x Golden Brown',
+    tag: 'Andy Morris & Rob Landes · Violín & Piano 🎻⭐',
+    icon: '🎻',
+    type: 'audio',
+    src: '/audio/love_story_x_golden_brown.m4a',
+    synthMode: 'piano',
   },
   {
-    id: 'piano',
-    name: 'Balada en Piano Romántico',
-    tag: 'Melodía Acústica & Clásica',
-    icon: '🎹',
-    type: 'synth-piano',
+    id: 'golden-hour',
+    name: 'golden hour',
+    tag: 'JVKE · Melodía de Entrada al Sobre ⭐',
+    icon: '✨',
+    type: 'audio',
+    src: '/audio/golden_hour.m4a',
+    synthMode: 'piano',
+  },
+  {
+    id: 'ocean-eyes',
+    name: 'ocean eyes',
+    tag: 'Billie Eilish · Video Oficial 🌊',
+    icon: '🌊',
+    type: 'audio',
+    src: '/audio/ocean_eyes.m4a',
+    synthMode: 'ocean-eyes',
+  },
+  {
+    id: 'beauty-beast',
+    name: 'Beauty and the Beast',
+    tag: 'Disney Gala · Versión Instrumental 🌹',
+    icon: '🌹',
+    type: 'audio',
+    src: '/audio/beauty_and_the_beast_exact.m4a',
+    synthMode: 'beauty-beast',
+  },
+  {
+    id: 'suave',
+    name: 'Suave',
+    tag: 'Luis Miguel · Video Oficial 🎷',
+    icon: '🎷',
+    type: 'audio',
+    src: '/audio/suave_luis_miguel.m4a',
+    synthMode: 'suave',
+  },
+  {
+    id: 'no-se-tu',
+    name: 'No Sé Tú',
+    tag: 'Luis Miguel · Balada Romántica 💖',
+    icon: '💖',
+    type: 'audio',
+    src: '/audio/no_se_tu_luis_miguel.m4a',
+    synthMode: 'piano',
+  },
+  {
+    id: 'birds-feather',
+    name: 'BIRDS OF A FEATHER',
+    tag: 'Billie Eilish · Canción Favorita 🕊️',
+    icon: '🕊️',
+    type: 'audio',
+    src: '/audio/birds_of_a_feather.webm',
+    synthMode: 'ocean-eyes',
   },
   {
     id: 'harp',
     name: 'Fantasía de Arpa de Cristal',
     tag: 'Armonía de Cuento de Hadas 🦋',
     icon: '🦋',
-    type: 'synth-harp',
+    type: 'synth',
+    synthMode: 'harp',
   },
 ]
 
 // ─── Real Audio Music Player with Melody Selector ───────────────────────────────
 function RealMusicPlayer({ playTriggerRef }: { playTriggerRef: React.MutableRefObject<(() => void) | null> }) {
   const [isPlaying, setIsPlaying] = useState(false)
-  const [currentTrackId, setCurrentTrackId] = useState<string>('vals')
+  const [currentTrackId, setCurrentTrackId] = useState<string>('love-story-golden-brown')
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [muted, setMuted] = useState(false)
@@ -1022,21 +1290,28 @@ function RealMusicPlayer({ playTriggerRef }: { playTriggerRef: React.MutableRefO
   const currentTrack = AMBIENT_TRACKS.find(t => t.id === currentTrackId) || AMBIENT_TRACKS[0]
 
   const startPlaybackForTrack = useCallback((track: AmbientTrack) => {
-    if (track.type === 'mp3') {
-      quinceSynth.stop()
-      const audio = audioRef.current
+    quinceSynth.stop()
+    const audio = audioRef.current
+
+    if (track.type === 'audio' && track.src) {
       if (audio) {
-        audio.play().then(() => setIsPlaying(true)).catch(err => console.warn("Audio play blocked", err))
+        if (!audio.src.endsWith(track.src)) {
+          audio.src = track.src
+          audio.load()
+        }
+        audio.play()
+          .then(() => setIsPlaying(true))
+          .catch(err => {
+            console.warn("Audio play blocked or format error", err)
+            if (track.synthMode) {
+              quinceSynth.start(track.synthMode)
+              setIsPlaying(true)
+            }
+          })
       }
-    } else if (track.type === 'synth-piano') {
-      const audio = audioRef.current
+    } else if (track.type === 'synth') {
       if (audio) audio.pause()
-      quinceSynth.start('piano')
-      setIsPlaying(true)
-    } else if (track.type === 'synth-harp') {
-      const audio = audioRef.current
-      if (audio) audio.pause()
-      quinceSynth.start('harp')
+      quinceSynth.start(track.synthMode || 'harp')
       setIsPlaying(true)
     }
   }, [])
@@ -1058,10 +1333,24 @@ function RealMusicPlayer({ playTriggerRef }: { playTriggerRef: React.MutableRefO
 
   const selectTrack = (track: AmbientTrack) => {
     setCurrentTrackId(track.id)
-    if (isPlaying) {
-      startPlaybackForTrack(track)
-    }
+    startPlaybackForTrack(track)
   }
+
+  const handleNextTrack = useCallback(() => {
+    const currentIndex = AMBIENT_TRACKS.findIndex(t => t.id === currentTrackId)
+    const nextIndex = (currentIndex + 1) % AMBIENT_TRACKS.length
+    const nextTrack = AMBIENT_TRACKS[nextIndex]
+    setCurrentTrackId(nextTrack.id)
+    startPlaybackForTrack(nextTrack)
+  }, [currentTrackId, startPlaybackForTrack])
+
+  const handlePrevTrack = useCallback(() => {
+    const currentIndex = AMBIENT_TRACKS.findIndex(t => t.id === currentTrackId)
+    const prevIndex = (currentIndex - 1 + AMBIENT_TRACKS.length) % AMBIENT_TRACKS.length
+    const prevTrack = AMBIENT_TRACKS[prevIndex]
+    setCurrentTrackId(prevTrack.id)
+    startPlaybackForTrack(prevTrack)
+  }, [currentTrackId, startPlaybackForTrack])
 
   useEffect(() => {
     playTriggerRef.current = () => {
@@ -1102,7 +1391,7 @@ function RealMusicPlayer({ playTriggerRef }: { playTriggerRef: React.MutableRefO
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const audio = audioRef.current
-    if (audio && currentTrack.type === 'mp3') {
+    if (audio && currentTrack.type === 'audio') {
       const seekTime = Number(e.target.value)
       audio.currentTime = seekTime
       setCurrentTime(seekTime)
@@ -1126,127 +1415,199 @@ function RealMusicPlayer({ playTriggerRef }: { playTriggerRef: React.MutableRefO
   }
 
   return (
-    <div className="fixed bottom-4 left-4 z-40 max-w-[calc(100vw-5rem)]">
+    <>
       <audio
         ref={audioRef}
-        src="/audio/vals_crista.mp3"
-        loop
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleTimeUpdate}
+        src={currentTrack.src || "/audio/love_story_x_golden_brown.m4a"}
         onPlay={() => setIsPlaying(true)}
-        onPause={() => {
-          if (currentTrack.type === 'mp3') setIsPlaying(false)
-        }}
+        onPause={() => setIsPlaying(false)}
+        onEnded={handleNextTrack}
+        onTimeUpdate={handleTimeUpdate}
       />
 
-      <div className="glass-card p-2 md:p-3 rounded-2xl border-2 border-gold/50 shadow-2xl flex flex-col gap-2.5 transition-all bg-cream/95 backdrop-blur-2xl">
-        <div className="flex items-center gap-3">
+      {/* Floating Music Bar Widget */}
+      <div className="fixed bottom-4 left-4 z-40 flex items-center gap-2 max-w-[94vw]">
+        <div className="glass-card pl-2.5 pr-3 py-2 rounded-full border-2 border-gold/50 shadow-2xl flex items-center gap-2.5 backdrop-blur-xl bg-cream/90 transition-all duration-300">
+          {/* Animated Spinning Play/Pause Button */}
           <button
+            type="button"
             onClick={togglePlay}
-            className="w-10 h-10 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-text-main flex items-center justify-center font-bold text-sm shadow-md hover:scale-105 active:scale-95 transition-transform shrink-0 cursor-pointer"
-            title={isPlaying ? "Pausar Melodía" : `Reproducir ${currentTrack.name}`}
+            className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r from-gold to-gold-dark text-text-main flex items-center justify-center text-sm shadow-md hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer ${
+              isPlaying ? 'ring-2 ring-gold/40' : 'opacity-85'
+            }`}
+            title={isPlaying ? "Pausar música" : "Reproducir música"}
           >
-            {isPlaying ? "⏸" : "▶"}
+            {isPlaying ? '⏸' : '▶'}
           </button>
 
-          <div className="flex flex-col min-w-[130px] max-w-[190px] pr-1 cursor-pointer" onClick={() => setExpanded(!expanded)}>
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs">{currentTrack.icon}</span>
-              <span className="text-[10px] uppercase font-montserrat tracking-wider text-gold-dark font-bold truncate">
+          {/* Current Song Title & Info (Click opens playlist) */}
+          <div
+            onClick={() => setExpanded(true)}
+            className="cursor-pointer max-w-[130px] sm:max-w-[190px] select-none text-left"
+            title="Toca para ver las 8 canciones disponibles"
+          >
+            <div className="flex items-center gap-1">
+              <span className="text-xs shrink-0">{currentTrack.icon}</span>
+              <p className="font-montserrat font-bold text-xs text-text-main truncate leading-tight">
                 {currentTrack.name}
-              </span>
+              </p>
             </div>
-            <span className="text-[9px] font-montserrat text-text-sub truncate">
-              {isPlaying ? "Reproduciendo ahora..." : "Toca para reproducir"}
-            </span>
+            <p className="text-[10px] font-montserrat text-gold-dark truncate font-medium">
+              {isPlaying ? '♫ Sonando' : 'Pausado'} · Toca p/ lista 🎶
+            </p>
           </div>
 
-          <div className="flex items-center gap-1.5">
+          {/* Controls: Prev, Next, Playlist */}
+          <div className="flex items-center gap-1 border-l border-gold/30 pl-2">
             <button
-              onClick={toggleMute}
-              className="text-xs text-gold-dark hover:text-gold p-1 cursor-pointer transition-colors"
-              title={muted ? "Activar Sonido" : "Silenciar"}
+              type="button"
+              onClick={handlePrevTrack}
+              className="w-7 h-7 rounded-full hover:bg-gold/15 flex items-center justify-center text-xs text-text-sub hover:text-gold-dark transition-colors cursor-pointer"
+              title="Canción anterior"
             >
-              {muted ? "🔇" : "🔊"}
+              ⏮
             </button>
             <button
-              onClick={() => setExpanded(!expanded)}
-              className="text-[10px] font-montserrat font-bold text-gold-dark bg-gold/15 hover:bg-gold/25 px-2 py-1 rounded-lg border border-gold/30 flex items-center gap-1 cursor-pointer transition-colors"
-              title="Cambiar Melodía de Fondo"
+              type="button"
+              onClick={handleNextTrack}
+              className="w-7 h-7 rounded-full hover:bg-gold/15 flex items-center justify-center text-xs text-text-sub hover:text-gold-dark transition-colors cursor-pointer"
+              title="Siguiente canción"
             >
-              <span>🎵</span>
-              <span className="hidden sm:inline">Melodía</span>
-              <span>{expanded ? "▲" : "▼"}</span>
+              ⏭
+            </button>
+            <button
+              type="button"
+              onClick={() => setExpanded(true)}
+              className="px-2 py-1 rounded-full bg-gold/15 hover:bg-gold/25 border border-gold/40 text-[10px] font-montserrat font-bold text-gold-dark flex items-center gap-1 shadow-2xs cursor-pointer ml-0.5"
+              title="Ver todas las 8 canciones"
+            >
+              <span>🎶</span>
+              <span className="hidden sm:inline">8 temas</span>
             </button>
           </div>
         </div>
+      </div>
 
-        {expanded && (
-          <div className="px-1 pt-1 pb-1 flex flex-col gap-2.5 border-t border-gold/30 animate-fade-in">
-            {/* Melody / Track Selector Pills */}
-            <div className="flex flex-col gap-1.5">
-              <div className="flex justify-between items-center px-1">
-                <span className="text-[9px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">
-                  Seleccionar Melodía de Fondo
+      {/* Playlist Catalog Modal */}
+      {expanded && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-fade-in"
+          onClick={() => setExpanded(false)}
+        >
+          <div
+            className="relative max-w-md w-full bg-[#FAF6EE] rounded-3xl p-5 sm:p-6 border-2 border-gold shadow-2xl flex flex-col gap-4 overflow-hidden max-h-[90vh]"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-gold/30 shrink-0">
+              <div className="flex items-center gap-2.5">
+                <span className="w-10 h-10 rounded-2xl bg-gold/20 border border-gold/50 flex items-center justify-center text-xl shadow-xs">
+                  🎶
                 </span>
-                <span className="text-[8px] text-text-sub">3 Piezas de Gala</span>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                {AMBIENT_TRACKS.map(track => {
-                  const isSelected = track.id === currentTrackId
-                  return (
-                    <button
-                      key={track.id}
-                      onClick={() => selectTrack(track)}
-                      className={`p-2 rounded-xl text-left flex items-center justify-between border transition-all cursor-pointer ${
-                        isSelected
-                          ? 'bg-gold/20 border-gold shadow-sm text-text-main'
-                          : 'bg-white/40 hover:bg-gold/10 border-gold/30 text-text-sub'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <span className="text-base shrink-0">{track.icon}</span>
-                        <div className="min-w-0">
-                          <p className={`text-[11px] font-montserrat font-bold truncate ${isSelected ? 'text-gold-dark' : 'text-text-main'}`}>
-                            {track.name}
-                          </p>
-                          <p className="text-[9px] text-text-muted truncate">{track.tag}</p>
-                        </div>
-                      </div>
-
-                      {isSelected && (
-                        <span className="text-xs text-gold-dark font-bold shrink-0 ml-2 animate-pulse">
-                          {isPlaying ? '🎶' : '✓'}
-                        </span>
-                      )}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            {/* Time scrubber (when MP3 is active) */}
-            {currentTrack.type === 'mp3' && (
-              <div className="px-1 pt-1 flex flex-col gap-1 text-[9px] font-montserrat text-text-sub border-t border-gold/20">
-                <input
-                  type="range"
-                  min={0}
-                  max={duration || 100}
-                  value={currentTime}
-                  onChange={handleSeek}
-                  className="w-full accent-gold h-1 bg-pastel-beige rounded-lg cursor-pointer"
-                />
-                <div className="flex justify-between font-semibold">
-                  <span>{formatTime(currentTime)}</span>
-                  <span>{formatTime(duration)}</span>
+                <div>
+                  <h3 className="font-playfair text-lg sm:text-xl font-bold text-text-main leading-tight">
+                    Melodías & Canciones de Krista
+                  </h3>
+                  <p className="text-[11px] font-montserrat text-gold-dark font-medium">
+                    8 canciones seleccionadas para sus XV Años
+                  </p>
                 </div>
               </div>
-            )}
+              <button
+                type="button"
+                onClick={() => setExpanded(false)}
+                className="w-9 h-9 rounded-full bg-gold/15 hover:bg-gold/30 border border-gold/40 flex items-center justify-center text-sm font-bold text-text-main transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Continuous Play Info Tip */}
+            <div className="p-2.5 rounded-xl bg-gold/10 border border-gold/30 flex items-center gap-2 text-[11px] font-montserrat text-text-sub font-medium shrink-0">
+              <span className="text-base">🔀</span>
+              <span><strong>Reproducción continua activa:</strong> cuando termine una canción, pasará a la siguiente automáticamente.</span>
+            </div>
+
+            {/* Track List */}
+            <div className="overflow-y-auto flex flex-col gap-2 pr-1 max-h-[50vh]">
+              {AMBIENT_TRACKS.map((t, idx) => {
+                const isCurrent = t.id === currentTrackId
+                return (
+                  <div
+                    key={t.id}
+                    onClick={() => selectTrack(t)}
+                    className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                      isCurrent
+                        ? 'bg-gradient-to-r from-gold/25 via-gold/15 to-transparent border-gold shadow-sm scale-[1.01]'
+                        : 'bg-white/75 hover:bg-white border-gold/25'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="font-playfair font-bold text-sm text-gold-dark w-5 shrink-0 text-center">
+                        #{idx + 1}
+                      </span>
+                      <span className="text-xl shrink-0">{t.icon}</span>
+                      <div className="min-w-0">
+                        <p className={`font-playfair font-bold text-sm truncate ${isCurrent ? 'text-gold-dark' : 'text-text-main'}`}>
+                          {t.name}
+                        </p>
+                        <p className="text-[10px] font-montserrat text-text-sub truncate">
+                          {t.tag}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="shrink-0 flex items-center gap-2">
+                      {isCurrent && isPlaying ? (
+                        <span className="px-2.5 py-1 rounded-full bg-gold text-white text-[10px] font-montserrat font-bold flex items-center gap-1 shadow-xs animate-pulse">
+                          <span>♫</span> Sonando
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); selectTrack(t); }}
+                          className="px-3 py-1 rounded-full border border-gold bg-gold/10 hover:bg-gold/25 text-gold-dark text-xs font-montserrat font-semibold transition-all cursor-pointer"
+                        >
+                          Escuchar ▶
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Modal Footer with Player Controls */}
+            <div className="pt-3 border-t border-gold/30 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={togglePlay}
+                  className="px-4 py-1.5 rounded-full bg-gradient-to-r from-gold to-gold-dark text-text-main font-montserrat text-xs font-bold shadow-sm hover:brightness-105 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>{isPlaying ? '⏸ Pausar' : '▶ Reanudar'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNextTrack}
+                  className="px-3 py-1.5 rounded-full border border-gold/40 text-text-main hover:bg-gold/15 font-montserrat text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Siguiente ⏭</span>
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={() => setExpanded(false)}
+                className="px-4 py-1.5 rounded-full bg-gold/20 hover:bg-gold/30 border border-gold/40 text-text-main font-montserrat font-bold text-xs cursor-pointer transition-colors"
+              >
+                Cerrar
+              </button>
+            </div>
           </div>
-        )}
-      </div>
-    </div>
+        </div>,
+        document.body
+      )}
+    </>
   )
 }
 
@@ -1367,73 +1728,32 @@ function ParallaxCard({ children, className = "" }: { children: React.ReactNode;
   )
 }
 
-// ─── Voice Message Greeting Widget ───────────────────────────────────────────
-function VoiceMessageWidget() {
-  const [playing, setPlaying] = useState(false)
-
-  return (
-    <div className="glass-card p-4 md:p-6 rounded-3xl border-2 border-gold/40 shadow-xl max-w-xl mx-auto my-6 flex items-center gap-4">
-      <button
-        onClick={() => setPlaying(!playing)}
-        className="w-14 h-14 rounded-full bg-gradient-to-r from-gold to-gold-dark text-text-main flex items-center justify-center text-xl shadow-lg hover:scale-105 active:scale-95 transition-all shrink-0 font-bold"
-      >
-        {playing ? '⏸️' : '▶️'}
-      </button>
-
-      <div className="flex-1">
-        <div className="flex justify-between items-center mb-1">
-          <span className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">Mensaje de Voz · Krista Mariel</span>
-          <span className="text-[10px] font-montserrat text-text-sub font-semibold">0:28</span>
-        </div>
-
-        <div className="flex items-center gap-1 h-6 my-1">
-          {Array.from({ length: 24 }).map((_, i) => (
-            <div
-              key={i}
-              className={`w-1 rounded-full bg-gold transition-all duration-300 ${
-                playing ? 'animate-bounce' : 'h-2 opacity-60'
-              }`}
-              style={{
-                height: playing ? `${Math.sin(i * 0.5) * 12 + 10}px` : '6px',
-                animationDelay: `${(i % 5) * 0.15}s`,
-              }}
-            />
-          ))}
-        </div>
-
-        <p className="font-playfair italic text-xs text-text-sub font-medium">
-          "¡Hola! Bienvenidos a mi invitación oficial. Estoy emocionada de celebrarlo juntos en Quinta Maria Teresa..."
-        </p>
-      </div>
-    </div>
-  )
-}
-
-// ─── Arrival Guide Component (Guía VIP a Quinta Maria Teresa) ──────────────────
+// ─── Arrival Guide Component (Guía VIP al Salón de Eventos) ───────────────────
 function ArrivalGuideSection({ onTriggerToast }: { onTriggerToast: (msg: string) => void }) {
   const copyAddress = () => {
-    navigator.clipboard.writeText("Quinta Maria Teresa - Quinta de Eventos")
-    onTriggerToast("¡Dirección copiada al portapapeles! 📍")
+    navigator.clipboard.writeText(`Salón de Eventos · ${VENUE_COORDINATES}`)
+    onTriggerToast("¡Coordenadas copiadas al portapapeles! 📍")
   }
 
   return (
     <section id="llegada" className="relative py-16 md:py-24 px-4 md:px-6">
       <div className="section-sep mb-16 md:mb-20" />
       <div className="max-w-4xl mx-auto">
-        <SectionHeader tag="Ubicación & Traslado" title="Guía VIP de Llegada a Quinta Maria Teresa" />
+        <SectionHeader tag="Ubicación & Traslado" title="Guía de Llegada al Salón de Eventos" />
 
         <ParallaxCard className="glass-card p-6 md:p-10 rounded-3xl border-2 border-gold/40 flex flex-col md:flex-row gap-8 shadow-2xl items-center">
           <div className="w-full md:w-1/2 flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <span className="text-3xl">🏰</span>
               <div>
-                <span className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">Lugar del Evento</span>
-                <h3 className="font-playfair text-2xl text-text-main font-bold">Quinta Maria Teresa</h3>
+                <span className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">Lugar de la Recepción</span>
+                <h3 className="font-playfair text-2xl text-text-main font-bold">Salón de Eventos</h3>
+                <p className="text-xs font-montserrat text-gold-dark font-semibold mt-0.5">{VENUE_COORDINATES}</p>
               </div>
             </div>
 
             <p className="font-montserrat text-xs md:text-sm text-text-sub leading-relaxed font-medium">
-              Contamos con amplio estacionamiento privado, seguridad y valet parking para recibirte como te mereces.
+              Contamos con amplio estacionamiento, seguridad y accesos cómodos para recibirte como te mereces en este día tan especial.
             </p>
 
             <div className="glass-card p-4 rounded-2xl border border-gold/30 flex items-center justify-between">
@@ -1444,12 +1764,12 @@ function ArrivalGuideSection({ onTriggerToast }: { onTriggerToast: (msg: string)
                   <p className="font-playfair text-sm text-text-main font-bold">24°C · Cielos Despejados</p>
                 </div>
               </div>
-              <span className="text-xs font-montserrat text-gold-dark font-bold bg-gold/15 px-2.5 py-1 rounded-full border border-gold/30">Ideal Jardín</span>
+              <span className="text-xs font-montserrat text-gold-dark font-bold bg-gold/15 px-2.5 py-1 rounded-full border border-gold/30">Ideal Fiesta</span>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 mt-2">
               <a
-                href="https://waze.com/ul?q=Quinta+Maria+Teresa"
+                href="https://waze.com/ul?ll=23.1751881,-102.9076614&navigate=yes"
                 target="_blank"
                 rel="noreferrer"
                 className="flex-1 py-3 px-4 rounded-2xl bg-[#33CCFF]/15 border border-[#33CCFF]/40 text-text-main font-montserrat font-bold text-xs flex items-center justify-center gap-2 shadow-sm hover:scale-105 transition-all"
@@ -1457,7 +1777,7 @@ function ArrivalGuideSection({ onTriggerToast }: { onTriggerToast: (msg: string)
                 <span>🚗</span> Abrir en Waze
               </a>
               <a
-                href="https://maps.google.com/?q=Quinta+Maria+Teresa"
+                href={VENUE_MAPS}
                 target="_blank"
                 rel="noreferrer"
                 className="flex-1 py-3 px-4 rounded-2xl bg-gold/20 border border-gold text-gold-dark font-montserrat font-bold text-xs flex items-center justify-center gap-2 shadow-sm hover:scale-105 transition-all"
@@ -1468,16 +1788,16 @@ function ArrivalGuideSection({ onTriggerToast }: { onTriggerToast: (msg: string)
 
             <button
               onClick={copyAddress}
-              className="py-2.5 px-4 rounded-xl border border-gold/40 glass-card text-text-sub font-montserrat font-semibold text-xs text-center hover:text-gold-dark transition-colors"
+              className="py-2.5 px-4 rounded-xl border border-gold/40 glass-card text-text-sub font-montserrat font-semibold text-xs text-center hover:text-gold-dark transition-colors cursor-pointer"
             >
-              📋 Copiar Dirección Exacta
+              📋 Copiar Coordenadas Exactas
             </button>
           </div>
 
           <div className="w-full md:w-1/2 aspect-video md:aspect-square rounded-2xl overflow-hidden border-2 border-gold relative shadow-lg">
             <iframe
-              title="Quinta Maria Teresa Map"
-              src="https://maps.google.com/maps?q=Quinta%20Maria%20Teresa&t=&z=15&ie=UTF8&iwloc=&output=embed"
+              title="Mapa Salón de Eventos"
+              src="https://maps.google.com/maps?q=23.1751881,-102.9076614&t=&z=16&ie=UTF8&iwloc=&output=embed"
               className="w-full h-full border-0 filter saturate-150"
               loading="lazy"
             />
@@ -1599,6 +1919,11 @@ function IntroVideoModal({
     if (isOpen) {
       window.dispatchEvent(new CustomEvent('pause-bg-music'))
       window.dispatchEvent(new CustomEvent('pause-butterflies'))
+    } else {
+      window.dispatchEvent(new CustomEvent('resume-butterflies'))
+    }
+    return () => {
+      window.dispatchEvent(new CustomEvent('resume-butterflies'))
     }
   }, [isOpen])
 
@@ -1683,6 +2008,7 @@ function IntroVideoModal({
     if (videoRef.current) {
       videoRef.current.pause()
     }
+    window.dispatchEvent(new CustomEvent('resume-butterflies'))
     onFinish()
   }
 
@@ -2179,14 +2505,104 @@ function QRCodeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
 }
 
 
-// ─── Hero Section ──────────────────────────────────────────────────────────────
+// ─── Reusable Ornate Stationery Plate Component (Matching the 7 Official Photos) ─
+function StationeryPlate({
+  children,
+  className = "",
+  topButterfly = true,
+  bottomButterfly = true,
+  hideTopStar = false,
+  tagText,
+}: {
+  children: React.ReactNode
+  className?: string
+  topButterfly?: boolean
+  bottomButterfly?: boolean
+  hideTopStar?: boolean
+  tagText?: string
+}) {
+  return (
+    <div
+      className={`stationery-plate relative w-full max-w-2xl mx-auto rounded-[28px] sm:rounded-[36px] p-6 sm:p-10 md:p-14 bg-[#FAF5EC] border border-[#D8C4A6]/90 shadow-[0_20px_60px_rgba(70,53,35,0.08)] overflow-hidden text-center flex flex-col items-center select-text ${className}`}
+    >
+      {/* Authentic Watercolor Botanical Floral Corners from original plates */}
+      <img
+        src="/images/plate_corner_tl.png"
+        alt=""
+        aria-hidden="true"
+        className="absolute top-0 left-0 w-36 sm:w-52 md:w-60 pointer-events-none mix-blend-multiply opacity-85 select-none"
+      />
+      <img
+        src="/images/plate_corner_br.png"
+        alt=""
+        aria-hidden="true"
+        className="absolute bottom-0 right-0 w-36 sm:w-52 md:w-60 pointer-events-none mix-blend-multiply opacity-85 select-none"
+      />
+      <img
+        src="/images/plate_corner_tr.png"
+        alt=""
+        aria-hidden="true"
+        className="absolute top-0 right-0 w-20 sm:w-32 md:w-36 pointer-events-none mix-blend-multiply opacity-75 select-none"
+      />
+      <img
+        src="/images/plate_corner_bl.png"
+        alt=""
+        aria-hidden="true"
+        className="absolute bottom-0 left-0 w-20 sm:w-32 md:w-36 pointer-events-none mix-blend-multiply opacity-75 select-none"
+      />
+
+      {/* Ornate Corner Inset Brackets matching original stationery */}
+      <div className="absolute top-4 sm:top-6 left-4 sm:left-6 w-5 sm:w-7 h-5 sm:h-7 border-t border-l border-[#C4A163]/85 pointer-events-none" />
+      <div className="absolute top-4 sm:top-6 right-4 sm:right-6 w-5 sm:w-7 h-5 sm:h-7 border-t border-r border-[#C4A163]/85 pointer-events-none" />
+      <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 w-5 sm:w-7 h-5 sm:h-7 border-b border-l border-[#C4A163]/85 pointer-events-none" />
+      <div className="absolute bottom-4 sm:bottom-6 right-4 sm:right-6 w-5 sm:w-7 h-5 sm:h-7 border-b border-r border-[#C4A163]/85 pointer-events-none" />
+
+      {/* Delicate Inner Hairline Frame */}
+      <div className="absolute inset-3.5 sm:inset-5 border border-[#D8C4A6]/60 rounded-2xl pointer-events-none" />
+
+      {/* Top Center Butterfly + Star */}
+      {topButterfly && (
+        <div className="relative z-10 flex flex-col items-center gap-1 mb-2 sm:mb-3">
+          <span className="text-2xl sm:text-3xl filter drop-shadow-[0_2px_4px_rgba(180,140,80,0.25)] select-none">
+            🦋
+          </span>
+          {!hideTopStar && (
+            <span className="text-gold-dark text-[10px] select-none">✦</span>
+          )}
+        </div>
+      )}
+
+      {tagText && (
+        <p className="relative z-10 text-[10px] sm:text-xs uppercase tracking-[0.35em] font-cinzel text-gold-dark font-bold mb-2">
+          {tagText}
+        </p>
+      )}
+
+      {/* Plate Body Content */}
+      <div className="relative z-10 w-full flex flex-col items-center">
+        {children}
+      </div>
+
+      {/* Bottom Center Butterfly */}
+      {bottomButterfly && (
+        <div className="relative z-10 flex flex-col items-center gap-1 mt-5 sm:mt-6">
+          <span className="text-2xl sm:text-3xl filter drop-shadow-[0_2px_4px_rgba(180,140,80,0.25)] select-none">
+            🦋
+          </span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Hero Section (Lámina 1 Oficial) ───────────────────────────────────────────
 function HeroSection({ onTriggerToast }: { onTriggerToast: (msg: string) => void }) {
   const time = useCountdown(EVENT_DATE)
   const units = [
-    { v: time.days, l: "Días" },
-    { v: time.hours, l: "Horas" },
-    { v: time.minutes, l: "Min" },
-    { v: time.seconds, l: "Seg" },
+    { v: time.days, l: "DÍAS", icon: "📅" },
+    { v: time.hours, l: "HORAS", icon: "🕐" },
+    { v: time.minutes, l: "MIN", icon: "⏱" },
+    { v: time.seconds, l: "SEG", icon: "🤍" },
   ]
 
   const handleCalendar = (type: 'google' | 'ics') => {
@@ -2222,150 +2638,213 @@ END:VCALENDAR`
   return (
     <section
       id="inicio"
-      className="relative min-h-screen flex flex-col items-center justify-center text-center px-4 md:px-6 py-20 md:py-28 hero-glow overflow-hidden"
+      className="relative min-h-screen flex flex-col items-center justify-center text-center px-4 md:px-6 py-16 md:py-24 hero-glow overflow-hidden"
     >
-      <div
-        className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[340px] md:w-[550px] h-[340px] md:h-[550px] rounded-full blur-[100px] md:blur-[140px] opacity-35 pointer-events-none"
-        style={{ background: 'radial-gradient(circle, #FFF5B8 0%, #F7C5D4 50%, transparent 75%)' }}
-      />
-
-      <div className="relative z-20 flex flex-col items-center max-w-4xl mx-auto w-full">
-        <p className="animate-fade-in text-[10px] md:text-xs uppercase tracking-[0.35em] md:tracking-[0.45em] font-montserrat text-gold-dark mb-3 font-bold flex items-center gap-2">
-          <span>🦋</span> Con la bendición de Dios y el amor de mi familia <span>🦋</span>
+      <StationeryPlate className="max-w-xl">
+        <p className="text-[10px] md:text-xs uppercase tracking-[0.35em] font-cinzel text-gold-dark font-bold mb-2">
+          CON LA BENDICIÓN DE DIOS Y EL AMOR DE MI FAMILIA
         </p>
+        <span className="text-gold-dark text-xs mb-2">✦</span>
 
-        <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-gold flex items-center justify-center glass-card my-2 animate-float-slow shadow-lg">
-          <span className="font-cinzel text-lg md:text-xl text-gold-dark font-bold">KM</span>
+        {/* KM Monogram with Royal Crown */}
+        <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-full border border-gold/70 flex flex-col items-center justify-center glass-card my-1 shadow-md animate-float-slow bg-cream/90">
+          <svg className="w-5 h-4 text-gold-dark mb-0.5" viewBox="0 0 24 16" fill="currentColor">
+            <path d="M2 14h20v2H2v-2zm1.5-2L1 4l6 4 5-7 5 7 6-4-2.5 8h-17z" />
+          </svg>
+          <span className="font-cinzel text-lg md:text-2xl text-gold-dark font-bold leading-none">KM</span>
         </div>
 
-        <p className="font-greatvibes text-4xl sm:text-5xl md:text-6xl text-gold-dark mt-1">
-          Mis Quince Años
+        <p className="font-cinzel text-xs md:text-sm uppercase tracking-[0.35em] text-gold-dark font-bold mt-2">
+          MIS QUINCE AÑOS
         </p>
 
-        <GoldDivider />
-
-        <div className="animate-fade-in-up my-2 md:my-4">
-          <h1 className="text-6xl sm:text-7xl md:text-9xl font-greatvibes gold-text-gradient leading-tight drop-shadow-xl">
-            {QUINCE_NAME}
+        {/* Script Name */}
+        <div className="my-2 md:my-3">
+          <h1 className="text-6xl sm:text-7xl md:text-8xl font-script gold-text-gradient leading-tight drop-shadow-sm">
+            Krista
           </h1>
-          <p className="text-xs md:text-sm font-montserrat uppercase tracking-[0.4em] text-text-sub font-bold mt-1">
+          <h2 className="text-5xl sm:text-6xl md:text-7xl font-cinzel uppercase tracking-[0.3em] text-gold-dark font-light -mt-2 sm:-mt-3">
+            MARIEL
+          </h2>
+          <p className="text-xs md:text-sm font-cinzel uppercase tracking-[0.35em] text-text-sub font-bold mt-2">
             {QUINCE_FULL_NAME}
           </p>
+          <div className="flex justify-center mt-2">
+            <span className="text-gold-dark text-xs">✦</span>
+          </div>
         </div>
 
-        <p className="max-w-xl font-playfair italic text-text-main text-base sm:text-lg md:text-xl leading-relaxed mb-6 px-2 font-medium">
-          "Hay momentos en la vida que son verdaderamente mágicos, pero compartirlos con las personas que más quiero los hace inolvidables."
+        {/* Quote exactly as in image.png */}
+        <p className="max-w-xl font-playfair italic text-text-main text-base sm:text-lg md:text-xl leading-relaxed mb-4 px-2 font-medium">
+          “Hay momentos en la vida que se vuelven mágicos, y quiero compartir el mío contigo.”
         </p>
 
-        <div className="px-6 md:px-8 py-3 rounded-full glass-card border-2 border-gold/40 my-3 shadow-md flex flex-col sm:flex-row items-center gap-2">
-          <p className="font-playfair text-gold-dark font-bold text-base sm:text-lg md:text-xl tracking-wider">
-            Sábado · 17 de Octubre, 2026
-          </p>
-          <span className="hidden sm:inline text-gold-dark">•</span>
-          <span className="text-xs font-montserrat text-text-sub font-semibold">
-            (Mi Cumpleaños: 15 de Octubre 🎂)
+        {/* Date Layout matching image.png */}
+        <div className="flex items-center justify-center gap-4 sm:gap-6 my-2">
+          <span className="text-xs md:text-sm font-cinzel uppercase tracking-[0.25em] text-gold-dark font-bold">
+            SÁBADO
+          </span>
+          <div className="h-10 w-px bg-gold/50" />
+          <div className="flex flex-col items-center">
+            <span className="text-3xl md:text-4xl font-cormorant font-bold text-gold-dark leading-none">
+              17
+            </span>
+            <span className="text-[9px] md:text-[10px] font-cinzel uppercase tracking-[0.3em] text-gold-dark font-semibold mt-1">
+              OCTUBRE
+            </span>
+          </div>
+          <div className="h-10 w-px bg-gold/50" />
+          <span className="text-xs md:text-sm font-cinzel tracking-[0.25em] text-gold-dark font-bold">
+            2026
           </span>
         </div>
 
-        <div className="animate-fade-in-up mt-6 md:mt-8 flex gap-2 sm:gap-4 md:gap-6 justify-center">
-          {units.map(({ v, l }) => (
-            <div key={l} className="flex flex-col items-center gap-1.5">
-              <div className="w-14 h-14 sm:w-18 sm:h-18 md:w-20 md:h-20 rounded-2xl glass-card flex items-center justify-center border-2 border-gold/40 shadow-lg animate-border-glow">
-                <span className="text-xl sm:text-2xl md:text-3xl font-playfair font-bold text-gold-dark">
-                  {String(v).padStart(2, "0")}
-                </span>
-              </div>
-              <span className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] font-montserrat text-text-sub font-bold">
+        <p className="text-xs font-playfair italic text-text-sub font-medium mb-5">
+          (Mi cumpleaños: 15 de Octubre 🎂)
+        </p>
+
+        {/* 4 Countdown Cards matching image.png */}
+        <div className="flex gap-2 sm:gap-3 md:gap-4 justify-center w-full max-w-md">
+          {units.map(({ v, l, icon }) => (
+            <div
+              key={l}
+              className="flex-1 py-3 px-1 sm:py-4 rounded-2xl glass-card flex flex-col items-center justify-center border border-gold/40 shadow-sm gap-0.5 bg-cream/80"
+            >
+              <span className="text-xs sm:text-sm opacity-85">{icon}</span>
+              <span className="text-xl sm:text-2xl md:text-3xl font-cormorant font-bold text-gold-dark leading-none">
+                {String(v).padStart(2, "0")}
+              </span>
+              <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.2em] font-montserrat text-text-sub font-semibold">
                 {l}
               </span>
             </div>
           ))}
         </div>
 
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-xs sm:max-w-none px-4">
+        {/* 3 Pill Buttons matching image.png */}
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-2.5 w-full px-2">
           <a
             href="#video-especial"
-            className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-text-main text-[11px] font-montserrat uppercase tracking-wider font-bold shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-gradient-to-r from-[#E6D0A7] via-[#C9A871] to-[#9F7E47] text-[#332415] text-[11px] font-cinzel uppercase tracking-wider font-bold shadow-md hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
           >
-            <span>🎬</span> Ver Video Especial <span>🦋</span>
+            <span>🎬</span> VER VIDEO ESPECIAL <span>🦋</span>
           </a>
           <button
             onClick={() => handleCalendar('google')}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-full border-2 border-gold/40 glass-card text-[11px] font-montserrat uppercase tracking-wider text-gold-dark hover:bg-gold/15 transition-all flex items-center justify-center gap-2 font-bold shadow-sm"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-full border border-gold/60 glass-card text-[10px] font-cinzel uppercase tracking-wider text-gold-dark hover:bg-gold/15 transition-all flex items-center justify-center gap-1.5 font-bold shadow-sm"
           >
-            <span>📅</span> Agregar a Google Calendar
+            <span>📅</span> AGREGAR A GOOGLE CALENDAR
           </button>
           <button
             onClick={() => handleCalendar('ics')}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-full border-2 border-gold/40 glass-card text-[11px] font-montserrat uppercase tracking-wider text-gold-dark hover:bg-gold/15 transition-all flex items-center justify-center gap-2 font-bold shadow-sm"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-full border border-gold/60 glass-card text-[10px] font-cinzel uppercase tracking-wider text-gold-dark hover:bg-gold/15 transition-all flex items-center justify-center gap-1.5 font-bold shadow-sm"
           >
-            <span>📲</span> Guardar en iPhone / iCal
+            <span>📱</span> GUARDAR EN IPHONE / ICAL
           </button>
         </div>
-
-        {/* Voice Greeting Message Widget */}
-        <VoiceMessageWidget />
-
-        <a href="#padres" className="mt-12 flex flex-col items-center gap-2 opacity-70 hover:opacity-100 transition-opacity">
-          <span className="text-[9px] uppercase tracking-[0.3em] text-text-sub font-bold">Descubrir más</span>
-          <svg width="14" height="20" viewBox="0 0 16 22" fill="none" className="animate-bounce">
-            <path d="M8 0 V16 M2 10 L8 16 L14 10" stroke="#9A7B38" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </a>
-      </div>
+      </StationeryPlate>
     </section>
   )
 }
 
-// ─── Parents & Godparents Section ──────────────────────────────────────────────
+// ─── Parents & Godparents Section (Lámina 3 Oficial) ───────────────────────────
 function ParentsSection() {
   return (
-    <section id="padres" className="relative py-16 md:py-24 px-4 md:px-6">
-      <div className="section-sep mb-16 md:mb-20" />
-      <div className="max-w-4xl mx-auto">
-        <SectionHeader tag="Nuestra Familia" title="Padres & Padrinos" />
+    <section id="padres" className="relative py-12 md:py-20 px-4 md:px-6">
+      <div className="section-sep mb-12 md:mb-16" />
+      <StationeryPlate className="max-w-xl">
+        <p className="text-xs uppercase tracking-[0.35em] font-cinzel text-gold-dark font-bold">
+          KRISTA MARIEL
+        </p>
+        <span className="text-gold-dark text-xs my-1">✦</span>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-          <div className="glass-card glass-card-hover p-6 md:p-8 rounded-3xl text-center flex flex-col items-center gap-3 md:gap-4 border-2 border-gold/40">
-            <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border-2 border-gold flex items-center justify-center bg-gold/10 shrink-0">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="#9A7B38" strokeWidth="1.8" fill="none" />
-              </svg>
+        {/* Section Header: Nuestra Familia / Padres & Padrinos */}
+        <div className="flex items-center gap-2 mt-2 mb-1">
+          <span className="text-base">🦋</span>
+          <span className="text-xs uppercase tracking-[0.3em] font-cinzel text-gold-dark font-bold">
+            NUESTRA FAMILIA
+          </span>
+          <span className="text-base">🦋</span>
+        </div>
+
+        <h2 className="font-script text-5xl sm:text-6xl text-gold-dark my-1">
+          Padres & Padrinos
+        </h2>
+
+        <span className="text-gold-dark text-xs my-1">✦</span>
+
+        {/* Cards: Mis Padres & Mis Padrinos (Clean, NO vals player widget) */}
+        <div className="flex flex-col gap-3.5 w-full mt-2">
+          {/* Card 1: MIS PADRES */}
+          <div className="glass-card p-5 md:p-6 rounded-3xl border border-gold/40 shadow-sm flex flex-col items-center gap-2 bg-cream/75">
+            <div className="w-10 h-10 rounded-full border border-gold/70 flex items-center justify-center bg-gold/15 text-gold-dark text-base shadow-sm">
+              ♡
             </div>
-            <p className="text-[11px] md:text-xs uppercase tracking-[0.3em] font-montserrat text-gold-dark font-bold flex items-center gap-1.5">
-              <span>MIS PADRES</span> <span className="text-gold-dark">♡</span>
+            <p className="text-[11px] uppercase tracking-[0.3em] font-cinzel text-gold-dark font-bold">
+              MIS PADRES
             </p>
-            <h3 className="font-playfair text-xl md:text-2xl text-text-main font-bold">
+            <h3 className="font-cinzel text-base md:text-lg text-text-main font-bold">
               {FATHER_NAME}
             </h3>
-            <span className="text-gold-dark font-greatvibes text-2xl md:text-3xl">&</span>
-            <h3 className="font-playfair text-xl md:text-2xl text-text-main font-bold">
+            <span className="text-gold-dark font-script text-2xl leading-none">&</span>
+            <h3 className="font-cinzel text-base md:text-lg text-text-main font-bold">
               {MOTHER_NAME}
             </h3>
           </div>
 
-          <div className="glass-card glass-card-hover p-6 md:p-8 rounded-3xl text-center flex flex-col items-center gap-3 md:gap-4 border-2 border-gold/40">
-            <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border-2 border-gold flex items-center justify-center bg-gold/10 shrink-0">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="#9A7B38" strokeWidth="1.8" fill="none" />
-              </svg>
+          {/* Card 2: MIS PADRINOS (Clean, strictly without vals player) */}
+          <div className="glass-card p-5 md:p-6 rounded-3xl border border-gold/40 shadow-sm flex flex-col items-center gap-2 bg-cream/75">
+            <div className="w-10 h-10 rounded-full border border-gold/70 flex items-center justify-center bg-gold/15 text-gold-dark text-base shadow-sm">
+              ♫
             </div>
-            <p className="text-[11px] md:text-xs uppercase tracking-[0.3em] font-montserrat text-gold-dark font-bold flex items-center gap-1.5">
-              <span>MIS PADRINOS</span> <span className="text-gold-dark">♡</span>
+            <p className="text-[11px] uppercase tracking-[0.3em] font-cinzel text-gold-dark font-bold">
+              MIS PADRINOS
             </p>
-            <h3 className="font-playfair text-xl md:text-2xl text-text-main font-bold">
+            <h3 className="font-cinzel text-base md:text-lg text-text-main font-bold">
               {GODMOTHER_NAME}
             </h3>
-            <span className="text-gold-dark font-greatvibes text-2xl md:text-3xl">&</span>
-            <h3 className="font-playfair text-xl md:text-2xl text-text-main font-bold">
+            <span className="text-gold-dark font-script text-2xl leading-none">&</span>
+            <h3 className="font-cinzel text-base md:text-lg text-text-main font-bold">
               {GODFATHER_NAME}
             </h3>
           </div>
         </div>
-      </div>
+
+        {/* Bottom ornament */}
+        <div className="flex items-center gap-3 mt-6 opacity-75">
+          <div className="h-px w-12 bg-gold/50" />
+          <span className="text-base">🦋</span>
+          <div className="h-px w-12 bg-gold/50" />
+        </div>
+        <p className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] font-cinzel text-text-main font-bold mt-2">
+          17 DE OCTUBRE, 2026
+        </p>
+        <p className="text-[9px] md:text-[10px] uppercase tracking-[0.25em] font-cinzel text-text-sub font-semibold">
+          QUINTA MARIA TERESA
+        </p>
+      </StationeryPlate>
     </section>
   )
 }
+
+// ─── Official 15 Program Items matching image copy 5.png ───────────────────────
+const OFFICIAL_15_PROGRAM = [
+  { id: 1, time: "1:00 PM", title: "MISA", icon: "⛪", desc: "Misa Solemne de Acción de Gracias en la Parroquia Nuestra Señora del Carmen" },
+  { id: 2, time: "3:00 PM", title: "RECEPCIÓN DE INVITADOS", icon: "🥂", desc: "Apertura de puertas, bienvenida y cóctel en Quinta María Teresa" },
+  { id: 3, time: "4:00 PM", title: "COMIDA", icon: "🍽️", desc: "Servicio del banquete especial de gala" },
+  { id: 4, time: "4:00 PM", title: "MARIACHI", icon: "🎵", desc: "Entrada del Mariachi para amenizar la tarde" },
+  { id: 5, time: "5:00 PM", title: "GRUPO VERSÁTIL", icon: "🌐", desc: "Música en vivo y ambiente para abrir la pista" },
+  { id: 6, time: "", title: "VALS FAMILIAR", icon: "👨‍👩‍👧", desc: "Vals emotivo con padres, padrinos y familia" },
+  { id: 7, time: "", title: "SEMBLANZA", icon: "📜", desc: "Momento nostálgico recordando los momentos más bellos de Krista Mariel" },
+  { id: 8, time: "", title: "VALS PRINCIPAL", icon: "👑", desc: "Vals de gala de la Quinceañera con sus chambelanes" },
+  { id: 9, time: "", title: "BRINDIS", icon: "🥂", desc: "Brindis oficial de honor por la felicidad de Krista Mariel" },
+  { id: 10, time: "", title: "PASTEL", icon: "🎂", desc: "Corte del pastel y Las Mañanitas para la festejada" },
+  { id: 11, time: "", title: "SORPRESA", icon: "🎁", desc: "Sorpresa especial preparada para Krista Mariel" },
+  { id: 12, time: "", title: "BAILE SORPRESA", icon: "💃", desc: "Show coreográfico estelar moderno y alegre" },
+  { id: 13, time: "", title: "CABINA DE FOTOS", icon: "📷", desc: "Cabina de fotos instantáneas para llevar recuerdos impresos" },
+  { id: 14, time: "", title: "INAUGURACIÓN DE TIENDA MERCH STORE", icon: "🏬", desc: "Apertura del stand de recuerdos y artículos oficiales XV" },
+  { id: 15, time: "", title: "BANDA", icon: "🥁", desc: "Banda sinaloense en vivo para cantar y bailar con todo" },
+]
 
 // ─── Protocol / Itinerary Section (Exact Client Timeline & 25-Step Protocol) ─────
 function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) => void }) {
@@ -2800,71 +3279,103 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
     <section id="itinerario" className="relative py-16 md:py-24 px-4 md:px-6">
       <div className="section-sep mb-16 md:mb-20" />
       <div className="max-w-5xl mx-auto">
-        <SectionHeader 
-          tag="Protocolo Oficial" 
-          title="Organización de Tiempo & Protocolo" 
-        />
-        <p className="text-center font-playfair italic text-text-sub text-sm sm:text-base -mt-6 mb-8 max-w-2xl mx-auto">
-          "Cada instante de mis XV Años ha sido planeado con infinito amor. Conoce los 25 momentos que compartiré contigo en esta fecha tan especial."
-        </p>
-
-        {/* Quick Highlights Strip */}
-        <div className="glass-card p-6 md:p-8 rounded-3xl border-2 border-gold/50 shadow-2xl mb-8 text-center bg-gradient-to-b from-cream via-cream/90 to-pastel-beige/40">
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <span className="text-xl">🦋</span>
-            <span className="text-[11px] uppercase tracking-[0.3em] font-montserrat text-gold-dark font-bold">
-              SÁBADO 17 DE OCTUBRE, 2026 · QUINTA MARÍA TERESA
+        {/* Top Header matching image copy 5.png wrapped in StationeryPlate */}
+        <StationeryPlate className="max-w-3xl mb-12">
+          <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-cream border border-gold/50 shadow-sm mb-2">
+            <span>🎬</span>
+            <span className="text-[10px] uppercase tracking-[0.25em] font-cinzel text-gold-dark font-bold">
+              PROTOCOLO OFICIAL
             </span>
-            <span className="text-xl">🦋</span>
+            <span className="text-gold-dark text-xs">✦</span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 md:gap-4 py-3 border-y border-gold/30 my-2">
-            <div className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white/60 border border-gold/30 shadow-sm">
-              <span className="text-3xl">⛪</span>
-              <span className="font-playfair text-gold-dark font-bold text-sm md:text-base">1:00 PM</span>
-              <span className="text-[10px] uppercase tracking-wider font-montserrat font-bold text-text-main">Misa de Acción de Gracias</span>
-            </div>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-base">🦋</span>
+            <span className="text-xs uppercase tracking-[0.3em] font-cinzel text-gold-dark font-bold">
+              ORGANIZACIÓN DE
+            </span>
+            <span className="text-base">🦋</span>
+          </div>
 
-            <div className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white/60 border border-gold/30 shadow-sm">
-              <span className="text-3xl">🥂</span>
-              <span className="font-playfair text-gold-dark font-bold text-sm md:text-base">3:00 PM</span>
-              <span className="text-[10px] uppercase tracking-wider font-montserrat font-bold text-text-main">Recepción de Invitados</span>
-            </div>
+          <h2 className="font-script text-5xl sm:text-6xl md:text-7xl text-gold-dark leading-tight my-1">
+            Tiempo & Protocolo
+          </h2>
 
-            <div className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white/60 border border-gold/30 shadow-sm">
-              <span className="text-3xl">🍽️</span>
-              <span className="font-playfair text-gold-dark font-bold text-sm md:text-base">4:00 PM</span>
-              <span className="text-[10px] uppercase tracking-wider font-montserrat font-bold text-text-main">Mariachi & Comida</span>
-            </div>
+          <p className="font-playfair italic text-text-sub text-sm sm:text-base font-medium mb-1">
+            “Gracias por ser parte de este día tan especial.”
+          </p>
+          <span className="text-base my-1">🦋</span>
 
-            <div className="flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white/60 border border-gold/30 shadow-sm">
-              <span className="text-3xl">🪩</span>
-              <span className="font-playfair text-gold-dark font-bold text-sm md:text-base">5:00 PM</span>
-              <span className="text-[10px] uppercase tracking-wider font-montserrat font-bold text-text-main">Grupo Versátil</span>
-            </div>
+          {/* Location Card matching image copy 5.png */}
+          <div className="glass-card p-5 md:p-6 rounded-3xl border border-gold/40 shadow-sm max-w-md w-full my-3 flex flex-col items-center gap-1 bg-cream/90">
+            <span className="text-2xl text-gold-dark">📍</span>
+            <span className="text-[10px] uppercase tracking-[0.25em] font-cinzel text-gold-dark font-bold">
+              SALÓN
+            </span>
+            <h3 className="font-cinzel text-xl md:text-2xl font-bold text-text-main">
+              Quinta María Teresa
+            </h3>
+            <span className="text-gold-dark text-xs my-0.5">✦</span>
+            <p className="text-xs font-cinzel tracking-wider text-text-main font-bold">
+              SÁBADO 17 DE OCTUBRE, 2026
+            </p>
+            <p className="text-[10px] font-cinzel tracking-widest text-text-sub font-semibold">
+              QUINTA MARÍA TERESA
+            </p>
+          </div>
 
-            <div className="col-span-2 sm:col-span-1 flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white/60 border border-gold/30 shadow-sm">
-              <span className="text-3xl">🎷</span>
-              <span className="font-playfair text-gold-dark font-bold text-sm md:text-base">12:00 AM</span>
-              <span className="text-[10px] uppercase tracking-wider font-montserrat font-bold text-text-main">Banda & Cena</span>
-            </div>
+          {/* Subheading: Programa del Día */}
+          <div className="inline-flex items-center gap-2 px-6 py-1.5 rounded-full bg-cream border border-gold/50 shadow-sm my-3">
+            <span className="text-gold-dark text-xs">✦</span>
+            <span className="text-xs uppercase tracking-[0.25em] font-cinzel text-gold-dark font-bold">
+              PROGRAMA DEL DÍA
+            </span>
+            <span className="text-gold-dark text-xs">✦</span>
+          </div>
+
+          {/* 15 Program Cards Grid matching image copy 5.png */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-3.5 w-full my-3">
+            {OFFICIAL_15_PROGRAM.map(item => (
+              <div
+                key={item.id}
+                onClick={() => onTriggerToast(`Momento ${item.id}: ${item.title} - ${item.desc}`)}
+                className="glass-card p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl border border-gold/40 shadow-sm flex flex-col items-center justify-between text-center gap-1.5 hover:border-gold hover:shadow-md transition-all bg-cream/75 cursor-pointer group"
+              >
+                <span className="text-2xl sm:text-3xl group-hover:scale-110 transition-transform">
+                  {item.icon}
+                </span>
+                <div className="flex flex-col items-center gap-0.5 min-h-[44px] justify-center">
+                  {item.time && (
+                    <span className="text-[11px] sm:text-xs font-cinzel font-bold text-gold-dark">
+                      {item.time}
+                    </span>
+                  )}
+                  <span className="text-[10px] sm:text-[11px] font-cinzel font-bold uppercase tracking-wider text-text-main leading-tight">
+                    {item.title}
+                  </span>
+                </div>
+                <span className="text-xs text-gold-dark/60 font-bold group-hover:text-gold-dark transition-colors">
+                  +
+                </span>
+              </div>
+            ))}
           </div>
 
           <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
             <button
               onClick={copyFullProtocol}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 hover:bg-white text-gold-dark border border-gold/40 text-xs font-montserrat font-bold shadow-sm transition-all hover:shadow-md"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/80 hover:bg-white text-gold-dark border border-gold/40 text-xs font-cinzel font-bold shadow-sm transition-all hover:shadow-md cursor-pointer"
             >
-              <span>📋</span> Copiar Lista Completa (25 Momentos)
+              <span>📋</span> Copiar Programa Completo
             </button>
             <button
               onClick={() => window.print()}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/15 hover:bg-gold/25 text-gold-dark border border-gold/40 text-xs font-montserrat font-bold shadow-sm transition-all"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gold/15 hover:bg-gold/25 text-gold-dark border border-gold/40 text-xs font-cinzel font-bold shadow-sm transition-all cursor-pointer"
             >
-              <span>🖨️</span> Imprimir / Guardar en PDF
+              <span>🖨️</span> Imprimir / PDF
             </button>
           </div>
-        </div>
+        </StationeryPlate>
 
         {/* View Mode Toggle: Interactive vs Official Printed Card Replica */}
         <div className="flex items-center justify-center mb-8">
@@ -3124,114 +3635,232 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
   )
 }
 
+// ─── Reserved Color Section (Lámina 7 Oficial) ─────────────────────────────────
+function ReservedColorSection({ onTriggerToast }: { onTriggerToast: (msg: string) => void }) {
+  const [showFullPlate, setShowFullPlate] = useState(false)
+
+  return (
+    <section id="color-reservado" className="relative py-16 md:py-24 px-4 md:px-6">
+      <div className="section-sep mb-16 md:mb-20" />
+      <div className="max-w-3xl mx-auto flex flex-col items-center">
+        {/* Official Plate Card matching image copy 6.png */}
+        {/* Official Plate Card matching image copy 6.png */}
+        <div className="w-full max-w-md mx-auto flex flex-col items-center">
+          <div
+            onClick={() => {
+              setShowFullPlate(true)
+              onTriggerToast("✨ Mostrando lámina oficial en pantalla completa 🦋")
+            }}
+            className="relative w-full rounded-3xl overflow-hidden shadow-2xl border-2 border-gold/60 bg-[#FAF5EC] cursor-pointer group transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            title="Toca para ampliar en pantalla completa"
+          >
+            <img
+              src="/fotos/image copy 6.png"
+              alt="El Color de la Quinceañera Está Reservado"
+              className="w-full h-auto object-contain select-none"
+            />
+            {/* Subtle interactive hover badge */}
+            <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm text-white text-[10px] font-montserrat font-semibold flex items-center gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity">
+              <span>🔍</span>
+              <span>Toca para ampliar</span>
+            </div>
+          </div>
+
+          {/* Explanatory Guest Guidance Pill */}
+          <div className="mt-6 p-5 rounded-3xl border border-gold/40 bg-gold/10 w-full text-left flex flex-col gap-2.5 shadow-sm glass-card">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">👗</span>
+              <p className="text-xs uppercase tracking-widest font-cinzel text-gold-dark font-bold">
+                Guía de Color para Invitados
+              </p>
+            </div>
+            <p className="font-montserrat text-xs text-text-main leading-relaxed font-medium">
+              Con mucho cariño te pedimos <strong>reservar los tonos champán satinado, marfil y palo de rosa</strong> exclusivamente para Krista Mariel.
+            </p>
+            <p className="font-montserrat text-xs text-text-sub leading-relaxed font-medium">
+              ✨ <strong>¡Libertad total de colores para invitados!</strong> Puedes lucir tu vestido largo o traje formal en cualquier otro color de tu elección (azul, esmeralda, bugambilia, vino, etc.) para acompañarnos a celebrar esta gran noche.
+            </p>
+          </div>
+        </div>
+
+        {/* Full Plate Modal Lightbox */}
+        {showFullPlate && (
+          <div
+            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in"
+            onClick={() => setShowFullPlate(false)}
+          >
+            <div
+              className="relative max-w-lg w-full max-h-[92vh] flex flex-col items-center glass-card p-3 sm:p-4 rounded-3xl border-2 border-gold shadow-2xl bg-cream/95 overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                onClick={() => setShowFullPlate(false)}
+                className="absolute top-3 right-3 w-9 h-9 rounded-full bg-gold/20 hover:bg-gold/40 text-gold-dark flex items-center justify-center text-sm font-bold transition-all z-10 cursor-pointer"
+                title="Cerrar"
+              >
+                ✕
+              </button>
+              <div className="w-full overflow-y-auto max-h-[82vh] rounded-2xl flex justify-center">
+                <img
+                  src="/fotos/image copy 6.png"
+                  alt="Lámina Oficial - El Color de la Quinceañera Está Reservado"
+                  className="w-full h-auto object-contain rounded-xl shadow-lg"
+                />
+              </div>
+              <p className="text-[11px] font-cinzel tracking-widest text-gold-dark font-bold mt-2">
+                KRISTA MARIEL · 17 DE OCTUBRE, 2026
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
 // ─── Outfit Coordination Section (Baile Sorpresa XV Años) ─────────────────────
 function OutfitCoordinationSection() {
-  const [selectedRole, setSelectedRole] = useState<number>(0)
+  const [showLightbox, setShowLightbox] = useState(false)
 
-  const roles = [
-    {
-      role: "XV Años Krista Mariel",
-      color: "#F5E6D3",
-      colorLabel: "Champán / Beige Floral",
-      description: "Vestido espectacular de gala corte princesa con tirantes caídos, encaje de mariposas 3D en relieve con destellos y tiara dorada real.",
-      icon: "👑"
-    },
-    {
-      role: "Abuelo",
-      color: "#D4C5B0",
-      colorLabel: "Traje Beige Sastre",
-      description: "Traje formal de 3 piezas en tono beige cálido con chaleco y corbata champagne a juego.",
-      icon: "👔"
-    },
-    {
-      role: "Abuela",
-      color: "#C5B299",
-      colorLabel: "Champán Pastel",
-      description: "Vestido largo plisado beige champán con sobrefalda fluida y capa bordada en motivos de mariposas.",
-      icon: "👗"
-    },
-    {
-      role: "Papá",
-      color: "#1C2D42",
-      colorLabel: "Azul Marino / Beige",
-      description: "Traje sastre formal de 3 piezas en tono azul marino/beige con corbata pastel a juego.",
-      icon: "👞"
-    },
-    {
-      role: "Mamá",
-      color: "#B88E52",
-      colorLabel: "Dorado Pastel Ocre",
-      description: "Vestido largo de gala en tono dorado miel/ocre con drapeado sofisticado, cinto con pedrería y capa majestuosa.",
-      icon: "✨"
-    },
-    {
-      role: "Hermana",
-      color: "#8FA396",
-      colorLabel: "Verde Sage / Menta Pastel",
-      description: "Vestido de noche strapless con escote corazón en tono verde menta/sage con sobrefalda y apertura elegante.",
-      icon: "🌸"
-    },
-    {
-      role: "Chambelanes",
-      color: "#DDD0BD",
-      colorLabel: "Beige Nude & Moño Menta",
-      description: "Trajes coordinados formales en beige nude cálido con moño y pañuelo pastel verde menta a juego.",
-      icon: "🤵"
-    },
+  const participants = [
+    { label: "Abuelo", icon: "👔" },
+    { label: "Abuela", icon: "👗" },
+    { label: "Papá", icon: "👞" },
+    { label: "Mamá", icon: "✨" },
+    { label: "XV Años", icon: "👑" },
+    { label: "Hermana", icon: "🌸" },
+    { label: "Chambelanes", icon: "🤵" },
   ]
 
   return (
     <section id="coordinacion-outfits" className="relative py-16 md:py-24 px-4 md:px-6">
       <div className="section-sep mb-16 md:mb-20" />
       <div className="max-w-5xl mx-auto">
-        <SectionHeader tag="Baile Sorpresa XV Años" title="Coordinación de Outfits" />
+        {/* Section Header with exact styling from official print */}
+        <div className="text-center mb-8 md:mb-12">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold/15 border border-gold/40 mb-3 shadow-xs">
+            <span className="text-sm">🦋</span>
+            <span className="font-greatvibes text-xl md:text-2xl text-gold-dark font-normal tracking-wide">
+              Baile Sorpresa XV años
+            </span>
+            <span className="text-sm">🦋</span>
+          </div>
+          <h2 className="font-cinzel text-2xl md:text-4xl text-text-main font-bold tracking-[0.15em] uppercase">
+            Coordinación de Outfits
+          </h2>
+          <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mt-3" />
+        </div>
 
-        <div className="glass-card p-6 md:p-10 rounded-3xl border-2 border-gold/40 flex flex-col gap-8 shadow-xl">
+        {/* Main Banner Card */}
+        <div className="glass-card p-4 sm:p-6 md:p-8 rounded-3xl border-2 border-gold/40 shadow-2xl flex flex-col gap-6">
           <div className="text-center max-w-2xl mx-auto">
-            <p className="font-montserrat text-xs md:text-sm text-text-sub font-semibold leading-relaxed">
-              Para lograr la armonía mágica en las fotos familiares y la sorpresa de Krista Mariel, nuestra corte y familia coordinarán en esta paleta elegante de tonos pasteles beige, oro y menta.
+            <p className="font-montserrat text-xs md:text-sm text-text-sub font-medium leading-relaxed">
+              Guía oficial para la coordinación de vestimenta de la corte y familiares para el momento especial del baile sorpresa de Krista Mariel.
             </p>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-2 md:gap-3">
-            {roles.map((r, idx) => (
-              <button
-                key={r.role}
-                onClick={() => setSelectedRole(idx)}
-                className={`px-4 py-2.5 rounded-full text-xs font-montserrat font-bold transition-all flex items-center gap-2 ${
-                  selectedRole === idx
-                    ? 'bg-gradient-to-r from-gold to-gold-dark text-text-main shadow-lg scale-105'
-                    : 'bg-cream/80 text-text-sub hover:text-gold-dark border border-gold/30'
-                }`}
-              >
-                <span>{r.icon}</span>
-                <span>{r.role}</span>
-              </button>
-            ))}
+          {/* Interactive Image Container */}
+          <div
+            onClick={() => setShowLightbox(true)}
+            className="relative w-full rounded-2xl overflow-hidden border-2 border-gold/50 shadow-xl bg-gradient-to-b from-[#FFFDF9] to-[#F7F2EA] cursor-pointer group transition-all duration-300 hover:shadow-2xl hover:border-gold"
+          >
+            <img
+              src="/images/coordinacion_outfits.png"
+              alt="Coordinación de Outfits - Baile Sorpresa XV Años Krista Mariel"
+              className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-[1.01]"
+            />
+
+            {/* Hover overlay hint */}
+            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+              <span className="px-5 py-2.5 rounded-full bg-white/90 backdrop-blur-md border border-gold text-xs font-montserrat font-bold text-text-main shadow-lg flex items-center gap-2 transform group-hover:scale-105 transition-transform">
+                <span>🔍</span> Toca para ver en pantalla completa
+              </span>
+            </div>
+
+            {/* Corner badge on mobile */}
+            <div className="absolute bottom-2 right-2 md:hidden">
+              <span className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-xs text-[10px] font-montserrat font-bold text-white border border-white/30 flex items-center gap-1 shadow-md">
+                🔍 Ampliar
+              </span>
+            </div>
           </div>
 
-          <div className="glass-card p-6 md:p-8 rounded-2xl border border-gold/40 flex flex-col md:flex-row items-center gap-6">
-            <div
-              className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-gold shadow-lg shrink-0 flex items-center justify-center text-3xl"
-              style={{ backgroundColor: roles[selectedRole].color }}
-            >
-              {roles[selectedRole].icon}
-            </div>
-
-            <div className="flex-1 text-center md:text-left">
-              <span className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">
-                Tono Sugerido: {roles[selectedRole].colorLabel}
-              </span>
-              <h3 className="font-playfair text-2xl text-text-main font-bold mt-1">
-                {roles[selectedRole].role}
-              </h3>
-              <p className="font-montserrat text-xs md:text-sm text-text-sub mt-2 leading-relaxed font-medium">
-                {roles[selectedRole].description}
-              </p>
-            </div>
+          {/* Roles Pills Bar with the exact labels from image */}
+          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 pt-2 border-t border-gold/20">
+            {participants.map((p) => (
+              <div
+                key={p.label}
+                className="px-3 py-1.5 rounded-full bg-cream/90 border border-gold/35 flex items-center gap-1.5 shadow-2xs"
+              >
+                <span className="text-xs">{p.icon}</span>
+                <span className="font-cinzel text-[10px] sm:text-xs font-bold text-text-main tracking-wider uppercase">
+                  {p.label}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
+
+      {/* Fullscreen Lightbox Modal */}
+      {showLightbox && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fade-in"
+          onClick={() => setShowLightbox(false)}
+        >
+          <div
+            className="relative max-w-6xl w-full max-h-[92vh] bg-[#FAF6EE] rounded-3xl p-4 sm:p-6 border-2 border-gold shadow-2xl flex flex-col gap-3 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-2 border-b border-gold/30 shrink-0">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🦋</span>
+                <div>
+                  <h3 className="font-cinzel text-sm sm:text-base font-bold text-text-main uppercase tracking-wider">
+                    Coordinación de Outfits
+                  </h3>
+                  <p className="font-greatvibes text-sm sm:text-base text-gold-dark -mt-1">
+                    Baile Sorpresa XV años
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowLightbox(false)}
+                className="w-9 h-9 rounded-full bg-gold/15 hover:bg-gold/30 border border-gold/40 flex items-center justify-center text-sm font-bold text-text-main transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Scrollable / Zoomable Full Panoramic Image */}
+            <div className="w-full flex-1 min-h-0 overflow-auto rounded-2xl bg-white/70 border border-gold/25 p-2 flex items-center justify-center">
+              <img
+                src="/images/coordinacion_outfits.png"
+                alt="Coordinación de Outfits - Vista Completa"
+                className="w-full max-h-full object-contain rounded-xl shadow-md"
+              />
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px] font-montserrat text-text-sub shrink-0">
+              <span className="font-medium">
+                Abuelo · Abuela · Papá · Mamá · Krista Mariel (XV Años) · Hermana · Chambelanes
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowLightbox(false)}
+                className="px-4 py-1.5 rounded-full bg-gold text-white font-bold text-xs shadow-sm hover:bg-gold-dark cursor-pointer transition-colors"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </section>
   )
 }
@@ -4031,9 +4660,16 @@ function LivePhotoWallSection({
 
 // ─── Dress Code & Gifts Section ─────────────────────────────────────────────────
 function DressGiftsSection({ onTriggerToast }: { onTriggerToast: (msg: string) => void }) {
+  const [showLiverpoolCard, setShowLiverpoolCard] = useState(false)
+
   const copyClabe = () => {
     navigator.clipboard.writeText(BANK_CLABE.replace(/\s/g, ''))
     onTriggerToast("¡CLABE bancaria copiada! 💳")
+  }
+
+  const copyEventNumber = () => {
+    navigator.clipboard.writeText(LIVERPOOL_EVENT_NUMBER)
+    onTriggerToast(`¡Número de evento ${LIVERPOOL_EVENT_NUMBER} copiado! 🎁`)
   }
 
   return (
@@ -4108,79 +4744,103 @@ function DressGiftsSection({ onTriggerToast }: { onTriggerToast: (msg: string) =
 
               {/* The 3 Official Gift Channels from Printed Card */}
               <div className="grid grid-cols-1 gap-3 mb-4">
-                {/* 1. Liverpool Gift Registry */}
-                <div className="p-3.5 rounded-2xl border-2 border-[#D80075]/30 bg-white/60 hover:bg-[#D80075]/5 transition-all flex items-center justify-between gap-3 shadow-sm">
-                  <div className="flex items-center gap-3 min-w-0">
-                    {/* Liverpool official geometric ribbon logo */}
-                    <div className="w-10 h-10 rounded-xl bg-[#D80075] flex items-center justify-center p-2 shrink-0 shadow-sm">
-                      <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
-                        <path d="M20 20 H80 V80 H20 Z" stroke="white" strokeWidth="12" fill="none" />
-                        <path d="M35 35 H65 V65 H35 Z" stroke="white" strokeWidth="10" fill="none" />
-                      </svg>
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-montserrat font-bold text-xs uppercase tracking-wider text-[#D80075]">
-                        Mesa de Regalos Liverpool
-                      </p>
-                      <p className="text-[10px] font-montserrat text-text-sub truncate">
-                        Evento: Krista Mariel Sandoval Caldera
-                      </p>
-                    </div>
-                  </div>
-                  <a
-                    href="https://mesaderegalos.liverpool.com.mx/"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-3 py-1.5 rounded-xl bg-[#D80075] text-white text-[10px] font-montserrat font-bold uppercase tracking-wider hover:brightness-110 active:scale-95 transition-all shrink-0"
-                  >
-                    Ver Mesa 🛍️
-                  </a>
-                </div>
-
-                {/* 2. Sobre (Lluvia de sobres y transferencia) */}
-                <div className="p-3.5 rounded-2xl border border-gold/40 bg-white/60 flex flex-col gap-2.5 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-xl">✉️</span>
+                {/* 1. Liverpool Gift Registry (Tarjeta Oficial Fiel al Ticket) */}
+                <div className="rounded-2xl border-2 border-[#D80075]/35 bg-white/80 overflow-hidden shadow-md flex flex-col transition-all hover:shadow-lg">
+                  {/* Liverpool Official Header Ribbon (Matching Ticket Pink) */}
+                  <div className="bg-gradient-to-r from-[#D96B88] via-[#E2839C] to-[#CE5C7C] px-3.5 py-2.5 text-white flex items-center justify-between border-b border-[#C84F70]/40">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-white/20 backdrop-blur-xs flex items-center justify-center p-1 shrink-0 border border-white/30">
+                        <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+                          <path d="M20 20 H80 V80 H20 Z" stroke="white" strokeWidth="12" fill="none" />
+                          <path d="M35 35 H65 V65 H35 Z" stroke="white" strokeWidth="10" fill="none" />
+                        </svg>
+                      </div>
                       <div>
-                        <p className="font-montserrat font-bold text-xs uppercase tracking-wider text-gold-dark">
-                          Sobre
-                        </p>
-                        <p className="text-[10px] font-montserrat text-text-sub">
-                          Buzón en el salón o transferencia digital
+                        <span className="font-montserrat font-extrabold text-sm tracking-wide text-white drop-shadow-xs">
+                          Liverpool
+                        </span>
+                        <p className="text-[8px] font-montserrat tracking-wider text-white/90 leading-none">
+                          es parte de mi vida®
                         </p>
                       </div>
                     </div>
-                    <span className="text-[10px] font-montserrat font-bold text-gold-dark bg-gold/15 px-2 py-0.5 rounded-full border border-gold/30">
-                      Tradicional
-                    </span>
+                    <div className="text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <span className="text-xs">🎀</span>
+                        <span className="font-montserrat font-bold text-[11px] uppercase tracking-wider text-white">
+                          mesa de: regalos
+                        </span>
+                      </div>
+                      <p className="text-[7px] font-montserrat tracking-tight text-white/85 leading-none">
+                        festejando todas las etapas de tu vida
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Bank info box */}
-                  <div className="p-3 rounded-xl bg-cream border border-gold/30 flex flex-col gap-1.5 text-[11px]">
-                    <div className="flex justify-between">
-                      <span className="text-text-sub font-semibold">Banco:</span>
-                      <span className="font-bold text-text-main">{BANK_NAME}</span>
+                  {/* Card Body with 3 Official Ticket Fields */}
+                  <div className="p-3 sm:p-4 bg-gradient-to-b from-[#FFF9FB] to-white flex flex-col gap-2.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      {/* Evento */}
+                      <div className="p-2 sm:p-2.5 rounded-xl bg-white border border-[#E8A5B6]/50 shadow-2xs flex sm:flex-col justify-between items-center sm:items-start">
+                        <div className="flex items-center gap-1 text-[9px] uppercase font-montserrat tracking-wider text-[#A24863] font-bold">
+                          <span>👗</span> Evento:
+                        </div>
+                        <span className="font-script text-base sm:text-lg text-text-main font-bold truncate leading-tight">
+                          {LIVERPOOL_EVENT_NAME}
+                        </span>
+                      </div>
+
+                      {/* # de Evento */}
+                      <div className="p-2 sm:p-2.5 rounded-xl bg-[#FFF2F5] border-2 border-[#D96B88]/60 shadow-2xs flex sm:flex-col justify-between items-center sm:items-start">
+                        <div className="flex items-center gap-1 text-[9px] uppercase font-montserrat tracking-wider text-[#A24863] font-bold">
+                          <span>🎁</span> # de Evento:
+                        </div>
+                        <span className="font-cormorant text-lg sm:text-xl font-bold text-[#A24863] tracking-widest leading-tight">
+                          {LIVERPOOL_EVENT_NUMBER}
+                        </span>
+                      </div>
+
+                      {/* Vigencia */}
+                      <div className="p-2 sm:p-2.5 rounded-xl bg-white border border-[#E8A5B6]/50 shadow-2xs flex sm:flex-col justify-between items-center sm:items-start">
+                        <div className="flex items-center gap-1 text-[9px] uppercase font-montserrat tracking-wider text-[#A24863] font-bold">
+                          <span>📅</span> Vigencia:
+                        </div>
+                        <span className="font-montserrat text-xs sm:text-sm font-bold text-text-main leading-tight">
+                          {LIVERPOOL_EVENT_EXPIRY}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-text-sub font-semibold">Beneficiario:</span>
-                      <span className="font-bold text-text-main">{BANK_BENEFICIARY}</span>
+
+                    {/* Interactive Action Buttons */}
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={copyEventNumber}
+                        className="flex-1 min-w-[130px] py-2 px-3 rounded-xl bg-[#D96B88] hover:bg-[#C84F70] active:scale-95 text-white text-[10px] font-montserrat font-bold uppercase tracking-wider transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <span>📋</span> Copiar No. {LIVERPOOL_EVENT_NUMBER}
+                      </button>
+                      <a
+                        href={LIVERPOOL_URL}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex-1 min-w-[130px] py-2 px-3 rounded-xl bg-white border-2 border-[#D96B88] hover:bg-[#FFF2F5] active:scale-95 text-[#A24863] text-[10px] font-montserrat font-bold uppercase tracking-wider transition-all shadow-2xs flex items-center justify-center gap-1.5"
+                      >
+                        <span>🛍️</span> Ir a Mesa Liverpool
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => setShowLiverpoolCard(true)}
+                        className="py-2 px-3 rounded-xl bg-cream border border-gold/40 hover:bg-gold/15 text-text-main text-[10px] font-montserrat font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1 shadow-2xs cursor-pointer"
+                        title="Ver foto de la tarjeta física entregada en tienda"
+                      >
+                        <span>📸</span> Ver Tarjeta
+                      </button>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-text-sub font-semibold">CLABE:</span>
-                      <span className="font-mono font-bold text-gold-dark">{BANK_CLABE}</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={copyClabe}
-                      className="mt-1 py-1.5 rounded-lg border border-gold/40 bg-gold/15 hover:bg-gold/25 text-gold-dark text-[10px] font-montserrat font-bold uppercase tracking-wider transition-colors cursor-pointer"
-                    >
-                      Copiar CLABE Bancaria 📋
-                    </button>
                   </div>
                 </div>
 
-                {/* 3. Lo que gustes */}
+                {/* 2. Lo que gustes */}
                 <div className="p-3.5 rounded-2xl border border-gold/30 bg-white/60 flex items-center gap-3 shadow-sm">
                   <span className="text-2xl text-gold-dark">♡</span>
                   <div>
@@ -4204,6 +4864,57 @@ function DressGiftsSection({ onTriggerToast }: { onTriggerToast: (msg: string) =
           </div>
         </div>
       </div>
+
+      {/* Modal Lightbox: Tarjeta Física Liverpool */}
+      {showLiverpoolCard && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setShowLiverpoolCard(false)}
+        >
+          <div
+            className="relative max-w-sm w-full bg-white rounded-3xl p-5 shadow-2xl border-2 border-gold flex flex-col items-center gap-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowLiverpoolCard(false)}
+              className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/10 hover:bg-black/20 flex items-center justify-center text-sm font-bold text-text-main transition-colors cursor-pointer"
+            >
+              ✕
+            </button>
+
+            <div className="text-center">
+              <span className="text-[10px] font-montserrat uppercase tracking-[0.25em] text-[#D96B88] font-bold">
+                Tarjeta Oficial Entregada en Tienda
+              </span>
+              <h4 className="font-playfair text-lg font-bold text-text-main mt-0.5">
+                Mesa de Regalos Liverpool
+              </h4>
+            </div>
+
+            <div className="w-full rounded-2xl overflow-hidden border border-gold/30 shadow-inner bg-[#FBF7F2] p-2 flex items-center justify-center">
+              <img
+                src="/images/liverpool_mesa_regalos.jpg"
+                alt="Tarjeta Mesa de Regalos Liverpool Mis xv Krista"
+                className="w-full h-auto max-h-[60vh] object-contain rounded-xl shadow-md"
+              />
+            </div>
+
+            <div className="w-full flex items-center justify-between text-xs font-montserrat px-1">
+              <div>
+                <p className="text-[10px] text-text-sub">Evento: <strong>{LIVERPOOL_EVENT_NAME}</strong></p>
+                <p className="text-[10px] text-text-sub">Vigencia: <strong>{LIVERPOOL_EVENT_EXPIRY}</strong></p>
+              </div>
+              <button
+                type="button"
+                onClick={copyEventNumber}
+                className="py-1.5 px-3 rounded-xl bg-[#D96B88] text-white text-[10px] font-bold tracking-wider uppercase shadow-xs hover:bg-[#C84F70] cursor-pointer"
+              >
+                Copiar #{LIVERPOOL_EVENT_NUMBER} 📋
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   )
 }
@@ -4284,38 +4995,50 @@ function GallerySection() {
             <div
               key={item.id}
               onClick={() => setLightboxItem(item)}
-              className="relative aspect-[3/4] rounded-3xl overflow-hidden glass-card glass-card-hover cursor-pointer group border-2 border-gold/40 shadow-xl flex flex-col justify-between"
+              className={`rounded-3xl overflow-hidden glass-card glass-card-hover cursor-pointer group border-2 border-gold/40 shadow-xl flex flex-col justify-between p-3 sm:p-4 transition-all duration-300 hover:border-gold hover:shadow-2xl ${
+                item.id === 6 && selectedCategory === 'infancia' ? 'sm:col-span-2' : ''
+              }`}
             >
-              <img
-                src={item.src}
-                alt={item.title}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                loading="lazy"
-              />
+              {/* Photo Frame Container - Shows 100% of the image without ANY cropping */}
+              <div className="relative w-full h-60 sm:h-64 rounded-2xl overflow-hidden bg-gradient-to-b from-[#FFFDF9] via-[#FAF6EE] to-[#F3EAD8] flex items-center justify-center p-2 border border-gold/30 shadow-inner">
+                <img
+                  src={item.src}
+                  alt={item.title}
+                  className="max-h-full max-w-full object-contain rounded-xl drop-shadow-md transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
 
-              {/* Top Category Badge */}
-              <div className="absolute top-3 left-3 z-10">
-                <span className="text-[10px] font-montserrat font-bold px-2.5 py-1 rounded-full bg-cream/90 backdrop-blur-md text-gold-dark border border-gold/30 shadow-sm">
-                  {item.category === 'infancia' ? '🧸 Infancia' : '✨ XV Años'}
-                </span>
+                {/* Top Category Badge */}
+                <div className="absolute top-2 left-2 z-10">
+                  <span className="text-[10px] font-montserrat font-bold px-2.5 py-1 rounded-full bg-cream/95 backdrop-blur-md text-gold-dark border border-gold/30 shadow-xs">
+                    {item.category === 'infancia' ? '🧸 Infancia' : '✨ XV Años'}
+                  </span>
+                </div>
+
+                {/* Zoom icon pill */}
+                <div className="absolute bottom-2 right-2 z-10 opacity-80 group-hover:opacity-100 transition-opacity">
+                  <span className="px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-xs border border-gold/40 text-[10px] font-montserrat font-bold text-gold-dark flex items-center gap-1 shadow-xs">
+                    🔍 Ver
+                  </span>
+                </div>
               </div>
 
-              {/* Hover & Bottom Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-cream/95 via-cream/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-end z-10">
-                <span className="text-[9px] font-montserrat uppercase tracking-wider text-gold-dark font-bold">
+              {/* Caption and interactive info */}
+              <div className="pt-3 px-1 flex flex-col gap-1.5">
+                <span className="text-[10px] font-montserrat uppercase tracking-wider text-gold-dark font-bold truncate">
                   {item.subtitle}
                 </span>
-                <p className="font-playfair text-sm sm:text-base text-text-main font-bold leading-snug mt-0.5">
+                <p className="font-playfair text-sm sm:text-base text-text-main font-bold leading-snug line-clamp-2 group-hover:text-gold-dark transition-colors">
                   {item.title}
                 </p>
-                <div className="flex justify-between items-center mt-3 pt-2 border-t border-gold/20">
-                  <span className="text-[9px] font-montserrat uppercase tracking-widest text-gold-dark font-bold">
-                    Ver Foto 🔍
+                <div className="flex justify-between items-center mt-2 pt-2 border-t border-gold/20">
+                  <span className="text-[10px] font-montserrat uppercase tracking-wider text-gold-dark font-bold flex items-center gap-1">
+                    🔍 Foto Completa
                   </span>
                   <button
                     type="button"
                     onClick={e => handleLike(item.id, e)}
-                    className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 border border-gold/40 text-xs text-gold-dark font-bold shadow-sm hover:scale-105 transition-transform"
+                    className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 border border-gold/40 text-xs text-gold-dark font-bold shadow-2xs hover:scale-105 active:scale-95 transition-transform cursor-pointer"
                   >
                     <span>❤️</span>
                     <span>{likes[item.id]}</span>
@@ -4328,15 +5051,15 @@ function GallerySection() {
       </div>
 
       {/* Lightbox Modal */}
-      {lightboxItem && (
+      {lightboxItem && typeof document !== 'undefined' && createPortal(
         <div
-          className="fixed inset-0 z-50 bg-cream/95 backdrop-blur-2xl flex items-center justify-center p-3 sm:p-4 animate-fade-in"
+          className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-fade-in"
           onClick={() => setLightboxItem(null)}
         >
           <button
             type="button"
             onClick={() => setLightboxItem(null)}
-            className="absolute top-4 right-4 w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-gold text-gold-dark text-lg md:text-xl flex items-center justify-center glass-card hover:bg-gold/20 z-20 font-bold cursor-pointer transition-transform hover:scale-105"
+            className="absolute top-4 right-4 w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-gold text-gold-dark text-lg md:text-xl flex items-center justify-center bg-white/90 hover:bg-white z-20 font-bold cursor-pointer transition-transform hover:scale-105 shadow-lg"
             aria-label="Cerrar"
           >
             ✕
@@ -4344,9 +5067,9 @@ function GallerySection() {
 
           <div
             onClick={e => e.stopPropagation()}
-            className="relative max-w-3xl w-full max-h-[90vh] rounded-3xl overflow-hidden border-2 border-gold glass-card p-3 md:p-4 shadow-2xl flex flex-col"
+            className="relative max-w-4xl w-full max-h-[92vh] rounded-3xl overflow-hidden border-2 border-gold bg-[#FAF6EE] p-3 md:p-5 shadow-2xl flex flex-col"
           >
-            <div className="relative flex items-center justify-center overflow-hidden rounded-2xl bg-cream/50 max-h-[72vh]">
+            <div className="relative flex items-center justify-center overflow-hidden rounded-2xl bg-white/70 border border-gold/20 max-h-[75vh] p-2">
               <img
                 src={lightboxItem.src}
                 alt={lightboxItem.title}
@@ -4365,14 +5088,15 @@ function GallerySection() {
               <button
                 type="button"
                 onClick={e => handleLike(lightboxItem.id, e)}
-                className="flex items-center gap-2 px-4 py-2 rounded-full border border-gold bg-gradient-to-r from-gold/20 to-gold/30 text-gold-dark text-xs sm:text-sm font-bold shadow-sm hover:scale-105 transition-transform"
+                className="flex items-center gap-2 px-4 py-2 rounded-full border border-gold bg-gradient-to-r from-gold/20 to-gold/30 text-gold-dark text-xs sm:text-sm font-bold shadow-sm hover:scale-105 transition-transform cursor-pointer"
               >
                 <span>❤️ Me Encanta</span>
                 <span>({likes[lightboxItem.id]})</span>
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   )
@@ -4705,7 +5429,14 @@ function DJPlaylistSection({ onTriggerToast }: { onTriggerToast: (msg: string) =
                 <div className="flex items-center gap-3">
                   <span className="font-playfair font-bold text-lg text-gold-dark w-6">#{idx + 1}</span>
                   <div>
-                    <h4 className="font-playfair font-bold text-text-main text-base">{s.title}</h4>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <h4 className="font-playfair font-bold text-text-main text-base">{s.title}</h4>
+                      {'tag' in s && s.tag && (
+                        <span className="text-[9px] font-montserrat font-bold bg-gold/20 text-gold-dark px-2 py-0.5 rounded-full border border-gold/40 shadow-xs">
+                          {(s as any).tag}
+                        </span>
+                      )}
+                    </div>
                     <p className="font-montserrat text-xs text-text-sub font-medium">{s.artist}</p>
                   </div>
                 </div>
@@ -4947,35 +5678,54 @@ function RSVPSection({ onTriggerSwarm }: { onTriggerSwarm: () => void }) {
   )
 }
 
-// ─── Carta Especial de Krista Mariel ──────────────────────────────────────────
+// ─── Carta Especial de Krista Mariel (Lámina 2 Oficial) ───────────────────────
 function KristaLetterSection() {
   return (
-    <section id="carta" className="relative py-16 md:py-24 px-4 md:px-6">
-      <div className="section-sep mb-16 md:mb-20" />
-      <div className="max-w-3xl mx-auto">
-        <div className="glass-card p-8 md:p-12 rounded-3xl border-2 border-gold/40 shadow-2xl relative overflow-hidden text-center flex flex-col items-center gap-6">
-          <div className="absolute -top-10 -right-10 w-40 h-40 bg-gold/10 rounded-full blur-2xl pointer-events-none" />
-          <div className="w-16 h-16 rounded-full border-2 border-gold flex items-center justify-center text-3xl bg-gold/10 shadow-md">
-            🦋
-          </div>
-          <p className="text-[10px] uppercase tracking-[0.4em] font-montserrat text-gold-dark font-bold">
-            Mensaje Especial
-          </p>
-          <h2 className="font-greatvibes text-4xl sm:text-5xl md:text-6xl gold-text-gradient">
-            Palabras de Krista Mariel
-          </h2>
-          <GoldDivider />
+    <section id="carta" className="relative py-12 md:py-20 px-4 md:px-6">
+      <div className="section-sep mb-12 md:mb-16" />
+      <StationeryPlate className="max-w-xl">
+        <p className="text-xs uppercase tracking-[0.35em] font-cinzel text-gold-dark font-bold mb-1">
+          MENSAJE ESPECIAL
+        </p>
 
-          <p className="font-playfair italic text-text-main text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl font-medium">
-            "Hoy dejo atrás la infancia para abrir mis alas como una mariposa y volar hacia un futuro lleno de sueños e ilusiones. Cumplir 15 años rodeada del amor de mi familia y de la compañía de mis amigos más queridos es la alegría más grande de mi vida. Gracias por ser parte de mi historia y por acompañarme a celebrar esta noche inolvidable."
-          </p>
+        <span className="text-gold-dark text-xs my-1">✦</span>
 
-          <div className="mt-2 flex flex-col items-center">
-            <span className="font-greatvibes text-3xl text-gold-dark font-bold">Krista Mariel</span>
-            <span className="text-[10px] uppercase tracking-widest font-montserrat text-text-sub font-bold">17 de Octubre, 2026 · Quinta Maria Teresa</span>
-          </div>
+        {/* Golden Circle with Embossed Butterfly matching image copy.png */}
+        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border border-gold/70 flex items-center justify-center text-3xl sm:text-4xl bg-gradient-to-b from-[#FFFDF9] via-[#FAF3E6] to-[#F1E4CE] shadow-md my-2">
+          <span className="filter drop-shadow select-none">🦋</span>
         </div>
-      </div>
+
+        <p className="text-xs sm:text-sm uppercase tracking-[0.35em] font-cinzel text-gold-dark font-bold mt-1">
+          PALABRAS DE
+        </p>
+
+        <h2 className="font-script text-6xl sm:text-7xl md:text-8xl gold-text-gradient leading-tight my-1 drop-shadow-sm">
+          Krista Mariel
+        </h2>
+
+        <span className="text-gold-dark text-xs my-2">✦</span>
+
+        <p className="font-playfair italic text-text-main text-base sm:text-lg md:text-xl leading-relaxed max-w-lg font-medium px-2 my-2">
+          “Hay momentos que marcan el comienzo de una nueva etapa. Hoy quiero celebrar uno de los más especiales de mi vida, rodeada de quienes quiero y agradecida por compartirlo contigo.”
+        </p>
+
+        <div className="mt-4 flex flex-col items-center gap-1">
+          <span className="font-script text-4xl sm:text-5xl text-gold-dark">Krista Mariel</span>
+          <span className="text-gold-dark text-xs my-1">✦</span>
+          <span className="text-[11px] sm:text-xs uppercase tracking-[0.3em] font-cinzel text-text-main font-bold">
+            17 DE OCTUBRE, 2026
+          </span>
+          <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] font-cinzel text-text-sub font-semibold">
+            QUINTA MARIA TERESA
+          </span>
+        </div>
+
+        <div className="flex items-center gap-3 mt-6 opacity-75">
+          <div className="h-px w-12 bg-gold/50" />
+          <span className="text-base">🦋</span>
+          <div className="h-px w-12 bg-gold/50" />
+        </div>
+      </StationeryPlate>
     </section>
   )
 }
@@ -5144,17 +5894,38 @@ function SpecialVideoSection({
 
 
   return (
-    <section id="video-especial" className="relative py-16 md:py-24 px-4 md:px-6">
-      <div className="section-sep mb-16 md:mb-20" />
-      <div className="max-w-4xl mx-auto flex flex-col items-center">
-        <SectionHeader tag="Momento Estelar" title="Video Especial de Krista Mariel" />
+    <section id="video-especial" className="relative py-12 md:py-20 px-4 md:px-6">
+      <div className="section-sep mb-12 md:mb-16" />
+      <StationeryPlate className="max-w-xl">
+        {/* Top Header matching image copy 3.png */}
+        <p className="text-xs uppercase tracking-[0.35em] font-cinzel text-gold-dark font-bold">
+          KRISTA MARIEL
+        </p>
+        <span className="text-gold-dark text-xs my-1">✦</span>
 
-        <p className="font-playfair italic text-text-main text-center text-sm md:text-base max-w-xl -mt-6 mb-8 px-2 font-medium">
-          "Un instante irrepetible capturado en video, lleno de luz, emoción y la alegría de celebrar mis 15 años."
+        <div className="flex items-center gap-2 my-1">
+          <span className="text-base">🦋</span>
+          <span className="text-xs uppercase tracking-[0.3em] font-cinzel text-gold-dark font-bold">
+            MOMENTO ESTELAR
+          </span>
+          <span className="text-base">🦋</span>
+        </div>
+
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-cinzel text-text-main my-1 font-normal">
+          Video Especial de{' '}
+          <span className="font-script text-5xl sm:text-6xl md:text-7xl text-gold-dark block sm:inline">
+            Krista Mariel
+          </span>
+        </h2>
+
+        <span className="text-gold-dark text-xs my-1.5">✦</span>
+
+        <p className="font-playfair italic text-text-main text-center text-sm md:text-base max-w-lg mb-6 px-2 font-medium">
+          “Un instante irrepetible capturado en video, lleno de luz, emoción y la alegría de celebrar mis 15 años.”
         </p>
 
         {/* Ambient Glow & Cinema Frame Container */}
-        <div className="relative w-full max-w-[350px] sm:max-w-[380px] mx-auto group">
+        <div className="relative w-full max-w-[340px] sm:max-w-[360px] mx-auto group my-2">
           {/* Hardware-Accelerated Ambient Backlight Glow */}
           <div
             className="absolute -inset-4 sm:-inset-6 rounded-[38px] bg-gradient-to-tr from-gold/30 via-[#FFE57F]/20 to-gold-dark/30 blur-xl pointer-events-none opacity-60 transform-gpu"
@@ -5164,7 +5935,7 @@ function SpecialVideoSection({
           {/* Luxury Filigree Reel Container */}
           <div
             onMouseMove={handleMouseMoveControls}
-            className="relative w-full aspect-[9/16] rounded-3xl overflow-hidden border-2 border-gold/70 bg-[#120F0D] shadow-[0_20px_60px_-10px_rgba(212,175,55,0.4)] flex flex-col justify-between select-none"
+            className="relative w-full aspect-[9/16] rounded-3xl overflow-hidden border-2 border-gold/70 bg-[#120F0D] shadow-[0_20px_60px_-10px_rgba(196,161,99,0.35)] flex flex-col justify-between select-none"
           >
             {/* Ornate Gold Filigree Corner Accents */}
             <div className="absolute top-2.5 left-2.5 w-6 h-6 border-t-2 border-l-2 border-gold pointer-events-none z-20" />
@@ -5229,7 +6000,7 @@ function SpecialVideoSection({
                     Toca para Reproducir
                   </span>
                   <p className="text-[10px] font-montserrat text-white/80 font-medium">
-                    (El vals se pausará automáticamente para escuchar el video 🎵)
+                    (La música se pausará automáticamente para escuchar el video 🎵)
                   </p>
                 </div>
               </div>
@@ -5315,21 +6086,31 @@ function SpecialVideoSection({
         </div>
 
         {/* Quick Action Badges Under Video */}
-        <div className="mt-6 flex flex-wrap justify-center gap-3 w-full max-w-md">
+        <div className="mt-4 flex flex-wrap justify-center gap-2.5 w-full max-w-md">
           <button
             onClick={openCinemaModal}
-            className="px-5 py-2.5 rounded-full glass-card border border-gold/50 text-gold-dark text-xs font-montserrat font-bold flex items-center gap-2 shadow-sm hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            className="px-5 py-2 rounded-full glass-card border border-gold/50 text-gold-dark text-[11px] font-cinzel font-bold flex items-center gap-1.5 shadow-sm hover:scale-105 active:scale-95 transition-all cursor-pointer"
           >
-            <span>🎬</span> Pantalla Completa VIP
+            <span>🎬</span> Pantalla Completa VIP ✦
           </button>
           <button
             onClick={shareVideo}
-            className="px-5 py-2.5 rounded-full glass-card border border-gold/50 text-gold-dark text-xs font-montserrat font-bold flex items-center gap-2 shadow-sm hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            className="px-5 py-2 rounded-full glass-card border border-gold/50 text-gold-dark text-[11px] font-cinzel font-bold flex items-center gap-1.5 shadow-sm hover:scale-105 active:scale-95 transition-all cursor-pointer"
           >
-            <span>📲</span> Compartir con Familia
+            <span>📱</span> Compartir con Familia ✦
           </button>
         </div>
-      </div>
+
+        {/* Bottom ornament and note matching image copy 3.png */}
+        <div className="flex items-center gap-3 mt-6 opacity-75">
+          <div className="h-px w-12 bg-gold/50" />
+          <span className="text-base">🦋</span>
+          <div className="h-px w-12 bg-gold/50" />
+        </div>
+        <p className="text-[10px] md:text-[11px] uppercase tracking-[0.25em] font-cinzel text-text-sub font-semibold mt-2 text-center">
+          LA MÚSICA SE PAUSARÁ AUTOMÁTICAMENTE PARA ESCUCHAR EL VIDEO 🎵
+        </p>
+      </StationeryPlate>
 
       {/* Full-Screen Cinema VIP Theater Modal */}
       {isCinemaModalOpen && (
@@ -5388,30 +6169,30 @@ function VirtualHugsSection({ onTriggerSwarm, onTriggerToast }: { onTriggerSwarm
   return (
     <section id="abrazos" className="relative py-8 md:py-12 px-4 md:px-6">
       <div className="max-w-2xl mx-auto text-center">
-        <div className="glass-card p-6 md:p-8 rounded-3xl border-2 border-gold/40 flex flex-col items-center gap-4 shadow-xl">
-          <div className="w-14 h-14 rounded-full border-2 border-gold flex items-center justify-center text-3xl bg-gold/15 animate-bounce">
+        <div className="glass-card p-6 md:p-8 rounded-3xl border-2 border-gold/40 flex flex-col items-center gap-4 shadow-xl bg-cream/80 backdrop-blur-xl">
+          <div className="w-14 h-14 rounded-full border-2 border-gold/70 flex items-center justify-center text-2xl bg-gold/15 shadow-md">
             💖
           </div>
 
-          <h3 className="font-greatvibes text-3xl sm:text-4xl gold-text-gradient">
+          <h3 className="font-cinzel text-base md:text-lg text-text-main font-bold">
             Envía un Abrazo Virtual a Krista Mariel
           </h3>
 
-          <p className="font-montserrat text-xs md:text-sm text-text-sub font-medium leading-relaxed max-w-md">
+          <p className="font-playfair italic text-xs md:text-sm text-text-sub font-medium leading-relaxed max-w-md">
             Cada abrazo llena de alegría el corazón de Krista Mariel en su camino hacia sus Quince Años.
           </p>
 
-          <div className="px-6 py-2 rounded-full bg-gold/15 border border-gold/40 my-1">
-            <span className="font-playfair text-gold-dark font-bold text-lg md:text-xl">
-              {hugs.toLocaleString()} Abrazos Entregados 🦋
+          <div className="px-6 py-2 rounded-full bg-cream border border-gold/60 my-1 shadow-inner">
+            <span className="font-cinzel text-gold-dark font-bold text-sm md:text-base">
+              🤍 {hugs.toLocaleString()} Abrazos Entregados ✦
             </span>
           </div>
 
           <button
             onClick={handleSendHug}
-            className="px-8 py-3.5 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-text-main font-montserrat font-bold text-xs uppercase tracking-wider shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+            className="w-full max-w-xs py-3.5 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-text-main font-cinzel font-bold text-xs uppercase tracking-wider shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
-            <span>💖</span> Enviar Abrazo Virtual <span>🦋</span>
+            <span>🤍</span> ¡ENVIAR ABRAZO VIRTUAL! <span>✦</span>
           </button>
         </div>
       </div>
@@ -5759,26 +6540,29 @@ function Navbar({
 
   const mainNavLinks = [
     { href: '#inicio', label: 'Inicio' },
-    { href: '#video-especial', label: 'Video Especial' },
+    { href: '#carta', label: 'Mensaje' },
     { href: '#padres', label: 'Familia' },
+    { href: '#video-especial', label: 'Video' },
     { href: '#itinerario', label: 'Protocolo' },
-    { href: '#coordinacion-outfits', label: 'Outfits' },
+    { href: '#color-reservado', label: 'Color Reservado' },
     { href: '#galeria', label: 'Galería' },
     { href: '#rsvp', label: 'RSVP' },
   ]
 
   const allNavLinks = [
     { href: '#inicio', label: 'Inicio' },
+    { href: '#carta', label: 'Mensaje Especial 💌' },
+    { href: '#padres', label: 'Familia & Padrinos' },
     { href: '#video-especial', label: 'Video Especial 🎬' },
-    { href: '#padres', label: 'Familia' },
-    { href: '#itinerario', label: 'Protocolo' },
+    { href: '#brindis', label: 'Brindis & Abrazos 🥂' },
+    { href: '#itinerario', label: 'Tiempo & Protocolo' },
+    { href: '#color-reservado', label: 'Color Reservado 🦋' },
     { href: '#coordinacion-outfits', label: 'Outfits' },
     { href: '#trivia', label: 'Trivia' },
-    { href: '#vestimenta', label: 'Detalles' },
+    { href: '#vestimenta', label: 'Detalles & Regalos' },
     { href: '#galeria', label: 'Galería' },
     { href: '#linea-tiempo', label: 'Historia' },
     { href: '#marco-foto', label: 'Marco Stories' },
-    { href: '#muro-fotos', label: 'Muro de Fotos 📸' },
     { href: '#deseos', label: 'Deseos' },
     { href: '#playlist', label: 'DJ Playlist' },
     { href: '#rsvp', label: 'RSVP' },
@@ -6109,12 +6893,15 @@ export default function App() {
   const handleFinishIntroVideo = () => {
     setIntroVideoOpen(false)
     setEnvelopeOpen(true)
+    window.dispatchEvent(new CustomEvent('resume-butterflies'))
     triggerExplosiveBurst()
     setToastMessage("💌 ¡Toca la mariposa dorada para abrir tu sobre oficial! 🦋")
   }
 
   const handleCloseEnvelope = () => {
     setEnvelopeOpen(false)
+    window.dispatchEvent(new CustomEvent('resume-butterflies'))
+    triggerExplosiveBurst()
     if (playTriggerRef.current) {
       playTriggerRef.current()
     }
@@ -6141,24 +6928,6 @@ export default function App() {
 
       {/* Background Real Audio Player */}
       <RealMusicPlayer playTriggerRef={playTriggerRef} />
-
-      {/* Floating Action Buttons */}
-      <div className="fixed bottom-4 right-4 z-40 flex flex-col gap-2">
-        <button
-          onClick={() => speakEventDetails(setToastMessage)}
-          className="w-11 h-11 md:w-12 md:h-12 rounded-full glass-card border-2 border-gold/50 flex items-center justify-center text-lg md:text-xl shadow-2xl hover:scale-110 transition-transform active:scale-95 text-gold-dark"
-          title="Escuchar detalles del evento en voz alta 🔊"
-        >
-          🔊
-        </button>
-        <button
-          onClick={triggerSwarm}
-          className="w-11 h-11 md:w-12 md:h-12 rounded-full glass-card border-2 border-gold/50 flex items-center justify-center text-lg md:text-xl shadow-2xl hover:scale-110 transition-transform active:scale-95 text-gold-dark"
-          title="Lluvia de Mariposas Pasteles"
-        >
-          🦋
-        </button>
-      </div>
 
       {/* Intro Cinema Video Modal (Se muestra primero al entrar) */}
       <IntroVideoModal
@@ -6212,12 +6981,13 @@ export default function App() {
       {/* Main Sections */}
       <main className="relative z-20">
         <HeroSection onTriggerToast={setToastMessage} />
-        <ParentsSection />
         <KristaLetterSection />
+        <ParentsSection />
         <SpecialVideoSection onTriggerToast={setToastMessage} onTriggerBurst={triggerExplosiveBurst} />
         <VirtualCheersSection onTriggerSwarm={handleRSVPSubmitWithConfetti} onTriggerToast={setToastMessage} />
         <VirtualHugsSection onTriggerSwarm={handleRSVPSubmitWithConfetti} onTriggerToast={setToastMessage} />
         <ItinerarySection onTriggerToast={setToastMessage} />
+        <ReservedColorSection onTriggerToast={setToastMessage} />
         <ArrivalGuideSection onTriggerToast={setToastMessage} />
         <OutfitCoordinationSection />
         <VIPPassSection onTriggerToast={setToastMessage} />
@@ -6227,7 +6997,6 @@ export default function App() {
         <TimelineSection />
         <TimeCapsuleSection onTriggerToast={setToastMessage} />
         <PhotoFrameCreator onTriggerToast={setToastMessage} />
-        <LivePhotoWallSection onTriggerToast={setToastMessage} onTriggerBurst={triggerExplosiveBurst} />
         <WishbookSection onTriggerSwarm={handleRSVPSubmitWithConfetti} onTriggerToast={setToastMessage} />
         <DJPlaylistSection onTriggerToast={setToastMessage} />
         <RSVPSection onTriggerSwarm={handleRSVPSubmitWithConfetti} />

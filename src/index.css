@@ -1,29 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&family=Pinyon+Script&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap');
 @import 'tailwindcss';
 
 @theme {
-  --color-gold: #D4AF37;
-  --color-gold-light: #F9E79F;
-  --color-gold-muted: #C5A059;
-  --color-gold-dark: #9A7B38;
-  --color-gold-bronze: #6E531E;
+  --color-gold: #C4A163;
+  --color-gold-light: #EEDBB9;
+  --color-gold-muted: #B89557;
+  --color-gold-dark: #8A6832;
+  --color-gold-bronze: #664B20;
   
-  --color-pastel-yellow: #FFE57F;
-  --color-pastel-yellow-light: #FFF8C5;
-  --color-pastel-beige: #F5E6D3;
-  --color-pastel-beige-dark: #E6D3B8;
-  --color-cream: #FAF6F0;
+  --color-pastel-yellow: #F7E7C4;
+  --color-pastel-yellow-light: #FDF6E2;
+  --color-pastel-beige: #F5E8D6;
+  --color-pastel-beige-dark: #E5D2BA;
+  --color-cream: #FAF5EC;
   --color-pure-white: #FFFFFF;
-  --color-botanical-green: #2E6B34;
-  --color-botanical-green-dark: #1E4A23;
+  --color-botanical-green: #4D6B50;
+  --color-botanical-green-dark: #2F4732;
   
-  --color-text-main: #2D1F38;
-  --color-text-sub: #5A4866;
-  --color-text-muted: #8E789B;
+  --color-text-main: #3F3020;
+  --color-text-sub: #6A5641;
+  --color-text-muted: #95816C;
 
-  --font-family-greatvibes: 'Great Vibes', cursive;
+  --font-family-greatvibes: 'Alex Brush', 'Pinyon Script', cursive;
+  --font-family-script: 'Alex Brush', 'Pinyon Script', cursive;
   --font-family-playfair: 'Playfair Display', serif;
-  --font-family-cinzel: 'Cinzel Decorative', serif;
+  --font-family-cormorant: 'Cormorant Garamond', serif;
+  --font-family-cinzel: 'Cinzel', serif;
   --font-family-montserrat: 'Montserrat', sans-serif;
 }
 
@@ -32,8 +34,8 @@ html {
 }
 
 body {
-  background-color: #FAF6F0;
-  color: #2D1F38;
+  background-color: #FAF5EC;
+  color: #3F3020;
   font-family: 'Montserrat', sans-serif;
   overflow-x: hidden;
   transition: background-color 0.6s ease, color 0.6s ease;
@@ -95,6 +97,73 @@ body.night-mode .gold-text-gradient {
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+/* ─── Preserved Crisp Contrast Inside Printed Stationery Plates & Light Cards in Night Mode ─── */
+body.night-mode .stationery-plate,
+body.night-mode [class*="bg-[#FAF5EC]"],
+body.night-mode [class*="bg-[#FAF6EE]"] {
+  background-color: #FAF5EC !important;
+  color: #3F3020 !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(212, 175, 55, 0.15) !important;
+}
+
+body.night-mode .stationery-plate .text-text-main,
+body.night-mode [class*="bg-[#FAF5EC]"] .text-text-main,
+body.night-mode [class*="bg-[#FAF6EE]"] .text-text-main,
+body.night-mode [class*="from-[#FFF"] .text-text-main,
+body.night-mode [class*="bg-white"] .text-text-main {
+  color: #2D1F12 !important;
+}
+
+body.night-mode .stationery-plate .text-text-sub,
+body.night-mode [class*="bg-[#FAF5EC]"] .text-text-sub,
+body.night-mode [class*="bg-[#FAF6EE]"] .text-text-sub,
+body.night-mode [class*="from-[#FFF"] .text-text-sub,
+body.night-mode [class*="bg-white"] .text-text-sub {
+  color: #553E2A !important;
+}
+
+body.night-mode .stationery-plate .text-text-muted,
+body.night-mode [class*="bg-[#FAF5EC]"] .text-text-muted,
+body.night-mode [class*="bg-[#FAF6EE]"] .text-text-muted,
+body.night-mode [class*="bg-white"] .text-text-muted {
+  color: #7A5B3D !important;
+}
+
+body.night-mode .stationery-plate .text-gold-dark,
+body.night-mode [class*="bg-[#FAF5EC]"] .text-gold-dark,
+body.night-mode [class*="bg-[#FAF6EE]"] .text-gold-dark,
+body.night-mode [class*="from-[#FFF"] .text-gold-dark,
+body.night-mode [class*="bg-white"] .text-gold-dark {
+  color: #7A551E !important;
+}
+
+body.night-mode .stationery-plate .gold-text-gradient,
+body.night-mode [class*="bg-[#FAF5EC]"] .gold-text-gradient {
+  background: linear-gradient(135deg, #7A551E 0%, #B89557 35%, #5E4017 65%, #7A551E 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* Inside stationery-plate, internal countdown cards and monogram disc match parchment paper */
+body.night-mode .stationery-plate .glass-card {
+  background: rgba(255, 252, 245, 0.92) !important;
+  border-color: rgba(196, 161, 99, 0.5) !important;
+  box-shadow: 0 4px 15px rgba(70, 53, 35, 0.08) !important;
+}
+
+body.night-mode .stationery-plate .bg-cream,
+body.night-mode .stationery-plate .bg-cream\/90,
+body.night-mode .stationery-plate .bg-cream\/80 {
+  background-color: rgba(250, 245, 236, 0.95) !important;
+}
+
+body.night-mode .stationery-plate .border-gold\/40,
+body.night-mode .stationery-plate .border-gold\/60,
+body.night-mode .stationery-plate .border-gold\/70 {
+  border-color: rgba(196, 161, 99, 0.6) !important;
 }
 
 body.night-mode .hero-glow {
@@ -198,9 +267,9 @@ body.night-mode img {
 .animate-float-slow   { animation: float-slow 5s ease-in-out infinite; }
 .animate-pulse-glow  { animation: pulse-glow 4s ease-in-out infinite; }
 
-/* Shimmer Metallic Gold Text on Light Background */
+/* Shimmer Metallic Gold Text on Light Background matching client photos */
 .gold-text-gradient {
-  background: linear-gradient(135deg, #B8860B 0%, #D4AF37 30%, #9A7B38 50%, #D4AF37 75%, #B8860B 100%);
+  background: linear-gradient(135deg, #7C5A24 0%, #C4A163 30%, #EEDBB9 50%, #B89557 70%, #7C5A24 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
@@ -208,34 +277,34 @@ body.night-mode img {
   animation: shimmer-gold 6s linear infinite;
 }
 
-/* Light Glassmorphism cards with gold borders and subtle ambient warmth */
+/* Light Glassmorphism cards with antique gold borders matching client photos */
 .glass-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(250, 246, 240, 0.96) 100%);
+  background: linear-gradient(135deg, rgba(255, 253, 249, 0.94) 0%, rgba(250, 245, 236, 0.96) 100%);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(212, 175, 55, 0.38);
-  box-shadow: 0 12px 35px rgba(184, 134, 11, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(196, 161, 99, 0.42);
+  box-shadow: 0 10px 32px rgba(70, 53, 35, 0.06), inset 0 1px 1px rgba(255, 255, 255, 0.95);
 }
 
 .glass-card-hover {
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .glass-card-hover:hover {
-  border-color: rgba(212, 175, 55, 0.7);
-  box-shadow: 0 18px 45px rgba(212, 175, 55, 0.22), inset 0 1px 2px rgba(255, 255, 255, 1);
-  transform: translateY(-4px);
+  border-color: rgba(196, 161, 99, 0.7);
+  box-shadow: 0 16px 40px rgba(138, 104, 50, 0.15), inset 0 1px 2px rgba(255, 255, 255, 1);
+  transform: translateY(-3px);
 }
 
-/* Light Fantasy Hero Radial Glow with subtle pastels */
+/* Light Fantasy Hero Radial Glow matching client photos */
 .hero-glow {
-  background: radial-gradient(ellipse 90% 70% at 50% 30%, rgba(255, 245, 184, 0.45) 0%, transparent 75%),
-              radial-gradient(ellipse 60% 50% at 20% 80%, rgba(247, 197, 212, 0.35) 0%, transparent 65%),
-              radial-gradient(ellipse 70% 60% at 80% 20%, rgba(245, 230, 211, 0.5) 0%, transparent 60%);
+  background: radial-gradient(ellipse 90% 70% at 50% 30%, rgba(238, 219, 185, 0.35) 0%, transparent 75%),
+              radial-gradient(ellipse 60% 50% at 20% 80%, rgba(245, 232, 214, 0.28) 0%, transparent 65%),
+              radial-gradient(ellipse 70% 60% at 80% 20%, rgba(247, 231, 196, 0.3) 0%, transparent 60%);
 }
 
 /* Gold Dividers */
 .gold-line {
-  background: linear-gradient(90deg, transparent 0%, rgba(212, 175, 55, 0.8) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(196, 161, 99, 0.8) 50%, transparent 100%);
   height: 1.5px;
   border: none;
 }
@@ -243,7 +312,25 @@ body.night-mode img {
 .section-sep {
   width: 100%;
   height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(212, 175, 55, 0.15) 25%, rgba(212, 175, 55, 0.5) 50%, rgba(212, 175, 55, 0.15) 75%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(196, 161, 99, 0.15) 25%, rgba(196, 161, 99, 0.5) 50%, rgba(196, 161, 99, 0.15) 75%, transparent 100%);
+}
+
+/* Explicit font utilities ensuring 100% fidelity to the plates */
+.font-cinzel {
+  font-family: 'Cinzel', serif !important;
+}
+
+.font-script,
+.font-greatvibes {
+  font-family: 'Alex Brush', 'Pinyon Script', cursive !important;
+}
+
+.font-cormorant {
+  font-family: 'Cormorant Garamond', serif !important;
+}
+
+.font-playfair {
+  font-family: 'Playfair Display', serif !important;
 }
 
 /* Toast Banner animation */
