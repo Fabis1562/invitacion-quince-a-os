@@ -1417,7 +1417,7 @@ function ArrivalGuideSection({ onTriggerToast }: { onTriggerToast: (msg: string)
           title="Guía de Ubicaciones & Traslado"
         />
         <p className="text-center font-montserrat text-xs md:text-sm text-text-sub font-medium -mt-6 mb-8 max-w-xl mx-auto">
-          Encuentra las rutas oficiales en Google Maps y Waze para acompañarnos en la Misa y en la Fiesta
+          Encuentra las rutas oficiales en Google Maps y Waze para acompañarnos
         </p>
 
         {/* Location Switcher Tabs */}
@@ -2466,8 +2466,9 @@ END:VCALENDAR`
           <h2 className="text-5xl sm:text-6xl md:text-7xl font-cinzel uppercase tracking-[0.3em] text-gold-dark font-light -mt-2 sm:-mt-3">
             MARIEL
           </h2>
-          <p className="text-xs md:text-sm font-cinzel uppercase tracking-[0.35em] text-text-sub font-bold mt-2">
-            {QUINCE_FULL_NAME}
+          <p className="text-[10px] xs:text-[11px] sm:text-xs md:text-sm font-cinzel uppercase tracking-[0.16em] sm:tracking-[0.25em] text-text-sub font-bold mt-2 leading-relaxed">
+            <span className="inline-block whitespace-nowrap">KRISTA MARIEL</span>{' '}
+            <span className="inline-block whitespace-nowrap">SANDOVAL CALDERA</span>
           </p>
           <div className="flex justify-center mt-2">
             <span className="text-gold-dark text-xs">✦</span>
@@ -2635,15 +2636,6 @@ function ParentsSection() {
           <span className="text-gold-dark text-sm animate-bounce">↓</span>
         </div>
 
-        {/* Section Header: Nuestra Familia / Padres & Padrinos */}
-        <div className="flex items-center gap-2 mt-1 mb-1">
-          <GoldButterfly size={16} />
-          <span className="text-xs uppercase tracking-[0.3em] font-cinzel text-gold-dark font-bold">
-            NUESTRA FAMILIA
-          </span>
-          <GoldButterfly size={16} />
-        </div>
-
         <h2 className="font-script text-5xl sm:text-6xl text-gold-dark my-1">
           Padres & Padrinos
         </h2>
@@ -2654,9 +2646,6 @@ function ParentsSection() {
         <div className="flex flex-col gap-3.5 w-full mt-2">
           {/* Card 1: MIS PADRES */}
           <div className="glass-card p-5 md:p-6 rounded-3xl border border-gold/40 shadow-sm flex flex-col items-center gap-2 bg-cream/75">
-            <div className="w-10 h-10 rounded-full border border-gold/70 flex items-center justify-center bg-gold/15 text-gold-dark text-base shadow-sm">
-              ♡
-            </div>
             <p className="text-[11px] uppercase tracking-[0.3em] font-cinzel text-gold-dark font-bold">
               MIS PADRES
             </p>
@@ -2671,9 +2660,6 @@ function ParentsSection() {
 
           {/* Card 2: MIS PADRINOS */}
           <div className="glass-card p-5 md:p-6 rounded-3xl border border-gold/40 shadow-sm flex flex-col items-center gap-2 bg-cream/75">
-            <div className="w-10 h-10 rounded-full border border-gold/70 flex items-center justify-center bg-gold/15 text-gold-dark text-base shadow-sm">
-              ♫
-            </div>
             <p className="text-[11px] uppercase tracking-[0.3em] font-cinzel text-gold-dark font-bold">
               MIS PADRINOS
             </p>
@@ -2697,7 +2683,7 @@ function ParentsSection() {
           17 DE OCTUBRE, 2026
         </p>
         <p className="text-[9px] md:text-[10px] uppercase tracking-[0.25em] font-cinzel text-text-sub font-semibold">
-          QUINTA MARIA TERESA
+          SALÓN QUINTA MARÍA TERESA
         </p>
       </StationeryPlate>
     </section>
@@ -3044,9 +3030,7 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
 }
 
 // ─── Reserved Color Section (Lámina Oficial 1: GUÍA DE COLOR PARA INVITADOS) ───
-function ReservedColorSection({ onTriggerToast }: { onTriggerToast: (msg: string) => void }) {
-  const [showFullPlate, setShowFullPlate] = useState(false);
-
+function ReservedColorSection({ onTriggerToast: _onTriggerToast }: { onTriggerToast: (msg: string) => void }) {
   return (
     <section id="color-reservado" className="relative py-16 md:py-24 px-4 md:px-6">
       <div className="section-sep mb-16 md:mb-20" />
@@ -3113,52 +3097,7 @@ function ReservedColorSection({ onTriggerToast }: { onTriggerToast: (msg: string
           <p className="font-cinzel text-xs uppercase tracking-[0.35em] text-text-sub font-bold mt-1">
             Etiqueta Formal
           </p>
-
-          {/* Action to view official printed card */}
-          <div className="mt-6 flex items-center justify-center gap-3">
-            <button
-              onClick={() => {
-                setShowFullPlate(true);
-                onTriggerToast("✨ Mostrando lámina oficial en pantalla completa ✦");
-              }}
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-gold/15 hover:bg-gold/25 text-gold-dark border border-gold/50 text-[11px] font-cinzel font-bold shadow-xs transition-all cursor-pointer"
-            >
-              <span>🔍</span> Ver Tarjeta Impresa Original
-            </button>
-          </div>
         </StationeryPlate>
-
-        {/* Modal Lightbox for Guía de Color Card */}
-        {showFullPlate && (
-          <div
-            className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in"
-            onClick={() => setShowFullPlate(false)}
-          >
-            <div
-              className="relative max-w-md w-full max-h-[92vh] flex flex-col items-center glass-card p-3 rounded-3xl border-2 border-gold shadow-2xl bg-cream/95 overflow-hidden"
-              onClick={e => e.stopPropagation()}
-            >
-              <button
-                type="button"
-                onClick={() => setShowFullPlate(false)}
-                className="absolute top-3 right-3 w-9 h-9 rounded-full bg-gold/20 hover:bg-gold/40 text-gold-dark flex items-center justify-center text-sm font-bold transition-all z-10 cursor-pointer"
-                title="Cerrar"
-              >
-                ✕
-              </button>
-              <div className="w-full overflow-y-auto max-h-[82vh] rounded-2xl flex justify-center p-1">
-                <img
-                  src="/fotos/guia_color_invitados.png"
-                  alt="Lámina Oficial - Guía de Color para Invitados"
-                  className="w-full h-auto object-contain rounded-xl shadow-lg"
-                />
-              </div>
-              <p className="text-[11px] font-cinzel tracking-widest text-gold-dark font-bold mt-2">
-                GUÍA DE COLOR · 17 DE OCTUBRE, 2026
-              </p>
-            </div>
-          </div>
-        )}
       </div>
     </section>
   );
@@ -3854,8 +3793,6 @@ function LivePhotoWallSection({
 
 // ─── Dress Code & Gifts Section (Lámina Oficial 2: SUGERENCIA DE REGALOS) ────────
 function DressGiftsSection({ onTriggerToast }: { onTriggerToast: (msg: string) => void }) {
-  const [showGiftCardModal, setShowGiftCardModal] = useState(false);
-
   const copyEventNumber = () => {
     navigator.clipboard.writeText("60045186");
     onTriggerToast("¡Número de evento 60045186 copiado! 🎁");
@@ -3974,51 +3911,7 @@ function DressGiftsSection({ onTriggerToast }: { onTriggerToast: (msg: string) =
 
           <span className="text-gold-dark text-xs my-2">✦</span>
 
-          {/* Action button */}
-          <div className="mt-3 flex items-center justify-center gap-3">
-            <button
-              onClick={() => {
-                setShowGiftCardModal(true);
-                onTriggerToast("✨ Mostrando tarjeta oficial de regalos ✦");
-              }}
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-gold/15 hover:bg-gold/25 text-gold-dark border border-gold/50 text-[11px] font-cinzel font-bold shadow-xs transition-all cursor-pointer"
-            >
-              <span>🔍</span> Ver Tarjeta Impresa Original
-            </button>
-          </div>
         </StationeryPlate>
-
-        {/* Modal Lightbox for Regalos Card */}
-        {showGiftCardModal && (
-          <div
-            className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in"
-            onClick={() => setShowGiftCardModal(false)}
-          >
-            <div
-              className="relative max-w-md w-full max-h-[92vh] flex flex-col items-center glass-card p-3 rounded-3xl border-2 border-gold shadow-2xl bg-cream/95 overflow-hidden"
-              onClick={e => e.stopPropagation()}
-            >
-              <button
-                type="button"
-                onClick={() => setShowGiftCardModal(false)}
-                className="absolute top-3 right-3 w-9 h-9 rounded-full bg-gold/20 hover:bg-gold/40 text-gold-dark flex items-center justify-center text-sm font-bold transition-all z-10 cursor-pointer"
-                title="Cerrar"
-              >
-                ✕
-              </button>
-              <div className="w-full overflow-y-auto max-h-[82vh] rounded-2xl flex justify-center p-1">
-                <img
-                  src="/fotos/sugerencia_regalos.png"
-                  alt="Lámina Oficial - Sugerencia de Regalos"
-                  className="w-full h-auto object-contain rounded-xl shadow-lg"
-                />
-              </div>
-              <p className="text-[11px] font-cinzel tracking-widest text-gold-dark font-bold mt-2">
-                SUGERENCIA DE REGALOS · KRISTA MARIEL
-              </p>
-            </div>
-          </div>
-        )}
       </div>
     </section>
   );
@@ -4674,7 +4567,7 @@ function KristaLetterSection() {
             17 DE OCTUBRE, 2026
           </span>
           <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] font-cinzel text-text-sub font-semibold">
-            QUINTA MARIA TERESA
+            SALÓN QUINTA MARÍA TERESA
           </span>
         </div>
 
