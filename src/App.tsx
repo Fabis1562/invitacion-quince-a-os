@@ -76,108 +76,38 @@ const DRESS_RESERVED_COLORS = [
   { color: "#8FA396", label: "Verde Menta", role: "Hermana & Corte" },
 ]
 
-// ─── Photo Gallery Data (Fotos Reales de Krista Mariel) ───────────────────────
+// ─── Photo Gallery Data (Fotos Oficiales de Krista Mariel - Fotos2) ───────────
 const GALLERY_ITEMS = [
-  // Sesión Oficial XV Años (Fotos Oficiales de Krista Mariel)
   {
     id: 1,
-    category: "pre-xv",
-    categoryLabel: "Sesión XV Años",
     title: "Luz Dorada en el Jardín",
     subtitle: "Sesión Oficial XV Años",
-    src: "/images/krista_sesion_valla_dorada.jpg",
+    src: "/fotos2/krista_sesion_1.png",
     aspect: "aspect-[2/3]",
     likes: 278,
   },
   {
     id: 2,
-    category: "pre-xv",
-    categoryLabel: "Sesión XV Años",
-    title: "Atardecer Mágico en el Prado",
+    title: "Sendero de Ensueño & Rosas Amarillas",
     subtitle: "Sesión Oficial XV Años",
-    src: "/images/krista_sesion_cesped_jardin.jpg",
-    aspect: "aspect-[3/2]",
+    src: "/fotos2/krista_sesion_2.png",
+    aspect: "aspect-[2/3]",
     likes: 315,
   },
   {
     id: 3,
-    category: "pre-xv",
-    categoryLabel: "Sesión XV Años",
-    title: "Sendero de Ensueño & Rosas Amarillas",
-    subtitle: "Sesión Oficial XV Años",
-    src: "/images/krista_sesion_rosas_camino.jpg",
-    aspect: "aspect-[2/3]",
-    likes: 294,
-  },
-  {
-    id: 4,
-    category: "pre-xv",
-    categoryLabel: "Sesión XV Años",
     title: "Mirada de Ilusión & Gratitud",
     subtitle: "Sesión Oficial XV Años",
-    src: "/images/krista_sesion_rosas_primer_plano.jpg",
+    src: "/fotos2/krista_sesion_3.png",
     aspect: "aspect-[2/3]",
     likes: 342,
   },
   {
-    id: 5,
-    category: "pre-xv",
-    categoryLabel: "Sesión XV Años",
-    title: "Globo Mariposa · 17.10.2026",
+    id: 4,
+    title: "Atardecer Mágico en el Prado",
     subtitle: "Sesión Oficial XV Años",
-    src: "/images/krista_butterfly_balloon.jpg",
-    aspect: "aspect-[3/4]",
-    likes: 289,
-  },
-  {
-    id: 6,
-    category: "pre-xv",
-    categoryLabel: "Sesión XV Años",
-    title: "Retrato Sonriente de Krista Mariel",
-    subtitle: "Sesión Oficial XV Años",
-    src: "/images/krista_portrait_1.jpg",
-    aspect: "aspect-[3/4]",
-    likes: 260,
-  },
-  // Baúl de Recuerdos e Infancia
-  {
-    id: 7,
-    category: "infancia",
-    categoryLabel: "Baúl de Recuerdos",
-    title: "El Ángel que Llegó a Nuestras Vidas",
-    subtitle: "Recién Nacida · Octubre 2011",
-    src: "/images/krista_bebe_amarillo_durmiendo.jpg",
-    aspect: "aspect-[4/3]",
-    likes: 312,
-  },
-  {
-    id: 8,
-    category: "infancia",
-    categoryLabel: "Baúl de Recuerdos",
-    title: "Ternura y Dulzura Infinita",
-    subtitle: "Primeros Meses · Krista Mariel",
-    src: "/images/krista_bebe_primeros_meses.png",
-    aspect: "aspect-[16/9]",
-    likes: 295,
-  },
-  {
-    id: 9,
-    category: "infancia",
-    categoryLabel: "Baúl de Recuerdos",
-    title: "Sonrisas y Caritas Pizpiretas",
-    subtitle: "Collage Tierno con Gorrito Rosa",
-    src: "/images/krista_bebe_gorrito_rosa.jpg",
-    aspect: "aspect-[4/3]",
-    likes: 340,
-  },
-  {
-    id: 10,
-    category: "infancia",
-    categoryLabel: "Baúl de Recuerdos",
-    title: "La Alegría de Crecer Feliz",
-    subtitle: "Primeros Años · Sonrisa Radiante",
-    src: "/images/krista_infancia_sonrisa.png",
-    aspect: "aspect-[4/3]",
+    src: "/fotos2/krista_sesion_4.png",
+    aspect: "aspect-[3/2]",
     likes: 358,
   },
 ]
@@ -1342,7 +1272,7 @@ function GoldDivider() {
   )
 }
 
-function SectionHeader({ tag, title }: { tag: string; title: string }) {
+function SectionHeader({ tag, title }: { tag: string; title: React.ReactNode }) {
   return (
     <div className="text-center mb-10 md:mb-14 px-2">
       <p className="text-[10px] md:text-[11px] uppercase tracking-[0.35em] md:tracking-[0.45em] font-montserrat text-gold-dark/80 mb-2 font-bold flex items-center justify-center gap-2">
@@ -3919,17 +3849,12 @@ function DressGiftsSection({ onTriggerToast }: { onTriggerToast: (msg: string) =
 
 
 function GallerySection() {
-  const [selectedCategory, setSelectedCategory] = useState<'all' | 'pre-xv' | 'infancia'>('all')
   const [lightboxItem, setLightboxItem] = useState<(typeof GALLERY_ITEMS)[0] | null>(null)
   const [likes, setLikes] = useState<Record<number, number>>({
-    1: 245,
-    2: 218,
-    3: 262,
-    4: 289,
-    5: 312,
-    6: 295,
-    7: 340,
-    8: 358,
+    1: 278,
+    2: 315,
+    3: 342,
+    4: 358,
   })
 
   const handleLike = (id: number, e: React.MouseEvent) => {
@@ -3937,68 +3862,29 @@ function GallerySection() {
     setLikes(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }))
   }
 
-  const filteredItems = selectedCategory === 'all'
-    ? GALLERY_ITEMS
-    : GALLERY_ITEMS.filter(item => item.category === selectedCategory)
-
   return (
     <section id="galeria" className="relative py-16 md:py-24 px-4 md:px-6">
       <div className="section-sep mb-16 md:mb-20" />
       <div className="max-w-6xl mx-auto">
-        <SectionHeader tag="Momentos Inolvidables" title="Galería Oficial de Krista Mariel" />
-        <p className="text-center font-montserrat text-xs md:text-sm text-text-sub max-w-xl mx-auto -mt-4 mb-8 md:mb-10 font-medium">
-          Revive cada sonrisa: desde sus recuerdos más tiernos de bebé e infancia hasta su hermosa sesión oficial de Quince Años.
-        </p>
+        <SectionHeader
+          tag="Momentos Inolvidables"
+          title={
+            <span>
+              Galería Oficial de <span className="inline-block whitespace-nowrap">Krista Mariel</span>
+            </span>
+          }
+        />
 
-        {/* Filter Tabs */}
-        <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-3 mb-10">
-          <button
-            type="button"
-            onClick={() => setSelectedCategory('all')}
-            className={`px-4 py-2 rounded-full text-xs sm:text-sm font-montserrat font-bold transition-all duration-300 shadow-sm cursor-pointer ${
-              selectedCategory === 'all'
-                ? 'bg-gradient-to-r from-gold to-gold-dark text-white shadow-gold/30 shadow-md scale-105'
-                : 'glass-card text-text-main hover:bg-gold/15 border border-gold/40'
-            }`}
-          >
-            📸 Todos los Recuerdos ({GALLERY_ITEMS.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setSelectedCategory('pre-xv')}
-            className={`px-4 py-2 rounded-full text-xs sm:text-sm font-montserrat font-bold transition-all duration-300 shadow-sm cursor-pointer ${
-              selectedCategory === 'pre-xv'
-                ? 'bg-gradient-to-r from-gold to-gold-dark text-white shadow-gold/30 shadow-md scale-105'
-                : 'glass-card text-text-main hover:bg-gold/15 border border-gold/40'
-            }`}
-          >
-            👑 Sesión XV Años ({GALLERY_ITEMS.filter(i => i.category === 'pre-xv').length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setSelectedCategory('infancia')}
-            className={`px-4 py-2 rounded-full text-xs sm:text-sm font-montserrat font-bold transition-all duration-300 shadow-sm cursor-pointer ${
-              selectedCategory === 'infancia'
-                ? 'bg-gradient-to-r from-gold to-gold-dark text-white shadow-gold/30 shadow-md scale-105'
-                : 'glass-card text-text-main hover:bg-gold/15 border border-gold/40'
-            }`}
-          >
-            🧸 Baúl de Recuerdos & Infancia ({GALLERY_ITEMS.filter(i => i.category === 'infancia').length})
-          </button>
-        </div>
-
-        {/* Gallery Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
-          {filteredItems.map(item => (
+        {/* Gallery Grid - Fotos Oficiales de Fotos2 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 mt-2 mb-4">
+          {GALLERY_ITEMS.map(item => (
             <div
               key={item.id}
               onClick={() => setLightboxItem(item)}
-              className={`rounded-3xl overflow-hidden glass-card glass-card-hover cursor-pointer group border-2 border-gold/40 shadow-xl flex flex-col justify-between p-3 sm:p-4 transition-all duration-300 hover:border-gold hover:shadow-2xl ${
-                item.id === 6 && selectedCategory === 'infancia' ? 'sm:col-span-2' : ''
-              }`}
+              className="rounded-3xl overflow-hidden glass-card glass-card-hover cursor-pointer group border-2 border-gold/40 shadow-xl flex flex-col justify-between p-3 sm:p-4 transition-all duration-300 hover:border-gold hover:shadow-2xl"
             >
               {/* Photo Frame Container - Shows 100% of the image without ANY cropping */}
-              <div className="relative w-full h-60 sm:h-64 rounded-2xl overflow-hidden bg-gradient-to-b from-[#FFFDF9] via-[#FAF6EE] to-[#F3EAD8] flex items-center justify-center p-2 border border-gold/30 shadow-inner">
+              <div className="relative w-full h-64 sm:h-72 rounded-2xl overflow-hidden bg-gradient-to-b from-[#FFFDF9] via-[#FAF6EE] to-[#F3EAD8] flex items-center justify-center p-2 border border-gold/30 shadow-inner">
                 <img
                   src={item.src}
                   alt={item.title}
@@ -4006,10 +3892,10 @@ function GallerySection() {
                   loading="lazy"
                 />
 
-                {/* Top Category Badge */}
+                {/* Top Badge */}
                 <div className="absolute top-2 left-2 z-10">
                   <span className="text-[10px] font-montserrat font-bold px-2.5 py-1 rounded-full bg-cream/95 backdrop-blur-md text-gold-dark border border-gold/30 shadow-xs">
-                    {item.category === 'infancia' ? '🧸 Infancia' : '✨ XV Años'}
+                    ✨ Sesión Oficial
                   </span>
                 </div>
 
@@ -4039,7 +3925,7 @@ function GallerySection() {
                     className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 border border-gold/40 text-xs text-gold-dark font-bold shadow-2xs hover:scale-105 active:scale-95 transition-transform cursor-pointer"
                   >
                     <span>❤️</span>
-                    <span>{likes[item.id]}</span>
+                    <span>{likes[item.id] || 0}</span>
                   </button>
                 </div>
               </div>
