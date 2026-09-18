@@ -14,15 +14,18 @@ const GODMOTHER_NAME = "Lola Carlos"
 const GODFATHER_NAME = "Saúl Sandoval Santoyo"
 
 const CHURCH_TIME = "1:00 PM - 2:00 PM"
-const CHURCH_NAME = "Parroquia Nuestra Señora del Carmen"
-const CHURCH_ADDRESS = "Calle Principal #123, Centro Histórico"
-const CHURCH_MAPS = "https://maps.google.com/?q=Parroquia+Nuestra+Señora+del+Carmen"
+const CHURCH_NAME = "Templo de la Sagrada Familia"
+const CHURCH_ADDRESS = "Av. José María Morelos #207, Zona Centro, Fresnillo, Zac."
+const CHURCH_COORDINATES = "23°10'19.6\"N 102°52'16.5\"W"
+const CHURCH_MAPS = "https://www.google.com/maps?q=23.1721248626709,-102.8712387084961&z=17&hl=es"
+const CHURCH_WAZE = "https://waze.com/ul?ll=23.1721248626709,-102.8712387084961&navigate=yes"
 
 const VENUE_TIME = "3:00 PM"
 const VENUE_NAME = "Salón Quinta María Teresa"
 const VENUE_COORDINATES = "23°10'30.7\"N 102°54'27.6\"W"
-const VENUE_ADDRESS = "23°10'30.7\"N 102°54'27.6\"W"
+const VENUE_ADDRESS = "Fresnillo, Zacatecas (Coordenadas: 23°10'30.7\"N 102°54'27.6\"W)"
 const VENUE_MAPS = "https://www.google.com/maps/place/23%C2%B010'30.7%22N+102%C2%B054'27.6%22W/@23.1752309,-102.9085838,291m/data=!3m1!1e3!4m4!3m3!8m2!3d23.1751881!4d-102.9076614?hl=es&entry=ttu&g_ep=EgoyMDI2MDkxNS4wIKXMDSoASAFQAw%3D%3D"
+const VENUE_WAZE = "https://waze.com/ul?ll=23.1751881,-102.9076614&navigate=yes"
 
 const WHATSAPP_PHONE = "5214931141024" // +52 1 493 114 1024
 // 💡 Carpeta compartida de Google Drive / Google Photos para fotos de los invitados
@@ -178,7 +181,7 @@ const INITIAL_WISHES = [
   {
     id: 3,
     name: "Abuelitos Sandoval",
-    message: "Mi niña adorada Krista, tus 15 años son un regalo del cielo. Que la Virgen del Carmen ilumine siempre tu camino.",
+    message: "Mi niña adorada Krista, tus 15 años son un regalo del cielo. Que la Sagrada Familia y Dios iluminen siempre tu camino.",
     date: "Ayer",
     hue: "#FFF5B8",
   },
@@ -687,7 +690,7 @@ function speakEventDetails(onTriggerToast: (msg: string) => void) {
     return
   }
   window.speechSynthesis.cancel()
-  const text = `¡Hola! Con la bendición de Dios y el amor de sus padres Roberto Sandoval Santoyo y María Gabriela Caldera Arroyo, y sus padrinos Lola Carlos y Saúl Sandoval Santoyo, te invitamos con gran alegría a celebrar los Quince Años de Krista Mariel Sandoval Caldera. La ceremonia religiosa será el sábado 17 de Octubre a la 1:00 de la tarde en la Parroquia Nuestra Señora del Carmen. La recepción y comida iniciarán a las 3:00 de la tarde en el Salón Quinta María Teresa, seguido de Mariachi y Grupo Versátil. ¡Gracias por formar parte de este momento tan especial!`
+  const text = `¡Hola! Con la bendición de Dios y el amor de sus padres Roberto Sandoval Santoyo y María Gabriela Caldera Arroyo, y sus padrinos Lola Carlos y Saúl Sandoval Santoyo, te invitamos con gran alegría a celebrar los Quince Años de Krista Mariel Sandoval Caldera. La ceremonia religiosa será el sábado 17 de Octubre a la 1:00 de la tarde en el Templo de la Sagrada Familia. La recepción y comida iniciarán a las 3:00 de la tarde en el Salón Quinta María Teresa, seguido de Mariachi y Grupo Versátil. ¡Gracias por formar parte de este momento tan especial!`
 
   const utterance = new SpeechSynthesisUtterance(text)
   utterance.lang = 'es-MX'
@@ -1728,81 +1731,219 @@ function ParallaxCard({ children, className = "" }: { children: React.ReactNode;
   )
 }
 
-// ─── Arrival Guide Component (Guía VIP al Salón de Eventos) ───────────────────
+// ─── Arrival Guide Component (Guía de Ubicaciones: Misa & Salón) ──────────────
 function ArrivalGuideSection({ onTriggerToast }: { onTriggerToast: (msg: string) => void }) {
-  const copyAddress = () => {
-    navigator.clipboard.writeText(`Salón de Eventos · ${VENUE_COORDINATES}`)
-    onTriggerToast("¡Coordenadas copiadas al portapapeles! 📍")
+  const [activeLocation, setActiveLocation] = useState<'church' | 'venue'>('church')
+
+  const copyAddress = (type: 'church' | 'venue') => {
+    if (type === 'church') {
+      navigator.clipboard.writeText(`${CHURCH_NAME} · ${CHURCH_ADDRESS} (${CHURCH_COORDINATES})`)
+      onTriggerToast("¡Ubicación del Templo copiada al portapapeles! ⛪")
+    } else {
+      navigator.clipboard.writeText(`${VENUE_NAME} · ${VENUE_COORDINATES}`)
+      onTriggerToast("¡Ubicación del Salón copiada al portapapeles! 🏰")
+    }
   }
 
   return (
     <section id="llegada" className="relative py-16 md:py-24 px-4 md:px-6">
       <div className="section-sep mb-16 md:mb-20" />
       <div className="max-w-4xl mx-auto">
-        <SectionHeader tag="Ubicación & Traslado" title="Guía de Llegada al Salón de Eventos" />
+        <SectionHeader
+          tag="Ubicación & Traslado"
+          title="Guía de Ubicaciones & Traslado"
+        />
+        <p className="text-center font-montserrat text-xs md:text-sm text-text-sub font-medium -mt-6 mb-8 max-w-xl mx-auto">
+          Encuentra las rutas oficiales en Google Maps y Waze para acompañarnos en la Misa y en la Fiesta
+        </p>
 
-        <ParallaxCard className="glass-card p-6 md:p-10 rounded-3xl border-2 border-gold/40 flex flex-col md:flex-row gap-8 shadow-2xl items-center">
-          <div className="w-full md:w-1/2 flex flex-col gap-4">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">🏰</span>
-              <div>
-                <span className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">Lugar de la Recepción</span>
-                <h3 className="font-playfair text-2xl text-text-main font-bold">Salón de Eventos</h3>
-                <p className="text-xs font-montserrat text-gold-dark font-semibold mt-0.5">{VENUE_COORDINATES}</p>
-              </div>
+        {/* Location Switcher Tabs */}
+        <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
+          <button
+            onClick={() => setActiveLocation('church')}
+            className={`px-5 py-3 rounded-full text-xs md:text-sm font-montserrat font-bold transition-all duration-300 flex items-center gap-2.5 shadow-md cursor-pointer ${
+              activeLocation === 'church'
+                ? 'bg-gradient-to-r from-gold via-gold-light to-gold-dark text-white scale-105 ring-2 ring-gold/50'
+                : 'glass-card border border-gold/40 text-text-sub hover:text-text-main hover:bg-gold/10'
+            }`}
+          >
+            <span className="text-xl">⛪</span>
+            <div className="text-left">
+              <span className="block leading-tight">1. Ceremonia Religiosa</span>
+              <span className="text-[10px] opacity-90 font-normal">Templo de la Sagrada Familia · 1:00 PM</span>
             </div>
+          </button>
 
-            <p className="font-montserrat text-xs md:text-sm text-text-sub leading-relaxed font-medium">
-              Contamos con amplio estacionamiento, seguridad y accesos cómodos para recibirte como te mereces en este día tan especial.
-            </p>
+          <button
+            onClick={() => setActiveLocation('venue')}
+            className={`px-5 py-3 rounded-full text-xs md:text-sm font-montserrat font-bold transition-all duration-300 flex items-center gap-2.5 shadow-md cursor-pointer ${
+              activeLocation === 'venue'
+                ? 'bg-gradient-to-r from-gold via-gold-light to-gold-dark text-white scale-105 ring-2 ring-gold/50'
+                : 'glass-card border border-gold/40 text-text-sub hover:text-text-main hover:bg-gold/10'
+            }`}
+          >
+            <span className="text-xl">🏰</span>
+            <div className="text-left">
+              <span className="block leading-tight">2. Recepción & Fiesta</span>
+              <span className="text-[10px] opacity-90 font-normal">Salón Quinta María Teresa · 3:00 PM</span>
+            </div>
+          </button>
+        </div>
 
-            <div className="glass-card p-4 rounded-2xl border border-gold/30 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">🌤️</span>
+        {/* Location Detail Card */}
+        {activeLocation === 'church' ? (
+          <ParallaxCard className="glass-card p-6 md:p-10 rounded-3xl border-2 border-gold/40 flex flex-col md:flex-row gap-8 shadow-2xl items-center animate-fade-in">
+            <div className="w-full md:w-1/2 flex flex-col gap-4">
+              <div className="flex items-center gap-3">
+                <span className="text-4xl">⛪</span>
                 <div>
-                  <span className="text-[9px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">Clima Previsto (17 de Octubre)</span>
-                  <p className="font-playfair text-sm text-text-main font-bold">24°C · Cielos Despejados</p>
+                  <span className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">Ceremonia Religiosa</span>
+                  <h3 className="font-playfair text-2xl text-text-main font-bold">{CHURCH_NAME}</h3>
+                  <p className="text-xs font-montserrat text-gold-dark font-semibold mt-0.5">{CHURCH_TIME}</p>
                 </div>
               </div>
-              <span className="text-xs font-montserrat text-gold-dark font-bold bg-gold/15 px-2.5 py-1 rounded-full border border-gold/30">Ideal Fiesta</span>
+
+              <div className="p-3.5 rounded-2xl bg-gold/10 border border-gold/30 flex items-start gap-2.5">
+                <span className="text-base mt-0.5">📍</span>
+                <div>
+                  <p className="text-xs font-montserrat text-text-main font-bold">Dirección Oficial:</p>
+                  <p className="text-xs font-montserrat text-text-sub mt-0.5">{CHURCH_ADDRESS}</p>
+                  <p className="text-[11px] font-montserrat text-gold-dark font-semibold mt-1">Coordenadas: {CHURCH_COORDINATES}</p>
+                </div>
+              </div>
+
+              <p className="font-montserrat text-xs md:text-sm text-text-sub leading-relaxed font-medium">
+                Acompáñanos a bendecir los 15 Años de Krista Mariel en una solemne y emotiva Eucaristía de Acción de Gracias junto a sus padres, padrinos y seres queridos.
+              </p>
+
+              <div className="glass-card p-4 rounded-2xl border border-gold/30 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">⏱️</span>
+                  <div>
+                    <span className="text-[9px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">Traslado hacia el Salón</span>
+                    <p className="font-playfair text-sm text-text-main font-bold">~12 min en automóvil</p>
+                  </div>
+                </div>
+                <span className="text-xs font-montserrat text-gold-dark font-bold bg-gold/15 px-2.5 py-1 rounded-full border border-gold/30">Misa 1:00 PM</span>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 mt-2">
+                <a
+                  href={CHURCH_WAZE}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 py-3 px-4 rounded-2xl bg-[#33CCFF]/15 border border-[#33CCFF]/40 text-text-main font-montserrat font-bold text-xs flex items-center justify-center gap-2 shadow-sm hover:scale-105 transition-all"
+                >
+                  <span>🚗</span> Abrir en Waze
+                </a>
+                <a
+                  href={CHURCH_MAPS}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 py-3 px-4 rounded-2xl bg-gold/20 border border-gold text-gold-dark font-montserrat font-bold text-xs flex items-center justify-center gap-2 shadow-sm hover:scale-105 transition-all"
+                >
+                  <span>🗺️</span> Google Maps
+                </a>
+              </div>
+
+              <button
+                onClick={() => copyAddress('church')}
+                className="py-2.5 px-4 rounded-xl border border-gold/40 glass-card text-text-sub font-montserrat font-semibold text-xs text-center hover:text-gold-dark transition-colors cursor-pointer flex items-center justify-center gap-2"
+              >
+                <span>📋</span> Copiar Dirección y Coordenadas del Templo
+              </button>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 mt-2">
-              <a
-                href="https://waze.com/ul?ll=23.1751881,-102.9076614&navigate=yes"
-                target="_blank"
-                rel="noreferrer"
-                className="flex-1 py-3 px-4 rounded-2xl bg-[#33CCFF]/15 border border-[#33CCFF]/40 text-text-main font-montserrat font-bold text-xs flex items-center justify-center gap-2 shadow-sm hover:scale-105 transition-all"
+            <div className="w-full md:w-1/2 aspect-video md:aspect-square rounded-2xl overflow-hidden border-2 border-gold relative shadow-lg">
+              <iframe
+                title="Mapa Templo de la Sagrada Familia"
+                src="https://maps.google.com/maps?q=23.1721248626709,-102.8712387084961&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                className="w-full h-full border-0 filter saturate-150"
+                loading="lazy"
+              />
+            </div>
+          </ParallaxCard>
+        ) : (
+          <ParallaxCard className="glass-card p-6 md:p-10 rounded-3xl border-2 border-gold/40 flex flex-col md:flex-row gap-8 shadow-2xl items-center animate-fade-in">
+            <div className="w-full md:w-1/2 flex flex-col gap-4">
+              <div className="flex items-center gap-3">
+                <span className="text-4xl">🏰</span>
+                <div>
+                  <span className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">Lugar de la Recepción</span>
+                  <h3 className="font-playfair text-2xl text-text-main font-bold">{VENUE_NAME}</h3>
+                  <p className="text-xs font-montserrat text-gold-dark font-semibold mt-0.5">{VENUE_TIME} en adelante</p>
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-gold/10 border border-gold/30 flex items-start gap-2.5">
+                <span className="text-base mt-0.5">📍</span>
+                <div>
+                  <p className="text-xs font-montserrat text-text-main font-bold">Ubicación del Salón:</p>
+                  <p className="text-xs font-montserrat text-text-sub mt-0.5">Fresnillo, Zacatecas</p>
+                  <p className="text-[11px] font-montserrat text-gold-dark font-semibold mt-1">Coordenadas: {VENUE_COORDINATES}</p>
+                </div>
+              </div>
+
+              <p className="font-montserrat text-xs md:text-sm text-text-sub leading-relaxed font-medium">
+                Contamos con amplio estacionamiento, seguridad privada y accesos cómodos para recibirte como te mereces en esta gran noche de gala y celebración.
+              </p>
+
+              <div className="glass-card p-4 rounded-2xl border border-gold/30 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">🌤️</span>
+                  <div>
+                    <span className="text-[9px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">Clima Previsto (17 de Octubre)</span>
+                    <p className="font-playfair text-sm text-text-main font-bold">24°C · Cielos Despejados</p>
+                  </div>
+                </div>
+                <span className="text-xs font-montserrat text-gold-dark font-bold bg-gold/15 px-2.5 py-1 rounded-full border border-gold/30">Ideal Fiesta</span>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 mt-2">
+                <a
+                  href={VENUE_WAZE}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 py-3 px-4 rounded-2xl bg-[#33CCFF]/15 border border-[#33CCFF]/40 text-text-main font-montserrat font-bold text-xs flex items-center justify-center gap-2 shadow-sm hover:scale-105 transition-all"
+                >
+                  <span>🚗</span> Abrir en Waze
+                </a>
+                <a
+                  href={VENUE_MAPS}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 py-3 px-4 rounded-2xl bg-gold/20 border border-gold text-gold-dark font-montserrat font-bold text-xs flex items-center justify-center gap-2 shadow-sm hover:scale-105 transition-all"
+                >
+                  <span>🗺️</span> Google Maps
+                </a>
+              </div>
+
+              <button
+                onClick={() => copyAddress('venue')}
+                className="py-2.5 px-4 rounded-xl border border-gold/40 glass-card text-text-sub font-montserrat font-semibold text-xs text-center hover:text-gold-dark transition-colors cursor-pointer flex items-center justify-center gap-2"
               >
-                <span>🚗</span> Abrir en Waze
-              </a>
-              <a
-                href={VENUE_MAPS}
-                target="_blank"
-                rel="noreferrer"
-                className="flex-1 py-3 px-4 rounded-2xl bg-gold/20 border border-gold text-gold-dark font-montserrat font-bold text-xs flex items-center justify-center gap-2 shadow-sm hover:scale-105 transition-all"
-              >
-                <span>🗺️</span> Google Maps
-              </a>
+                <span>📋</span> Copiar Coordenadas del Salón de Eventos
+              </button>
             </div>
 
-            <button
-              onClick={copyAddress}
-              className="py-2.5 px-4 rounded-xl border border-gold/40 glass-card text-text-sub font-montserrat font-semibold text-xs text-center hover:text-gold-dark transition-colors cursor-pointer"
-            >
-              📋 Copiar Coordenadas Exactas
-            </button>
-          </div>
+            <div className="w-full md:w-1/2 aspect-video md:aspect-square rounded-2xl overflow-hidden border-2 border-gold relative shadow-lg">
+              <iframe
+                title="Mapa Salón de Eventos"
+                src="https://maps.google.com/maps?q=23.1751881,-102.9076614&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                className="w-full h-full border-0 filter saturate-150"
+                loading="lazy"
+              />
+            </div>
+          </ParallaxCard>
+        )}
 
-          <div className="w-full md:w-1/2 aspect-video md:aspect-square rounded-2xl overflow-hidden border-2 border-gold relative shadow-lg">
-            <iframe
-              title="Mapa Salón de Eventos"
-              src="https://maps.google.com/maps?q=23.1751881,-102.9076614&t=&z=16&ie=UTF8&iwloc=&output=embed"
-              className="w-full h-full border-0 filter saturate-150"
-              loading="lazy"
-            />
-          </div>
-        </ParallaxCard>
+        {/* Route Connection Tip Card */}
+        <div className="mt-6 p-4 rounded-2xl bg-gold/10 border border-gold/30 flex items-center justify-center gap-3 text-center">
+          <span className="text-xl shrink-0">🚗</span>
+          <p className="text-xs font-montserrat text-text-sub font-medium">
+            <strong className="text-gold-dark font-bold">Traslado entre sedes:</strong> Al concluir la Misa (2:00 PM), hay 1 hora completa para trasladarse cómodamente al Salón (~12 a 15 minutos en coche). ¡Las puertas de Quinta María Teresa abren a las 3:00 PM!
+          </p>
+        </div>
       </div>
     </section>
   )
@@ -2829,7 +2970,7 @@ function ParentsSection() {
 
 // ─── Official 15 Program Items matching image copy 5.png ───────────────────────
 const OFFICIAL_15_PROGRAM = [
-  { id: 1, time: "1:00 PM", title: "MISA", icon: "⛪", desc: "Misa Solemne de Acción de Gracias en la Parroquia Nuestra Señora del Carmen" },
+  { id: 1, time: "1:00 PM", title: "MISA", icon: "⛪", desc: "Misa Solemne de Acción de Gracias en el Templo de la Sagrada Familia" },
   { id: 2, time: "3:00 PM", title: "RECEPCIÓN DE INVITADOS", icon: "🥂", desc: "Apertura de puertas, bienvenida y cóctel en Quinta María Teresa" },
   { id: 3, time: "4:00 PM", title: "COMIDA", icon: "🍽️", desc: "Servicio del banquete especial de gala" },
   { id: 4, time: "4:00 PM", title: "MARIACHI", icon: "🎵", desc: "Entrada del Mariachi para amenizar la tarde" },
@@ -2918,36 +3059,6 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
     {
       id: 5,
       num: 5,
-      title: "Piano",
-      subtitle: "Acompañamiento Instrumental en Vivo",
-      description: "Delicadas piezas al piano en vivo para acompañar la comida en una atmósfera cálida, distinguida y amena.",
-      time: "Tarde",
-      location: VENUE_NAME,
-      address: VENUE_ADDRESS,
-      maps: VENUE_MAPS,
-      category: "musica",
-      categoryLabel: "Música en Vivo",
-      icon: "🎹",
-      accent: "from-slate-100 to-slate-50 text-slate-900 border-slate-300",
-    },
-    {
-      id: 6,
-      num: 6,
-      title: "Violín",
-      subtitle: "Música Instrumental de Gala",
-      description: "Interpretación magistral de violín en vivo con hermosas melodías románticas y contemporáneas.",
-      time: "Tarde de Gala",
-      location: VENUE_NAME,
-      address: VENUE_ADDRESS,
-      maps: VENUE_MAPS,
-      category: "musica",
-      categoryLabel: "Música en Vivo",
-      icon: "🎻",
-      accent: "from-purple-100 to-purple-50 text-purple-900 border-purple-300",
-    },
-    {
-      id: 7,
-      num: 7,
       title: "Entrega de recuerdos a Señoras (vela virgen)",
       subtitle: "Detalle y Bendición Especial",
       description: "Entrega solemne de una hermosa vela bendecida con imagen de la Virgen como signo de agradecimiento y protección a las señoras invitadas.",
@@ -2961,8 +3072,8 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
       accent: "from-amber-100 to-amber-50 text-amber-900 border-amber-300",
     },
     {
-      id: 8,
-      num: 8,
+      id: 6,
+      num: 6,
       title: "Grupo Versátil",
       subtitle: "Ambiente, Baile y Fiesta",
       description: "Inicio del Grupo Versátil con el mejor repertorio para llenar la pista de alegría, baile y diversión.",
@@ -2976,8 +3087,8 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
       accent: "from-teal-100 to-teal-50 text-teal-900 border-teal-300",
     },
     {
-      id: 9,
-      num: 9,
+      id: 7,
+      num: 7,
       title: "Coronación por hermana",
       subtitle: "Momento Solemne de Tiara Real",
       description: "Su hermana realiza el emotivo acto de colocación de la corona y tiara a Krista Mariel, reconociéndola como la reina de la noche.",
@@ -2991,8 +3102,8 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
       accent: "from-amber-100 to-amber-50 text-amber-900 border-amber-300",
     },
     {
-      id: 10,
-      num: 10,
+      id: 8,
+      num: 8,
       title: "Vals con papá, mamá, hermana, abuelo, padrino, madrina y finaliza nuevamente con papá",
       subtitle: "Vals Familiar de Gala",
       description: "Inolvidable secuencia de vals con cada una de las personas más significativas de su vida, culminando con el abrazo y cierre de su padre.",
@@ -3006,8 +3117,8 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
       accent: "from-pink-100 to-pink-50 text-pink-900 border-pink-300",
     },
     {
-      id: 11,
-      num: 11,
+      id: 9,
+      num: 9,
       title: "Semblanza",
       subtitle: "Proyección Audiovisual de Recuerdos",
       description: "Video emotivo y proyección de fotos conmemorativas reviviendo las etapas más hermosas de la vida de Krista Mariel.",
@@ -3021,8 +3132,8 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
       accent: "from-indigo-100 to-indigo-50 text-indigo-900 border-indigo-300",
     },
     {
-      id: 12,
-      num: 12,
+      id: 10,
+      num: 10,
       title: "Vals principal chambelanes",
       subtitle: "Gran Coreografía de Gala",
       description: "Espectacular vals de honor de la quinceañera Krista Mariel acompañada de sus gallardos chambelanes.",
@@ -3036,8 +3147,8 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
       accent: "from-blue-100 to-blue-50 text-blue-900 border-blue-300",
     },
     {
-      id: 13,
-      num: 13,
+      id: 11,
+      num: 11,
       title: "Brindis",
       subtitle: "Palabras de Honor & Agradecimiento",
       description: "Los padres, padrinos e invitados levantan sus copas para brindar por la salud, bendiciones y sueños de la quinceañera.",
@@ -3051,8 +3162,8 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
       accent: "from-yellow-100 to-yellow-50 text-yellow-900 border-yellow-300",
     },
     {
-      id: 14,
-      num: 14,
+      id: 12,
+      num: 12,
       title: "Pastel",
       subtitle: "Corte Tradicional & Mañanitas",
       description: "Todos juntos cantamos las mañanitas a Krista Mariel y acompañamos el corte del pastel monumental de XV años.",
@@ -3066,8 +3177,8 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
       accent: "from-orange-100 to-orange-50 text-orange-900 border-orange-300",
     },
     {
-      id: 15,
-      num: 15,
+      id: 13,
+      num: 13,
       title: "Pinta Caritas",
       subtitle: "Glitter Bar & Glow Art",
       description: "Divertida estación artística de maquillaje con brillos, piedras y diseños festivos para darle un toque luminoso a la fiesta.",
@@ -3081,8 +3192,8 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
       accent: "from-fuchsia-100 to-fuchsia-50 text-fuchsia-900 border-fuchsia-300",
     },
     {
-      id: 16,
-      num: 16,
+      id: 14,
+      num: 14,
       title: "Cambiarse de outfit para baile sorpresa (quinceañera)",
       subtitle: "Intermedio de Preparación de Vestuario",
       description: "Breve transición donde Krista Mariel cambia a su deslumbrante outfit moderno para su gran show coreográfico.",
@@ -3096,8 +3207,8 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
       accent: "from-violet-100 to-violet-50 text-violet-900 border-violet-300",
     },
     {
-      id: 17,
-      num: 17,
+      id: 15,
+      num: 15,
       title: "Baile sorpresa con chambelanes",
       subtitle: "Show Coreográfico Estelar",
       description: "¡Luces, ritmo y energía! Krista Mariel y sus chambelanes sorprenden a los invitados con una coreografía moderna y vibrante.",
@@ -3111,8 +3222,8 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
       accent: "from-yellow-100 to-yellow-50 text-yellow-900 border-yellow-300",
     },
     {
-      id: 18,
-      num: 18,
+      id: 16,
+      num: 16,
       title: "Baile sorpresa con papá, mamá, padrino, madrina, hermana y finaliza con todos",
       subtitle: "Show Familiar Interactivo & Pista Abierta",
       description: "Divertido baile sorpresa en el que se integran papás, padrinos y hermana, contagiando a todos los invitados a llenar la pista.",
@@ -3126,8 +3237,8 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
       accent: "from-purple-100 to-purple-50 text-purple-900 border-purple-300",
     },
     {
-      id: 19,
-      num: 19,
+      id: 17,
+      num: 17,
       title: "Cabina de fotos",
       subtitle: "Photo Booth Instantáneo",
       description: "Espacio fotográfico interactivo con divertidos accesorios para que los invitados se lleven sus fotos impresas de recuerdo.",
@@ -3141,8 +3252,8 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
       accent: "from-sky-100 to-sky-50 text-sky-900 border-sky-300",
     },
     {
-      id: 20,
-      num: 20,
+      id: 18,
+      num: 18,
       title: "Inauguración de tienda Merch Store",
       subtitle: "Apertura de Merch Oficial XV",
       description: "Inauguración oficial del stand de recuerdos y artículos temáticos conmemorativos de los 15 Años de Krista Mariel.",
@@ -3156,8 +3267,8 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
       accent: "from-emerald-100 to-emerald-50 text-emerald-900 border-emerald-300",
     },
     {
-      id: 21,
-      num: 21,
+      id: 19,
+      num: 19,
       title: "Entrega por padrinos y quinceañera de pantunflas, alajeros y scrunchies (ligas para el cabello) para señoras y jóvenes y para los hombres calcetas",
       subtitle: "Kits de Confort para la Fiesta",
       description: "Krista y sus padrinos obsequian pantunflas descansadoras, alajeros y scrunchies para damas y jovencitas, y cómodas calcetas para los caballeros.",
@@ -3171,8 +3282,8 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
       accent: "from-pink-100 to-pink-50 text-pink-900 border-pink-300",
     },
     {
-      id: 22,
-      num: 22,
+      id: 20,
+      num: 20,
       title: "Entregar en tienda Merch Store vasos, lentes y scrunchies para amistades de la quinceañera",
       subtitle: "Kit Festivo para Jóvenes y Amigos",
       description: "En el stand Merch Store se distribuyen vasos conmemorativos, lentes con luz y scrunchies exclusivos para los amigos y amigas de Krista.",
@@ -3186,8 +3297,8 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
       accent: "from-cyan-100 to-cyan-50 text-cyan-900 border-cyan-300",
     },
     {
-      id: 23,
-      num: 23,
+      id: 21,
+      num: 21,
       title: "Entrega de dulces en charolas a cada mesa",
       subtitle: "Cortesía Dulce Mesa por Mesa",
       description: "Desfile de deliciosas charolas con selección de dulces finos y antojitos llevados directamente a la mesa de cada invitado.",
@@ -3201,8 +3312,8 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
       accent: "from-red-100 to-red-50 text-red-900 border-red-300",
     },
     {
-      id: 24,
-      num: 24,
+      id: 22,
+      num: 22,
       title: "Banda",
       subtitle: "Gran Fiesta & Ritmo de Banda en Vivo",
       description: "¡Comienza el show de Banda sinaloense en vivo para encender la pista, bailar, cantar y disfrutar la recta final del festejo!",
@@ -3215,25 +3326,10 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
       icon: "🎷",
       accent: "from-amber-100 to-amber-50 text-amber-900 border-amber-300",
     },
-    {
-      id: 25,
-      num: 25,
-      title: "Cena",
-      subtitle: "Cena de Gala & Desvelados",
-      description: "Delicioso servicio nocturno de cena para reponer energías, brindar nuevamente y despedir una celebración legendaria.",
-      time: "Cena de Desvelados",
-      location: VENUE_NAME,
-      address: VENUE_ADDRESS,
-      maps: VENUE_MAPS,
-      category: "ceremonia",
-      categoryLabel: "Cena Nocturna",
-      icon: "🍲",
-      accent: "from-stone-100 to-stone-50 text-stone-900 border-stone-300",
-    },
   ]
 
   const categories = [
-    { id: 'todos', label: 'Todos (25)', icon: '✨' },
+    { id: 'todos', label: 'Todos (22)', icon: '✨' },
     { id: 'ceremonia', label: 'Misa & Banquete', icon: '⛪' },
     { id: 'musica', label: 'Música en Vivo', icon: '🎺' },
     { id: 'protocolo', label: 'Valses & Protocolo', icon: '👑' },
@@ -3270,7 +3366,7 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
   const copyFullProtocol = () => {
     const text = `✨ PROTOCOLO · XV AÑOS KRISTA MARIEL ✨\nOrganización de tiempo (Sábado 17 de Octubre, 2026):\n\n` +
       protocolEvents.map(e => `${e.num}. ${e.title} (${e.time})`).join('\n') +
-      `\n\n⛪ Misa: Parroquia Nuestra Señora del Carmen (1:00 PM)\n🥂 Recepción: Salón Quinta María Teresa (3:00 PM)`
+      `\n\n⛪ Misa: ${CHURCH_NAME} (${CHURCH_TIME})\n🥂 Recepción: ${VENUE_NAME} (${VENUE_TIME})`
     navigator.clipboard.writeText(text)
     onTriggerToast("¡Protocolo completo copiado al portapapeles! 📋 Listo para compartir")
   }
@@ -3591,10 +3687,10 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
 
               {/* Card Footer */}
               <div className="mt-8 pt-4 border-t border-[#D4AF37]/30 text-center">
-                <div className="flex items-center justify-center gap-2 text-xs font-montserrat text-[#70634D] font-semibold">
-                  <span>⛪ Misa 1:00 PM</span>
+                <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-montserrat text-[#70634D] font-semibold">
+                  <span>⛪ Misa: Templo de la Sagrada Familia (1:00 PM)</span>
                   <span>•</span>
-                  <span>🥂 Salón Quinta María Teresa 3:00 PM</span>
+                  <span>🥂 Salón Quinta María Teresa (3:00 PM)</span>
                 </div>
                 <p className="font-playfair italic text-[#8C6D3B] text-xs mt-2">
                   "Gracias por acompañarme en el día más feliz de mis 15 Años"
@@ -6258,7 +6354,7 @@ function VIPPassSection({ onTriggerToast }: { onTriggerToast: (msg: string) => v
     ctx.fillStyle = '#6E531E'
     ctx.font = '12px "Montserrat", sans-serif'
     ctx.fillText('📅 SÁBADO 17 DE OCTUBRE, 2026', 50, 225)
-    ctx.fillText('⛪ MISA: 1:00 PM · PARROQUIA NTRA. SRA. DEL CARMEN', 50, 250)
+    ctx.fillText('⛪ MISA: 1:00 PM · TEMPLO DE LA SAGRADA FAMILIA', 50, 250)
     ctx.fillText('📍 RECEPCIÓN: 3:00 PM · SALÓN QUINTA MARÍA TERESA', 50, 275)
 
     // Monogram Stamp
@@ -6556,6 +6652,7 @@ function Navbar({
     { href: '#video-especial', label: 'Video Especial 🎬' },
     { href: '#brindis', label: 'Brindis & Abrazos 🥂' },
     { href: '#itinerario', label: 'Tiempo & Protocolo' },
+    { href: '#llegada', label: 'Ubicación & Mapas 📍' },
     { href: '#color-reservado', label: 'Color Reservado 🦋' },
     { href: '#coordinacion-outfits', label: 'Outfits' },
     { href: '#trivia', label: 'Trivia' },
