@@ -187,30 +187,6 @@ export function GoldButterfly({ className = "w-5 h-5", size, style }: { classNam
   );
 }
 
-const INITIAL_WISHES = [
-  {
-    id: 1,
-    name: "Tía Sofía & Familia",
-    message: "¡Querida Krista Mariel! Que tu vida siempre vuele alto llena de mariposas de felicidad, amor y bendiciones. ¡Estamos felices de celebrar tus 15 años!",
-    date: "Hace 1 hora",
-    hue: "#D4AF37",
-  },
-  {
-    id: 2,
-    name: "Valentina & Camila",
-    message: "¡Amiga hermosa! Te ves como una verdadera princesa con tus mariposas pasteles. ¡Va a ser la fiesta del año!",
-    date: "Hace 3 horas",
-    hue: "#F7C5D4",
-  },
-  {
-    id: 3,
-    name: "Abuelitos Sandoval",
-    message: "Mi niña adorada Krista, tus 15 años son un regalo del cielo. Que la Sagrada Familia y Dios iluminen siempre tu camino.",
-    date: "Ayer",
-    hue: "#FFF5B8",
-  },
-]
-
 // ─── 3D Hyper-Realistic Flying Butterfly Canvas ─────────────────────────────────
 interface ButterflyParticle {
   x: number
@@ -677,125 +653,6 @@ function speakEventDetails(onTriggerToast: (msg: string) => void) {
   onTriggerToast("🔊 Leyendo invitación en voz alta...")
 }
 
-
-// ─── Digital Time Capsule Section (For October 2031) ───────────────────────────
-function TimeCapsuleSection({ onTriggerToast }: { onTriggerToast: (msg: string) => void }) {
-  const [name, setName] = useState('')
-  const [relation, setRelation] = useState('')
-  const [secretWish, setSecretWish] = useState('')
-  const [sealed, setSealed] = useState(false)
-
-  const handleSealMessage = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!name.trim() || !secretWish.trim()) return
-
-    sendToGoogleSheets('addCapsule', {
-      name: name.trim(),
-      relation: relation.trim(),
-      wish: secretWish.trim(),
-      unlockDate: '15 de Octubre de 2031'
-    })
-
-    setSealed(true)
-    onTriggerToast("🔒 ¡Tu mensaje fue sellado en la Cápsula del Tiempo hasta 2031!")
-  }
-
-  return (
-    <section id="capsula-tiempo" className="relative py-16 md:py-24 px-4 md:px-6">
-      <div className="section-sep mb-16 md:mb-20" />
-      <div className="max-w-2xl mx-auto">
-        <SectionHeader tag="Recuerdo para el Futuro" title="Cápsula del Tiempo 2031" />
-
-        <div className="glass-card p-6 md:p-10 rounded-3xl border-2 border-gold/50 shadow-2xl relative overflow-hidden flex flex-col items-center gap-6 text-center">
-          <div className="w-16 h-16 rounded-full border-2 border-gold flex items-center justify-center text-3xl bg-gold/15 shadow-md">
-            🔒
-          </div>
-
-          <p className="text-[10px] uppercase tracking-[0.3em] font-montserrat text-gold-dark font-bold -mt-2">
-            Mensajes Secretos Sellados para Krista a sus 20 Años
-          </p>
-
-          <p className="font-montserrat text-xs md:text-sm text-text-sub font-medium leading-relaxed max-w-lg">
-            Escribe un mensaje especial, consejo o predicción para la futura Krista Mariel. Tu mensaje permanecerá **bloqueado y sellado** hasta su cumpleaños número 20 (15 de Octubre de 2031).
-          </p>
-
-          {sealed ? (
-            <div className="p-6 rounded-2xl bg-gold/10 border border-gold/40 text-center flex flex-col items-center gap-3 animate-fade-in">
-              <span className="text-3xl">✨ 🔒 ✨</span>
-              <h4 className="font-playfair text-xl text-gold-dark font-bold">¡Mensaje Sellado con Éxito!</h4>
-              <p className="font-montserrat text-xs text-text-sub leading-relaxed font-medium">
-                Gracias {name}. Tu mensaje ha sido resguardado en la cápsula del tiempo y Krista Mariel lo leerá el 15 de Octubre de 2031.
-              </p>
-              <button
-                onClick={() => setSealed(false)}
-                className="text-[10px] uppercase tracking-widest text-gold-dark underline font-bold mt-2"
-              >
-                Escribir otro mensaje para el futuro
-              </button>
-            </div>
-          ) : (
-            <form onSubmit={handleSealMessage} className="w-full flex flex-col gap-4 text-left">
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">
-                    Tu Nombre *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                    placeholder="Ej. Tía Sofía"
-                    className="w-full bg-cream border border-gold/40 focus:border-gold rounded-2xl px-4 py-3 text-sm text-text-main placeholder:text-text-muted outline-none font-medium"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">
-                    Parentesco / Relación
-                  </label>
-                  <input
-                    type="text"
-                    value={relation}
-                    onChange={e => setRelation(e.target.value)}
-                    placeholder="Ej. Madrina de Bautizo"
-                    className="w-full bg-cream border border-gold/40 focus:border-gold rounded-2xl px-4 py-3 text-sm text-text-main placeholder:text-text-muted outline-none font-medium"
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">
-                  Tu Mensaje Secreto para Krista a sus 20 Años *
-                </label>
-                <textarea
-                  rows={4}
-                  required
-                  value={secretWish}
-                  onChange={e => setSecretWish(e.target.value)}
-                  placeholder="¿Qué le deseas a Krista cuando cumpla 20 años en 2031?..."
-                  className="w-full bg-cream border border-gold/40 focus:border-gold rounded-2xl px-4 py-3 text-sm text-text-main placeholder:text-text-muted outline-none resize-none font-medium"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="py-3.5 rounded-2xl bg-gradient-to-r from-gold-light via-gold to-gold-dark text-text-main font-montserrat font-bold text-xs uppercase tracking-wider shadow-lg hover:brightness-110 transition-all flex items-center justify-center gap-2"
-              >
-                <span>🔒</span> Sellar Mensaje para el 2031 <span>✨</span>
-              </button>
-            </form>
-          )}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ─── Floating Wish Butterflies Disabled ──────────────────────────────────────
-function FloatingWishButterflies() {
-  return null
-}
 
 
 // ─── Post-Party Family Thank You Banner ────────────────────────────────────────
@@ -3034,129 +2891,6 @@ function ReservedColorSection({ onTriggerToast: _onTriggerToast }: { onTriggerTo
 }
 
 
-// ─── Photo Frame Creator for Instagram & Stories ───────────────────────────────
-function PhotoFrameCreator({ onTriggerToast }: { onTriggerToast: (msg: string) => void }) {
-  const [userImage, setUserImage] = useState<string | null>(null)
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onload = (evt) => {
-        if (evt.target?.result) {
-          setUserImage(evt.target.result as string)
-        }
-      }
-      reader.readAsDataURL(file)
-    }
-  }
-
-  useEffect(() => {
-    if (!userImage) return
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    const img = new Image()
-    img.crossOrigin = "anonymous"
-    img.onload = () => {
-      canvas.width = 600
-      canvas.height = 800
-
-      ctx.drawImage(img, 0, 0, 600, 800)
-
-      const grad = ctx.createLinearGradient(0, 0, 0, 800)
-      grad.addColorStop(0, 'rgba(250, 246, 240, 0.75)')
-      grad.addColorStop(0.2, 'transparent')
-      grad.addColorStop(0.75, 'transparent')
-      grad.addColorStop(1, 'rgba(250, 246, 240, 0.95)')
-      ctx.fillStyle = grad
-      ctx.fillRect(0, 0, 600, 800)
-
-      ctx.strokeStyle = '#D4AF37'
-      ctx.lineWidth = 14
-      ctx.strokeRect(10, 10, 580, 780)
-
-      ctx.strokeStyle = '#F5E6D3'
-      ctx.lineWidth = 2
-      ctx.strokeRect(22, 22, 556, 756)
-
-      ctx.fillStyle = '#9A7B38'
-      ctx.font = '34px "Great Vibes", cursive'
-      ctx.textAlign = 'center'
-      ctx.fillText('¡Nos vemos en los XV Años de!', 300, 60)
-
-      ctx.fillStyle = '#2D1F38'
-      ctx.font = 'bold 44px "Great Vibes", cursive'
-      ctx.fillText('Krista Mariel', 300, 720)
-
-      ctx.fillStyle = '#9A7B38'
-      ctx.font = 'bold 14px "Montserrat", sans-serif'
-      ctx.fillText('17 · OCTUBRE · 2026 ✦', 300, 750)
-    }
-    img.src = userImage
-  }, [userImage])
-
-  const downloadFrame = () => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const link = document.createElement('a')
-    link.download = `Foto_XV_KristaMariel.png`
-    link.href = canvas.toDataURL('image/png')
-    link.click()
-    onTriggerToast("¡Foto guardada! Lista para subir a tu Instagram / WhatsApp 📸")
-  }
-
-  return (
-    <section id="marco-foto" className="relative py-16 md:py-24 px-4 md:px-6">
-      <div className="section-sep mb-16 md:mb-20" />
-      <div className="max-w-3xl mx-auto">
-        <SectionHeader tag="Recuerdo Interactivo" title="Marco para Instagram & Stories" />
-
-        <div className="glass-card p-6 md:p-8 rounded-3xl text-center flex flex-col items-center gap-6 border-2 border-gold/40">
-          <p className="text-xs md:text-sm font-montserrat text-text-sub font-medium leading-relaxed max-w-lg">
-            ¡Sube tu foto favorita para vestirla con el marco oficial dorado con mariposas de Krista Mariel, y compártela en tus historias de Instagram o WhatsApp!
-          </p>
-
-          {!userImage ? (
-            <label className="w-full max-w-md aspect-[3/4] rounded-3xl border-2 border-dashed border-gold/60 bg-cream/60 hover:bg-gold/10 transition-colors flex flex-col items-center justify-center gap-4 cursor-pointer p-6 shadow-inner">
-              <div className="w-16 h-16 rounded-full border-2 border-gold flex items-center justify-center text-3xl bg-gold/10">
-                📸
-              </div>
-              <div>
-                <p className="font-montserrat font-bold text-sm text-gold-dark">Toca para Seleccionar tu Foto</p>
-                <p className="font-montserrat text-[11px] text-text-muted mt-1">Formatos JPG, PNG o selfie</p>
-              </div>
-              <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-            </label>
-          ) : (
-            <div className="flex flex-col items-center gap-5 w-full">
-              <div className="relative max-w-xs aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl border-2 border-gold">
-                <canvas ref={canvasRef} className="w-full h-full object-cover" />
-              </div>
-
-              <div className="flex flex-wrap justify-center gap-3">
-                <label className="px-5 py-2.5 rounded-full border-2 border-gold/50 text-xs font-montserrat font-bold text-gold-dark hover:bg-gold/15 transition-all cursor-pointer">
-                  Cambiar Foto
-                  <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                </label>
-                <button
-                  onClick={downloadFrame}
-                  className="px-6 py-2.5 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-text-main font-montserrat font-bold text-xs hover:brightness-110 transition-all shadow-lg"
-                >
-                  Descargar Foto para Stories 📲
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </section>
-  )
-}
-
 // ─── Live Photo Wall & Shared Album Section ─────────────────────────────────────
 interface SharedPhotoItem {
   id: string
@@ -4125,129 +3859,6 @@ function TimelineSection() {
           </div>
         </div>
       )}
-    </section>
-  )
-}
-
-// ─── Digital Wishbook Section ──────────────────────────────────────────────────
-function WishbookSection({ onTriggerSwarm, onTriggerToast }: { onTriggerSwarm: () => void; onTriggerToast: (msg: string) => void }) {
-  const [wishes, setWishes] = useState(INITIAL_WISHES)
-  const [name, setName] = useState('')
-  const [message, setMessage] = useState('')
-  const [loading, setLoading] = useState(false)
-
-  useEffect(() => {
-    async function loadCloudWishes() {
-      const cloudData = await fetchFromGoogleSheets('getWishes')
-      if (Array.isArray(cloudData) && cloudData.length > 0) {
-        setWishes(cloudData)
-      }
-    }
-    loadCloudWishes()
-  }, [])
-
-  const handleAddWish = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!name.trim() || !message.trim()) return
-
-    setLoading(true)
-    onTriggerSwarm()
-
-    const newWish = {
-      id: Date.now(),
-      name: name.trim(),
-      message: message.trim(),
-      date: "Justo ahora",
-      hue: "#D4AF37",
-    }
-
-    setWishes(prev => [newWish, ...prev])
-    setName('')
-    setMessage('')
-
-    const colorMap: Record<string, string> = {
-      '#D4AF37': 'Dorado Elegante 🏆',
-      '#F7C5D4': 'Rosa Pastel 🌸',
-      '#FFE57F': 'Amarillo Pastel 💛',
-      '#F5E6D3': 'Beige Vainilla 🍦',
-      '#2E6B34': 'Verde Botánico 🌿',
-      '#FFF5B8': 'Amarillo Sol ☀️'
-    }
-    const colorName = colorMap[newWish.hue] || 'Dorado Elegante 🏆'
-
-    await sendToGoogleSheets('addWish', { name: newWish.name, message: newWish.message, hue: newWish.hue, colorName })
-    setLoading(false)
-    onTriggerToast("¡Tu deseo fue publicado en el muro de Krista Mariel! ✨")
-  }
-
-  return (
-    <section id="deseos" className="relative py-16 md:py-24 px-4 md:px-6">
-      <div className="section-sep mb-16 md:mb-20" />
-      <div className="max-w-4xl mx-auto">
-        <SectionHeader tag="Muro de Felicitaciones" title="Libro de Deseos Mágico" />
-
-        <div className="grid md:grid-cols-5 gap-8">
-          <form onSubmit={handleAddWish} className="md:col-span-2 glass-card p-6 rounded-3xl flex flex-col gap-4 border-2 border-gold/40 shadow-md">
-            <h3 className="font-playfair text-xl text-gold-dark font-bold">Deja tu Mensaje a Krista Mariel</h3>
-            <p className="font-montserrat text-xs text-text-sub font-medium leading-relaxed">
-              Escribe tus felicitaciones y buenos deseos para que Krista Mariel los conserve por siempre en su corazón.
-            </p>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">
-                Tu Nombre *
-              </label>
-              <input
-                type="text"
-                required
-                value={name}
-                onChange={e => setName(e.target.value)}
-                placeholder="Ej. Tío Alejandro"
-                className="w-full bg-cream border border-gold/40 focus:border-gold rounded-2xl px-4 py-3 text-sm text-text-main placeholder:text-text-muted outline-none transition-colors font-medium"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">
-                Tu Felicitación *
-              </label>
-              <textarea
-                rows={4}
-                required
-                value={message}
-                onChange={e => setMessage(e.target.value)}
-                placeholder="Escribe un hermoso deseo..."
-                className="w-full bg-cream border border-gold/40 focus:border-gold rounded-2xl px-4 py-3 text-sm text-text-main placeholder:text-text-muted outline-none transition-colors resize-none font-medium"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="py-3 rounded-2xl bg-gradient-to-r from-gold-light via-gold to-gold-dark text-text-main font-montserrat font-bold text-xs uppercase tracking-wider shadow-md hover:brightness-110 transition-all mt-1 disabled:opacity-50"
-            >
-              {loading ? 'Publicando...' : 'Publicar Deseo ✨'}
-            </button>
-          </form>
-
-          <div className="md:col-span-3 flex flex-col gap-4 max-h-[450px] overflow-y-auto pr-1">
-            {wishes.map((w) => (
-              <div key={w.id} className="glass-card glass-card-hover p-5 rounded-3xl flex flex-col gap-2 relative border border-gold/30">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <GoldButterfly size={16} />
-                    <h4 className="font-playfair text-base text-text-main font-bold">{w.name}</h4>
-                  </div>
-                  <span className="text-[9px] font-montserrat text-gold-dark font-bold">{w.date}</span>
-                </div>
-                <p className="font-montserrat text-xs text-text-sub leading-relaxed italic font-medium">
-                  "{w.message}"
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
     </section>
   )
 }
@@ -5247,8 +4858,6 @@ function Navbar({
     { href: '#vestimenta', label: 'Sugerencia de Regalos' },
     { href: '#galeria', label: 'Galería' },
     { href: '#linea-tiempo', label: 'Historia' },
-    { href: '#marco-foto', label: 'Marco Stories' },
-    { href: '#deseos', label: 'Deseos' },
     { href: '#rsvp', label: 'RSVP' },
   ]
 
@@ -5659,9 +5268,6 @@ export default function App() {
       {/* Post Party Thank You Banner (Appears Oct 18 onwards or when test post-party mode is active) */}
       <PostPartyThanksBanner isManualPostParty={false} />
 
-      {/* Floating Wish Butterflies (Max 2 glass bubbles) */}
-      <FloatingWishButterflies />
-
       {/* Main Sections */}
       <main className="relative z-20">
         <HeroSection onTriggerToast={setToastMessage} />
@@ -5675,9 +5281,6 @@ export default function App() {
         <DressGiftsSection onTriggerToast={setToastMessage} />
         <GallerySection />
         <TimelineSection />
-        <TimeCapsuleSection onTriggerToast={setToastMessage} />
-        <PhotoFrameCreator onTriggerToast={setToastMessage} />
-        <WishbookSection onTriggerSwarm={handleRSVPSubmitWithConfetti} onTriggerToast={setToastMessage} />
         <RSVPSection onTriggerSwarm={handleRSVPSubmitWithConfetti} />
       </main>
 
