@@ -1235,7 +1235,7 @@ function ArrivalGuideSection({ onTriggerToast }: { onTriggerToast: (msg: string)
               </div>
 
               <p className="font-montserrat text-xs md:text-sm text-text-sub leading-relaxed font-medium">
-                Acompáñanos a bendecir los 15 Años de Krista Mariel en una solemne y emotiva Eucaristía de Acción de Gracias junto a sus padres, padrinos y seres queridos.
+                Acompáñanos a celebrar los XV años de Krista Mariel en una solemne Eucaristía de Acción de Gracias.
               </p>
 
               <div className="glass-card p-4 rounded-2xl border border-gold/30 flex items-center justify-between">
@@ -1363,7 +1363,7 @@ function ArrivalGuideSection({ onTriggerToast }: { onTriggerToast: (msg: string)
         <div className="mt-6 p-4 rounded-2xl bg-gold/10 border border-gold/30 flex items-center justify-center gap-3 text-center">
           <span className="text-xl shrink-0">🚗</span>
           <p className="text-xs font-montserrat text-text-sub font-medium">
-            <strong className="text-gold-dark font-bold">Traslado entre sedes:</strong> Al concluir la Misa (2:00 PM), hay 1 hora completa para trasladarse cómodamente al Salón (~12 a 15 minutos en coche). ¡Las puertas de Quinta María Teresa abren a las 3:00 PM!
+            <strong className="text-gold-dark font-bold">Traslado entre sedes:</strong> Al concluir la Misa (2:00 PM), hay 1 hora completa para trasladarse cómodamente al Salón (~12 a 15 minutos en coche). ¡Las puertas del Salón Quinta María Teresa abren a las 3:00 PM!
           </p>
         </div>
       </div>
@@ -1893,8 +1893,17 @@ function EnvelopeModal({
   )
 }
 
-// ─── Interactive QR Code Modal ─────────────────────────────────────────────────
-function QRCodeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+// ─── Interactive Share & QR Code Modal ───────────────────────────────────────────
+function QRCodeModal({
+  isOpen,
+  onClose,
+  onTriggerToast,
+}: {
+  isOpen: boolean
+  onClose: () => void
+  onTriggerToast?: (msg: string) => void
+}) {
+  const [activeTab, setActiveTab] = useState<'card' | 'qr'>('card')
   const [targetUrl, setTargetUrl] = useState<string>('')
   const [qrDataUrl, setQrDataUrl] = useState<string>('')
   const [copied, setCopied] = useState(false)
@@ -1936,11 +1945,12 @@ function QRCodeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
     if (navigator.clipboard) {
       navigator.clipboard.writeText(targetUrl)
       setCopied(true)
+      onTriggerToast?.("¡Enlace copiado al portapapeles! 📋")
       setTimeout(() => setCopied(false), 2500)
     }
   }
 
-  const handleDownload = () => {
+  const handleDownloadQR = () => {
     const src = displayQr
     if (!src) return
     const a = document.createElement('a')
@@ -1948,117 +1958,227 @@ function QRCodeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
     a.download = 'QR_Invitacion_KristaMariel.png'
     a.target = '_blank'
     a.click()
+    onTriggerToast?.("¡Código QR descargado! 📥")
+  }
+
+  const handleShareWhatsApp = () => {
+    const text = `🌸 *¡Estás cordialmente invitado a los XV Años de Krista Mariel!* ✨\n\nPara poder compartirles la alegría de este gran día, les hacemos llegar la invitación digital interactiva:\n👉 ${targetUrl}\n\n¡Esperamos contar con tu valiosa presencia!`
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`
+    window.open(url, '_blank')
+    onTriggerToast?.("Abriendo WhatsApp... 💬")
   }
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-cream/90 backdrop-blur-2xl flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-fade-in"
       onClick={onClose}
     >
       <div
         onClick={e => e.stopPropagation()}
-        className="glass-card p-6 md:p-8 rounded-3xl max-w-sm w-full text-center flex flex-col items-center gap-4 border-2 border-gold/50 shadow-2xl relative"
+        className="glass-card p-5 sm:p-7 rounded-3xl max-w-lg w-full max-h-[92vh] overflow-y-auto text-center flex flex-col items-center gap-4 border-2 border-gold/50 shadow-2xl relative bg-[#FCF9F3]/95 backdrop-blur-2xl"
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gold-dark hover:text-gold text-lg font-bold cursor-pointer"
+          className="absolute top-4 right-4 w-8 h-8 rounded-full border border-gold/40 flex items-center justify-center text-gold-dark hover:text-gold hover:bg-gold/10 text-sm font-bold cursor-pointer transition-all"
           title="Cerrar"
         >
           ✕
         </button>
 
-        <div className="text-center">
-          <p className="text-[10px] uppercase tracking-widest text-gold-dark font-bold font-montserrat">
-            Escanear para compartir
+        {/* Header */}
+        <div className="text-center pt-1 px-4">
+          <p className="text-[10px] uppercase tracking-widest text-gold-dark font-bold font-montserrat flex items-center justify-center gap-1.5">
+            <GoldButterfly size={14} /> Compartir con Invitados <GoldButterfly size={14} />
           </p>
-          <h3 className="font-greatvibes text-4xl gold-text-gradient mt-1">XV Años de Krista Mariel</h3>
+          <h3 className="font-greatvibes text-3xl sm:text-4xl gold-text-gradient mt-0.5">
+            XV Años de Krista Mariel
+          </h3>
         </div>
 
-        {/* Real Scannable QR Code Image */}
-        <div className="p-3 bg-white rounded-2xl shadow-xl border-4 border-gold/40 relative flex items-center justify-center">
-          {displayQr ? (
-            <img
-              src={displayQr}
-              alt="Código QR oficial para abrir la invitación digital"
-              className="w-48 h-48 rounded-xl object-contain block"
-              onError={(e) => {
-                const fallback = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(targetUrl)}`
-                if (e.currentTarget.src !== fallback) {
-                  e.currentTarget.src = fallback
-                }
-              }}
-            />
-          ) : (
-            <div className="w-48 h-48 flex items-center justify-center text-gold-dark font-montserrat text-xs animate-pulse">
-              Generando código QR...
-            </div>
-          )}
-        </div>
-
-        <p className="text-xs font-montserrat text-text-sub font-medium">
-          Apunta la cámara de cualquier celular al código para abrir la invitación digital al instante.
-        </p>
-
-        {/* Actions: Copy link & Download QR */}
-        <div className="flex gap-2 w-full">
+        {/* Tab Switcher */}
+        <div className="flex w-full rounded-2xl p-1 bg-gold/15 border border-gold/40">
           <button
             type="button"
-            onClick={handleCopy}
-            className="flex-1 py-2.5 px-3 rounded-xl border border-gold/60 bg-gold/10 hover:bg-gold/20 text-gold-dark font-montserrat font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+            onClick={() => setActiveTab('card')}
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-montserrat font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+              activeTab === 'card'
+                ? 'bg-gradient-to-r from-gold via-gold-dark to-gold text-text-main shadow-md'
+                : 'text-gold-dark hover:bg-gold/10'
+            }`}
           >
-            <span>{copied ? '✅' : '📋'}</span>
-            <span>{copied ? '¡Copiado!' : 'Copiar link'}</span>
+            <span>💌</span>
+            <span>Tarjeta & PDF Interactivo</span>
           </button>
           <button
             type="button"
-            onClick={handleDownload}
-            className="flex-1 py-2.5 px-3 rounded-xl border border-gold/60 bg-gold/10 hover:bg-gold/20 text-gold-dark font-montserrat font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+            onClick={() => setActiveTab('qr')}
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-montserrat font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+              activeTab === 'qr'
+                ? 'bg-gradient-to-r from-gold via-gold-dark to-gold text-text-main shadow-md'
+                : 'text-gold-dark hover:bg-gold/10'
+            }`}
           >
-            <span>📥</span>
-            <span>Guardar QR</span>
+            <span>📲</span>
+            <span>Código QR Oficial</span>
           </button>
         </div>
 
-        {/* Localhost / Custom Link Notice & Editor */}
-        <div className="w-full text-left bg-gold/10 border border-gold/30 rounded-xl p-2.5 flex flex-col gap-1.5">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold font-montserrat text-gold-dark uppercase tracking-wider">
-              Enlace codificado:
-            </span>
-            <button
-              type="button"
-              onClick={() => setShowEdit(!showEdit)}
-              className="text-[10px] font-bold text-gold-dark underline hover:text-gold cursor-pointer"
-            >
-              {showEdit ? 'Ocultar' : 'Personalizar link'}
-            </button>
-          </div>
-
-          {!showEdit ? (
-            <p className="text-[11px] font-mono text-text-muted truncate">
-              {targetUrl}
-            </p>
-          ) : (
-            <div className="flex flex-col gap-1 mt-1">
-              <input
-                type="text"
-                value={targetUrl}
-                onChange={e => setTargetUrl(e.target.value)}
-                placeholder="https://tudominio.com"
-                className="w-full px-2.5 py-1.5 text-xs font-mono bg-white border border-gold/50 rounded-lg text-text-main focus:outline-none focus:ring-1 focus:ring-gold"
+        {/* Content based on tab */}
+        {activeTab === 'card' ? (
+          <div className="w-full flex flex-col items-center gap-4 animate-fade-in">
+            {/* Card Preview */}
+            <div className="relative group max-w-[170px] sm:max-w-[195px] mx-auto rounded-2xl overflow-hidden shadow-xl border-2 border-gold/50 bg-[#FBF7F0]">
+              <img
+                src="/fotos/tarjeta_enlace_invitacion.png"
+                alt="Tarjeta Mensaje Especial Krista Mariel XV"
+                className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-105"
               />
-              {isLocal && (
-                <p className="text-[9px] text-text-muted leading-tight mt-0.5">
-                  💡 Tip: En tu PC estás en <code className="bg-gold/20 px-1 rounded font-bold">localhost</code>. Para abrirlo desde tu celular en tu WiFi, puedes poner la IP de tu PC (ej. <code className="bg-gold/20 px-1 rounded font-bold">http://192.168.1.XX:8443</code>) o tu link publicado.
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-2">
+                <span className="text-[9px] text-white font-montserrat font-semibold">
+                  Tarjeta Oficial de Krista Mariel
+                </span>
+              </div>
+            </div>
+
+            {/* Explanation Guide */}
+            <div className="w-full text-left bg-gold/10 border border-gold/30 rounded-2xl p-3 sm:p-3.5 text-xs font-montserrat flex flex-col gap-2">
+              <p className="font-bold text-gold-dark text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+                <span>✨</span> ¿Cómo compartirla con tus invitados?
+              </p>
+              <div className="text-[11px] text-text-sub space-y-1.5 leading-relaxed">
+                <p>
+                  <strong className="text-text-main">📄 PDF Interactivo (¡Recomendado para WhatsApp!):</strong> Al enviarlo como <em>Documento</em> por WhatsApp, tus invitados ven la tarjeta en su pantalla y al tocar el botón <em>"DA CLIC AQUÍ"</em> se abre inmediatamente la invitación en su celular con la música, fotos y sobre animado.
                 </p>
+                <p>
+                  <strong className="text-text-main">🖼️ Imagen (PNG):</strong> Ideal para guardarla en tu celular y subirla a tus Estados de WhatsApp, Historias de Facebook o Instagram.
+                </p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col gap-2 w-full">
+              {/* Interactive PDF Button */}
+              <a
+                href="/fotos/Invitacion_Digital_Krista_Mariel_XV.pdf"
+                download="Invitacion_Digital_Krista_Mariel_XV.pdf"
+                onClick={() => onTriggerToast?.("¡Descargando PDF interactivo! 📄")}
+                className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-gold via-gold-dark to-gold text-text-main font-montserrat font-bold text-xs uppercase tracking-wider shadow-lg hover:brightness-110 flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                <span>📄</span>
+                <span>Descargar PDF Interactivo (Botón Clickeable)</span>
+              </a>
+
+              {/* PNG High-res Button */}
+              <a
+                href="/fotos/tarjeta_enlace_invitacion.png"
+                download="Tarjeta_Invitacion_Krista_Mariel_XV.png"
+                onClick={() => onTriggerToast?.("¡Descargando imagen PNG! 🖼️")}
+                className="w-full py-2.5 px-4 rounded-2xl border border-gold/60 bg-gold/15 hover:bg-gold/25 text-gold-dark font-montserrat font-bold text-xs uppercase tracking-wider shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                <span>🖼️</span>
+                <span>Descargar Imagen en Alta Calidad (PNG)</span>
+              </a>
+
+              {/* WhatsApp Share Button */}
+              <button
+                type="button"
+                onClick={handleShareWhatsApp}
+                className="w-full py-2.5 px-4 rounded-2xl bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/50 text-[#1E7E34] font-montserrat font-bold text-xs uppercase tracking-wider shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                <span>💬</span>
+                <span>Enviar por WhatsApp con Enlace Listo</span>
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="w-full flex flex-col items-center gap-4 animate-fade-in">
+            {/* Real Scannable QR Code Image */}
+            <div className="p-3 bg-white rounded-2xl shadow-xl border-4 border-gold/40 relative flex items-center justify-center">
+              {displayQr ? (
+                <img
+                  src={displayQr}
+                  alt="Código QR oficial para abrir la invitación digital"
+                  className="w-44 h-44 sm:w-48 sm:h-48 rounded-xl object-contain block"
+                  onError={(e) => {
+                    const fallback = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(targetUrl)}`
+                    if (e.currentTarget.src !== fallback) {
+                      e.currentTarget.src = fallback
+                    }
+                  }}
+                />
+              ) : (
+                <div className="w-44 h-44 flex items-center justify-center text-gold-dark font-montserrat text-xs animate-pulse">
+                  Generando código QR...
+                </div>
               )}
             </div>
-          )}
-        </div>
+
+            <p className="text-xs font-montserrat text-text-sub font-medium">
+              Apunta la cámara de cualquier celular al código para abrir la invitación digital al instante.
+            </p>
+
+            {/* Actions: Copy link & Download QR */}
+            <div className="flex gap-2 w-full">
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="flex-1 py-2.5 px-3 rounded-xl border border-gold/60 bg-gold/10 hover:bg-gold/20 text-gold-dark font-montserrat font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              >
+                <span>{copied ? '✅' : '📋'}</span>
+                <span>{copied ? '¡Copiado!' : 'Copiar link'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleDownloadQR}
+                className="flex-1 py-2.5 px-3 rounded-xl border border-gold/60 bg-gold/10 hover:bg-gold/20 text-gold-dark font-montserrat font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              >
+                <span>📥</span>
+                <span>Guardar QR</span>
+              </button>
+            </div>
+
+            {/* Localhost / Custom Link Notice & Editor */}
+            <div className="w-full text-left bg-gold/10 border border-gold/30 rounded-xl p-2.5 flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold font-montserrat text-gold-dark uppercase tracking-wider">
+                  Enlace codificado:
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowEdit(!showEdit)}
+                  className="text-[10px] font-bold text-gold-dark underline hover:text-gold cursor-pointer"
+                >
+                  {showEdit ? 'Ocultar' : 'Personalizar link'}
+                </button>
+              </div>
+
+              {!showEdit ? (
+                <p className="text-[11px] font-mono text-text-muted truncate">
+                  {targetUrl}
+                </p>
+              ) : (
+                <div className="flex flex-col gap-1 mt-1">
+                  <input
+                    type="text"
+                    value={targetUrl}
+                    onChange={e => setTargetUrl(e.target.value)}
+                    placeholder="https://tudominio.com"
+                    className="w-full px-2.5 py-1.5 text-xs font-mono bg-white border border-gold/50 rounded-lg text-text-main focus:outline-none focus:ring-1 focus:ring-gold"
+                  />
+                  {isLocal && (
+                    <p className="text-[9px] text-text-muted leading-tight mt-0.5">
+                      💡 Tip: En tu PC estás en <code className="bg-gold/20 px-1 rounded font-bold">localhost</code>. Para abrirlo desde tu celular en tu WiFi, puedes poner la IP de tu PC o tu link publicado.
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         <button
           onClick={onClose}
-          className="w-full py-3 rounded-2xl bg-gradient-to-r from-gold to-gold-dark text-text-main font-montserrat font-bold text-xs uppercase tracking-wider shadow-md hover:brightness-110 cursor-pointer"
+          className="w-full py-2.5 rounded-2xl border border-gold/40 text-gold-dark font-montserrat font-bold text-xs uppercase tracking-wider hover:bg-gold/10 transition-all cursor-pointer mt-1"
         >
           Cerrar
         </button>
@@ -2155,7 +2275,13 @@ function StationeryPlate({
 }
 
 // ─── Hero Section (Lámina 1 Oficial) ───────────────────────────────────────────
-function HeroSection({ onTriggerToast }: { onTriggerToast: (msg: string) => void }) {
+function HeroSection({
+  onTriggerToast,
+  onOpenShare,
+}: {
+  onTriggerToast: (msg: string) => void
+  onOpenShare?: () => void
+}) {
   const time = useCountdown(EVENT_DATE)
   const units = [
     { v: time.days, l: "DÍAS", icon: "📅" },
@@ -2281,23 +2407,31 @@ END:VCALENDAR`
           ))}
         </div>
 
-        {/* 3 Pill Buttons matching image.png */}
-        <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-2.5 w-full px-2">
+        {/* Pill Action Buttons */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5 w-full px-2">
           <a
             href="#video-especial"
             className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-gradient-to-r from-[#E6D0A7] via-[#C9A871] to-[#9F7E47] text-[#332415] text-[11px] font-cinzel uppercase tracking-wider font-bold shadow-md hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
           >
             <span>🎬</span> VER VIDEO ESPECIAL <GoldButterfly size={14} className="inline-block ml-1" />
           </a>
+          {onOpenShare && (
+            <button
+              onClick={onOpenShare}
+              className="w-full sm:w-auto px-5 py-2.5 rounded-full border border-gold/60 glass-card text-[10px] font-cinzel uppercase tracking-wider text-gold-dark hover:bg-gold/15 transition-all flex items-center justify-center gap-1.5 font-bold shadow-sm cursor-pointer"
+            >
+              <span>💌</span> DESCARGAR TARJETA / COMPARTIR
+            </button>
+          )}
           <button
             onClick={() => handleCalendar('google')}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-full border border-gold/60 glass-card text-[10px] font-cinzel uppercase tracking-wider text-gold-dark hover:bg-gold/15 transition-all flex items-center justify-center gap-1.5 font-bold shadow-sm"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-full border border-gold/60 glass-card text-[10px] font-cinzel uppercase tracking-wider text-gold-dark hover:bg-gold/15 transition-all flex items-center justify-center gap-1.5 font-bold shadow-sm cursor-pointer"
           >
             <span>📅</span> AGREGAR A GOOGLE CALENDAR
           </button>
           <button
             onClick={() => handleCalendar('ics')}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-full border border-gold/60 glass-card text-[10px] font-cinzel uppercase tracking-wider text-gold-dark hover:bg-gold/15 transition-all flex items-center justify-center gap-1.5 font-bold shadow-sm"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-full border border-gold/60 glass-card text-[10px] font-cinzel uppercase tracking-wider text-gold-dark hover:bg-gold/15 transition-all flex items-center justify-center gap-1.5 font-bold shadow-sm cursor-pointer"
           >
             <span>📱</span> GUARDAR EN IPHONE / ICAL
           </button>
@@ -2405,7 +2539,7 @@ function ParentsSection() {
         <div className="flex items-center gap-3 mb-1 opacity-85">
           <GoldButterfly size={16} />
           <p className="text-xs uppercase tracking-[0.35em] font-cinzel text-gold-dark font-bold">
-            NUESTRA FAMILIA
+            MIS FAMILIARES
           </p>
           <GoldButterfly size={16} />
         </div>
@@ -2803,32 +2937,77 @@ function ItinerarySection({ onTriggerToast }: { onTriggerToast: (msg: string) =>
   );
 }
 
-// ─── El Color de la Quinceañera Está Reservado (Lámina Oficial Exclusiva) ─────
-function QuinceaneraColorSection() {
+// ─── Reserved Color Section (Lámina Oficial: GUÍA DE COLOR PARA INVITADOS) ────
+function ReservedColorSection({ onTriggerToast }: { onTriggerToast: (msg: string) => void }) {
   const [modalOpen, setModalOpen] = useState(false)
 
+  const handleDownload = () => {
+    const link = document.createElement('a')
+    link.href = '/fotos/guia_color_invitados.png'
+    link.download = 'Guia_De_Color_Krista_XV.png'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    onTriggerToast('✨ Descargando tarjeta oficial de Guía de Color ✦')
+  }
+
   return (
-    <section id="color-quinceanera" className="relative py-14 md:py-20 px-4 md:px-6">
+    <section id="color-reservado" className="relative py-16 md:py-24 px-4 md:px-6">
+      {/* Target anchor alias for any legacy links */}
+      <div id="color-quinceanera" className="absolute -top-20" />
       <div className="section-sep mb-14 md:mb-18" />
+
       <div className="max-w-4xl mx-auto flex flex-col items-center">
-        {/* Tarjeta Oficial Impresa con Efecto de Enmarcado Dorado de Lujo */}
+        {/* Header decoration */}
+        <div className="flex items-center gap-3 mb-2 opacity-80">
+          <div className="h-px w-12 bg-gold/60" />
+          <GoldButterfly size={18} />
+          <div className="h-px w-12 bg-gold/60" />
+        </div>
+        <p className="text-[10px] sm:text-xs uppercase tracking-[0.35em] font-cinzel text-gold-dark font-bold mb-1">
+          Código de Vestimenta
+        </p>
+        <h2 className="font-cinzel text-2xl sm:text-3xl md:text-4xl text-text-main font-bold tracking-[0.18em] uppercase text-center mb-6 sm:mb-8">
+          Guía de Color para Invitados
+        </h2>
+
+        {/* Tarjeta Oficial Impresa con Enmarcado Dorado de Lujo y Lightbox */}
         <div
           onClick={() => setModalOpen(true)}
           className="relative w-full max-w-md sm:max-w-lg mx-auto rounded-[28px] sm:rounded-[36px] overflow-hidden border-2 border-gold/40 shadow-2xl bg-[#FAF5EC] p-2.5 sm:p-3.5 cursor-pointer group hover:border-gold hover:scale-[1.01] transition-all duration-300"
+          title="Toca para ampliar la tarjeta oficial"
         >
           <img
-            src="/fotos/color_reservado.png"
-            alt="El Color de la Quinceañera Está Reservado - Krista Mariel"
+            src="/fotos/guia_color_invitados.png"
+            alt="Guía de Color para Invitados - Color Reservado exclusivamente para Krista Mariel"
             className="w-full h-auto rounded-[20px] sm:rounded-[28px] shadow-sm object-contain"
             loading="lazy"
           />
 
           {/* Botón flotante para ver en grande */}
-          <div className="absolute bottom-5 right-5 z-10 opacity-80 group-hover:opacity-100 transition-opacity">
-            <span className="px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-xs border border-gold/40 text-[11px] font-montserrat font-bold text-gold-dark flex items-center gap-1.5 shadow-md">
+          <div className="absolute bottom-5 right-5 z-10 opacity-90 group-hover:opacity-100 transition-opacity">
+            <span className="px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-xs border border-gold/40 text-[11px] font-montserrat font-bold text-gold-dark flex items-center gap-1.5 shadow-md group-hover:scale-105 transition-transform">
               🔍 Ampliar Tarjeta
             </span>
           </div>
+        </div>
+
+        {/* Botones de acción complementarios */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => setModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-gold/15 hover:bg-gold/25 text-gold-dark border border-gold/50 text-[11px] font-cinzel font-bold shadow-xs transition-all cursor-pointer hover:scale-102"
+          >
+            <span>🔍</span> Ver en Pantalla Completa
+          </button>
+          <button
+            type="button"
+            onClick={handleDownload}
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-white/90 hover:bg-white text-gold-dark border border-gold/40 text-[11px] font-cinzel font-bold shadow-xs transition-all cursor-pointer hover:scale-102"
+          >
+            <span>📥</span> Guardar Tarjeta
+          </button>
         </div>
 
         {/* Modal Lightbox */}
@@ -2850,10 +3029,13 @@ function QuinceaneraColorSection() {
               className="relative max-w-lg w-full max-h-[92vh] rounded-3xl overflow-hidden border-2 border-gold bg-[#FAF6EE] p-2.5 sm:p-3 shadow-2xl flex flex-col items-center justify-center"
             >
               <img
-                src="/fotos/color_reservado.png"
-                alt="El Color de la Quinceañera Está Reservado - Krista Mariel"
+                src="/fotos/guia_color_invitados.png"
+                alt="Guía de Color para Invitados - XV Años Krista Mariel"
                 className="max-h-[85vh] w-auto max-w-full object-contain rounded-2xl mx-auto shadow-md"
               />
+              <p className="text-[11px] font-cinzel tracking-widest text-gold-dark font-bold mt-2 text-center">
+                GUÍA DE COLOR · KRISTA MARIEL XV AÑOS
+              </p>
             </div>
           </div>,
           document.body
@@ -2861,80 +3043,6 @@ function QuinceaneraColorSection() {
       </div>
     </section>
   )
-}
-
-// ─── Reserved Color Section (Lámina Oficial 1: GUÍA DE COLOR PARA INVITADOS) ───
-function ReservedColorSection({ onTriggerToast: _onTriggerToast }: { onTriggerToast: (msg: string) => void }) {
-  return (
-    <section id="color-reservado" className="relative py-16 md:py-24 px-4 md:px-6">
-      <div className="section-sep mb-16 md:mb-20" />
-      <div className="max-w-4xl mx-auto flex flex-col items-center">
-        <StationeryPlate className="max-w-xl">
-          {/* Top Butterfly ornament matching exact card */}
-          <div className="flex items-center gap-3 mb-3 opacity-80">
-            <div className="h-px w-12 bg-gold/60" />
-            <GoldButterfly size={18} />
-            <div className="h-px w-12 bg-gold/60" />
-          </div>
-
-          {/* Title: GUÍA DE COLOR PARA INVITADOS */}
-          <h2 className="font-cinzel text-2xl sm:text-3xl md:text-4xl text-text-main font-bold tracking-[0.2em] uppercase leading-tight">
-            Guía de Color
-          </h2>
-          <p className="font-cinzel text-xs sm:text-sm uppercase tracking-[0.35em] text-gold-dark font-bold mt-1">
-            Para Invitados
-          </p>
-
-          {/* Primary Message */}
-          <div className="my-5 max-w-md">
-            <p className="font-playfair text-base sm:text-lg text-text-main leading-relaxed font-normal">
-              Con mucho cariño te pedimos
-            </p>
-            <p className="font-script text-4xl sm:text-5xl md:text-6xl text-gold-dark my-1 leading-tight drop-shadow-xs">
-              reservar el color exclusivamente para Krista.
-            </p>
-          </div>
-
-          <span className="text-gold-dark text-xs my-2">✦</span>
-
-          {/* Secondary Message: Freedom of Color */}
-          <div className="my-4 max-w-md">
-            <p className="font-playfair text-sm sm:text-base text-text-main leading-relaxed">
-              Para acompañarnos en esta celebración,
-            </p>
-            <p className="font-playfair text-sm sm:text-base text-text-main leading-relaxed">
-              <strong className="font-bold">puedes</strong> portar el color que gustes.
-            </p>
-          </div>
-
-          {/* Ornate Cartouche Frame matching card */}
-          <div className="relative my-6 max-w-md w-full px-6 py-5 rounded-2xl border border-[#C5A059]/70 bg-cream/75 shadow-xs flex flex-col items-center text-center">
-            {/* Delicate top flourish icon */}
-            <div className="absolute -top-3 px-3 bg-[#FAF5EC] text-gold-dark text-sm">
-              ❦
-            </div>
-            <p className="font-cinzel text-xs sm:text-sm font-bold tracking-widest text-text-main leading-relaxed uppercase">
-              Lo más importante es<br />
-              que te sientas cómoda (a)<br />
-              y seas tú.
-            </p>
-          </div>
-
-          {/* Bottom Butterfly with lines */}
-          <div className="flex items-center gap-3 my-2 opacity-80">
-            <div className="h-px w-12 bg-gold/60" />
-            <GoldButterfly size={16} />
-            <div className="h-px w-12 bg-gold/60" />
-          </div>
-
-          {/* ETIQUETA FORMAL */}
-          <p className="font-cinzel text-xs uppercase tracking-[0.35em] text-text-sub font-bold mt-1">
-            Etiqueta Formal
-          </p>
-        </StationeryPlate>
-      </div>
-    </section>
-  );
 }
 
 
@@ -4355,167 +4463,6 @@ function SpecialVideoSection({
   )
 }
 
-// ─── VIP Pass Generator Section ────────────────────────────────────────────────
-function VIPPassSection({ onTriggerToast }: { onTriggerToast: (msg: string) => void }) {
-  const [guestName, setGuestName] = useState('')
-  const [passCount, setPassCount] = useState('2')
-  const [generated, setGenerated] = useState(false)
-  const passCanvasRef = useRef<HTMLCanvasElement | null>(null)
-
-  const handleGeneratePass = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!guestName.trim()) return
-    setGenerated(true)
-    onTriggerToast("¡Pase de Gala personal generado! 🎫")
-  }
-
-  useEffect(() => {
-    if (!generated || !guestName) return
-    const canvas = passCanvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    canvas.width = 700
-    canvas.height = 380
-
-    // Background gradient
-    const grad = ctx.createLinearGradient(0, 0, 700, 380)
-    grad.addColorStop(0, '#FAF6F0')
-    grad.addColorStop(0.5, '#FFF8C5')
-    grad.addColorStop(1, '#F5E6D3')
-    ctx.fillStyle = grad
-    ctx.fillRect(0, 0, 700, 380)
-
-    // Border
-    ctx.strokeStyle = '#D4AF37'
-    ctx.lineWidth = 10
-    ctx.strokeRect(10, 10, 680, 360)
-
-    ctx.strokeStyle = '#9A7B38'
-    ctx.lineWidth = 2
-    ctx.strokeRect(20, 20, 660, 340)
-
-    // Details
-    ctx.fillStyle = '#9A7B38'
-    ctx.font = 'bold 12px "Montserrat", sans-serif'
-    ctx.fillText('PASE DE GALA VIP · MIS XV AÑOS', 50, 50)
-
-    ctx.fillStyle = '#2D1F38'
-    ctx.font = 'bold 34px "Great Vibes", cursive'
-    ctx.fillText('Krista Mariel Sandoval Caldera', 50, 95)
-
-    ctx.fillStyle = '#2E6B34'
-    ctx.font = 'bold 14px "Montserrat", sans-serif'
-    ctx.fillText(`INVITADO(A): ${guestName.toUpperCase()}`, 50, 145)
-    ctx.fillText(`PASES CONFIRMADOS: ${passCount} PERSONA(S)`, 50, 175)
-
-    ctx.fillStyle = '#6E531E'
-    ctx.font = '12px "Montserrat", sans-serif'
-    ctx.fillText('📅 SÁBADO 17 DE OCTUBRE, 2026', 50, 225)
-    ctx.fillText('⛪ MISA: 1:00 PM · TEMPLO DE LA SAGRADA FAMILIA', 50, 250)
-    ctx.fillText('📍 RECEPCIÓN: 3:00 PM · SALÓN QUINTA MARÍA TERESA', 50, 275)
-
-    // Monogram Stamp
-    ctx.fillStyle = '#D4AF37'
-    ctx.beginPath()
-    ctx.arc(580, 190, 65, 0, Math.PI * 2)
-    ctx.fill()
-
-    ctx.fillStyle = '#FAF6F0'
-    ctx.beginPath()
-    ctx.arc(580, 190, 58, 0, Math.PI * 2)
-    ctx.fill()
-
-    ctx.fillStyle = '#9A7B38'
-    ctx.font = 'bold 32px "Cinzel Decorative", serif'
-    ctx.textAlign = 'center'
-    ctx.fillText('KM', 580, 198)
-
-    ctx.font = 'bold 9px "Montserrat", sans-serif'
-    ctx.fillText('17 · OCT · 2026', 580, 225)
-  }, [generated, guestName, passCount])
-
-  const downloadPass = () => {
-    const canvas = passCanvasRef.current
-    if (!canvas) return
-    const link = document.createElement('a')
-    link.download = `Pase_VIP_${guestName.replace(/\s+/g, '_')}_KristaMariel.png`
-    link.href = canvas.toDataURL('image/png')
-    link.click()
-    onTriggerToast("¡Pase descargado exitosamente! 📥")
-  }
-
-  return (
-    <section id="pase-vip" className="relative py-16 md:py-24 px-4 md:px-6">
-      <div className="section-sep mb-16 md:mb-20" />
-      <div className="max-w-4xl mx-auto">
-        <SectionHeader tag="Pase Digital VIP" title="Genera tu Boleto de Gala" />
-
-        <div className="glass-card p-6 md:p-10 rounded-3xl border-2 border-gold/40 text-center flex flex-col items-center gap-6 shadow-xl">
-          <p className="text-xs md:text-sm font-montserrat text-text-sub font-medium leading-relaxed max-w-xl">
-            Ingresa tu nombre para generar tu pase de gala personal con código de acceso para mostrar al llegar a Quinta Maria Teresa.
-          </p>
-
-          <form onSubmit={handleGeneratePass} className="w-full max-w-md flex flex-col gap-4">
-            <div className="flex flex-col gap-1 text-left">
-              <label className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">
-                Nombre del Invitado *
-              </label>
-              <input
-                type="text"
-                required
-                value={guestName}
-                onChange={e => setGuestName(e.target.value)}
-                placeholder="Ej. Familia Sandoval"
-                className="w-full bg-cream border border-gold/40 focus:border-gold rounded-2xl px-4 py-3 text-sm text-text-main placeholder:text-text-muted outline-none font-medium"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1 text-left">
-              <label className="text-[10px] uppercase tracking-widest font-montserrat text-gold-dark font-bold">
-                Número de Pases
-              </label>
-              <select
-                value={passCount}
-                onChange={e => setPassCount(e.target.value)}
-                className="w-full bg-cream border border-gold/40 focus:border-gold rounded-2xl px-4 py-3 text-sm text-text-main outline-none font-medium"
-              >
-                <option value="1">1 Pase Personal</option>
-                <option value="2">2 Pases (Pareja)</option>
-                <option value="3">3 Pases (Familia)</option>
-                <option value="4">4 Pases (Familia)</option>
-                <option value="5+">5+ Pases Especiales</option>
-              </select>
-            </div>
-
-            <button
-              type="submit"
-              className="py-3.5 rounded-2xl bg-gradient-to-r from-gold-light via-gold to-gold-dark text-text-main font-montserrat font-bold text-xs uppercase tracking-wider shadow-md hover:brightness-110 transition-all mt-1"
-            >
-              Generar Mi Pase VIP 🎫
-            </button>
-          </form>
-
-          {generated && (
-            <div className="flex flex-col items-center gap-5 w-full mt-4 animate-fade-in-up">
-              <div className="relative w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl border-2 border-gold">
-                <canvas ref={passCanvasRef} className="w-full h-auto object-contain" />
-              </div>
-
-              <button
-                onClick={downloadPass}
-                className="px-6 py-2.5 rounded-full bg-gradient-to-r from-gold to-gold-dark text-text-main font-montserrat font-bold text-xs hover:brightness-110 transition-all shadow-md flex items-center gap-2"
-              >
-                <span>📥</span> Descargar Pase Digital VIP
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    </section>
-  )
-}
 
 // ─── Live AR Selfie Camera Modal with Royal Tiara & Butterflies ────────────────
 function ARCameraModal({ isOpen, onClose, onTriggerToast }: { isOpen: boolean; onClose: () => void; onTriggerToast: (msg: string) => void }) {
@@ -4711,8 +4658,7 @@ function Navbar({
     { href: '#video-especial', label: 'Video Especial 🎬' },
     { href: '#itinerario', label: 'Protocolo' },
     { href: '#llegada', label: 'Ubicación & Mapas 📍' },
-    { href: '#color-quinceanera', label: 'Color Reservado ✨' },
-    { href: '#color-reservado', label: 'Guía de Color' },
+    { href: '#color-reservado', label: 'Guía de Color ✨' },
     { href: '#vestimenta', label: 'Sugerencia de Regalos' },
     { href: '#galeria', label: 'Galería' },
     { href: '#rsvp', label: 'RSVP' },
@@ -4830,19 +4776,19 @@ function Navbar({
 
                 <button
                   onClick={() => { onOpenQR(); setOptionsOpen(false); }}
-                  className="flex items-center gap-3 p-2 rounded-xl hover:bg-gold/15 transition-colors text-left text-xs font-montserrat font-bold text-text-main"
+                  className="flex items-center gap-3 p-2 rounded-xl hover:bg-gold/15 transition-colors text-left text-xs font-montserrat font-bold text-text-main cursor-pointer"
                 >
-                  <span className="w-7 h-7 rounded-lg border border-gold/40 flex items-center justify-center bg-gold/10 text-gold-dark">📲</span>
+                  <span className="w-7 h-7 rounded-lg border border-gold/40 flex items-center justify-center bg-gold/10 text-gold-dark">💌</span>
                   <div>
-                    <div>Compartir Código QR</div>
-                    <div className="text-[10px] text-text-sub font-normal">Enviar invitación fácil</div>
+                    <div>Descargar Tarjeta & Compartir</div>
+                    <div className="text-[10px] text-text-sub font-normal">Tarjeta de enlace, PDF interactivo y QR</div>
                   </div>
                 </button>
 
                 {onOpenIntroVideo && (
                   <button
                     onClick={() => { onOpenIntroVideo(); setOptionsOpen(false); }}
-                    className="flex items-center gap-3 p-2 rounded-xl hover:bg-gold/15 transition-colors text-left text-xs font-montserrat font-bold text-text-main"
+                    className="flex items-center gap-3 p-2 rounded-xl hover:bg-gold/15 transition-colors text-left text-xs font-montserrat font-bold text-text-main cursor-pointer"
                   >
                     <span className="w-7 h-7 rounded-lg border border-gold/40 flex items-center justify-center bg-gold/10 text-gold-dark">🎬</span>
                     <div>
@@ -4854,7 +4800,7 @@ function Navbar({
 
                 <button
                   onClick={() => { onOpenEnvelope(); setOptionsOpen(false); }}
-                  className="flex items-center gap-3 p-2 rounded-xl hover:bg-gold/15 transition-colors text-left text-xs font-montserrat font-bold text-text-main"
+                  className="flex items-center gap-3 p-2 rounded-xl hover:bg-gold/15 transition-colors text-left text-xs font-montserrat font-bold text-text-main cursor-pointer"
                 >
                   <span className="w-7 h-7 rounded-lg border border-gold/40 flex items-center justify-center bg-gold/10 text-gold-dark">✉️</span>
                   <div>
@@ -4865,6 +4811,17 @@ function Navbar({
               </div>
             )}
           </div>
+
+          {/* Quick Share Button for Tablet / Desktop */}
+          <button
+            onClick={onOpenQR}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gold/50 glass-card text-gold-dark hover:bg-gold/15 transition-all text-xs font-montserrat font-bold shadow-sm cursor-pointer"
+            title="Descargar Tarjeta o Compartir"
+          >
+            <span>💌</span>
+            <span className="hidden md:inline">Descargar Tarjeta</span>
+            <span className="md:hidden">Tarjeta</span>
+          </button>
 
           <a
             href="#rsvp"
@@ -4894,10 +4851,16 @@ function Navbar({
               {label}
             </a>
           ))}
+          <button
+            onClick={() => { onOpenQR(); setMobileMenuOpen(false); }}
+            className="w-full text-center py-2.5 px-4 rounded-full border border-gold/60 bg-gold/15 text-gold-dark text-xs font-montserrat font-bold uppercase tracking-wider mt-1 shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>💌</span> Descargar Tarjeta & Compartir
+          </button>
           <a
             href="#rsvp"
             onClick={() => setMobileMenuOpen(false)}
-            className="w-full text-center py-3 rounded-full bg-gradient-to-r from-gold to-gold-dark text-text-main text-xs font-montserrat font-bold uppercase tracking-wider mt-2 shadow-md"
+            className="w-full text-center py-3 rounded-full bg-gradient-to-r from-gold to-gold-dark text-text-main text-xs font-montserrat font-bold uppercase tracking-wider mt-1 shadow-md"
           >
             Confirmar Asistencia
           </a>
@@ -5093,8 +5056,12 @@ export default function App() {
         onTriggerExplosiveBurst={triggerExplosiveBurst}
       />
 
-      {/* Interactive QR Code Modal */}
-      <QRCodeModal isOpen={qrOpen} onClose={() => setQrOpen(false)} />
+      {/* Interactive QR Code & Card Share Modal */}
+      <QRCodeModal
+        isOpen={qrOpen}
+        onClose={() => setQrOpen(false)}
+        onTriggerToast={setToastMessage}
+      />
 
       {/* AR Camera Modal with Tiara */}
       <ARCameraModal
@@ -5127,15 +5094,16 @@ export default function App() {
 
       {/* Main Sections */}
       <main className="relative z-20">
-        <HeroSection onTriggerToast={setToastMessage} />
+        <HeroSection
+          onTriggerToast={setToastMessage}
+          onOpenShare={() => setQrOpen(true)}
+        />
         <KristaLetterSection />
         <ParentsSection />
         <SpecialVideoSection onTriggerToast={setToastMessage} onTriggerBurst={triggerExplosiveBurst} />
         <ItinerarySection onTriggerToast={setToastMessage} />
-        <QuinceaneraColorSection />
         <ReservedColorSection onTriggerToast={setToastMessage} />
         <ArrivalGuideSection onTriggerToast={setToastMessage} />
-        <VIPPassSection onTriggerToast={setToastMessage} />
         <DressGiftsSection onTriggerToast={setToastMessage} />
         <GallerySection />
         <RSVPSection onTriggerSwarm={handleRSVPSubmitWithConfetti} />
