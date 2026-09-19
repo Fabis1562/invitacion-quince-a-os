@@ -1961,13 +1961,6 @@ function QRCodeModal({
     onTriggerToast?.("¡Código QR descargado! 📥")
   }
 
-  const handleShareWhatsApp = () => {
-    const text = `🌸 *¡Estás cordialmente invitado a los XV Años de Krista Mariel!* ✨\n\nPara poder compartirles la alegría de este gran día, les hacemos llegar la invitación digital interactiva:\n👉 ${targetUrl}\n\n¡Esperamos contar con tu valiosa presencia!`
-    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`
-    window.open(url, '_blank')
-    onTriggerToast?.("Abriendo WhatsApp... 💬")
-  }
-
   return (
     <div
       className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-fade-in"
@@ -1988,7 +1981,7 @@ function QRCodeModal({
         {/* Header */}
         <div className="text-center pt-1 px-4">
           <p className="text-[10px] uppercase tracking-widest text-gold-dark font-bold font-montserrat flex items-center justify-center gap-1.5">
-            <GoldButterfly size={14} /> Compartir con Invitados <GoldButterfly size={14} />
+            <GoldButterfly size={14} /> Descargar Tarjeta Oficial <GoldButterfly size={14} />
           </p>
           <h3 className="font-greatvibes text-3xl sm:text-4xl gold-text-gradient mt-0.5">
             XV Años de Krista Mariel
@@ -2043,20 +2036,20 @@ function QRCodeModal({
             {/* Explanation Guide */}
             <div className="w-full text-left bg-gold/10 border border-gold/30 rounded-2xl p-3 sm:p-3.5 text-xs font-montserrat flex flex-col gap-2">
               <p className="font-bold text-gold-dark text-[11px] uppercase tracking-wider flex items-center gap-1.5">
-                <span>✨</span> ¿Cómo compartirla con tus invitados?
+                <span>✨</span> Opciones de Descarga Oficial
               </p>
               <div className="text-[11px] text-text-sub space-y-1.5 leading-relaxed">
                 <p>
-                  <strong className="text-text-main">📄 PDF Interactivo (¡Recomendado para WhatsApp!):</strong> Al enviarlo como <em>Documento</em> por WhatsApp, tus invitados ven la tarjeta en su pantalla y al tocar el botón <em>"DA CLIC AQUÍ"</em> se abre inmediatamente la invitación en su celular con la música, fotos y sobre animado.
+                  <strong className="text-text-main">📄 PDF Interactivo:</strong> Guarda el archivo en tu dispositivo. Al abrirlo, el botón <em>"DA CLIC AQUÍ"</em> abre directamente la experiencia interactiva con música, animación y fotos.
                 </p>
                 <p>
-                  <strong className="text-text-main">🖼️ Imagen (PNG):</strong> Ideal para guardarla en tu celular y subirla a tus Estados de WhatsApp, Historias de Facebook o Instagram.
+                  <strong className="text-text-main">🖼️ Imagen (PNG):</strong> Descarga la tarjeta oficial en alta resolución para conservarla como recuerdo en tu galería.
                 </p>
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col gap-2 w-full">
+            <div className="flex flex-col gap-2.5 w-full">
               {/* Interactive PDF Button */}
               <a
                 href="/fotos/Invitacion_Digital_Krista_Mariel_XV.pdf"
@@ -2078,16 +2071,6 @@ function QRCodeModal({
                 <span>🖼️</span>
                 <span>Descargar Imagen en Alta Calidad (PNG)</span>
               </a>
-
-              {/* WhatsApp Share Button */}
-              <button
-                type="button"
-                onClick={handleShareWhatsApp}
-                className="w-full py-2.5 px-4 rounded-2xl bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/50 text-[#1E7E34] font-montserrat font-bold text-xs uppercase tracking-wider shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
-              >
-                <span>💬</span>
-                <span>Enviar por WhatsApp con Enlace Listo</span>
-              </button>
             </div>
           </div>
         ) : (
@@ -2420,7 +2403,7 @@ END:VCALENDAR`
               onClick={onOpenShare}
               className="w-full sm:w-auto px-5 py-2.5 rounded-full border border-gold/60 glass-card text-[10px] font-cinzel uppercase tracking-wider text-gold-dark hover:bg-gold/15 transition-all flex items-center justify-center gap-1.5 font-bold shadow-sm cursor-pointer"
             >
-              <span>💌</span> DESCARGAR TARJETA / COMPARTIR
+              <span>💌</span> DESCARGAR TARJETA OFICIAL
             </button>
           )}
           <button
@@ -2539,13 +2522,14 @@ function ParentsSection() {
         <div className="flex items-center gap-3 mb-1 opacity-85">
           <GoldButterfly size={16} />
           <p className="text-xs uppercase tracking-[0.35em] font-cinzel text-gold-dark font-bold">
-            MIS FAMILIARES
+            MIS
           </p>
           <GoldButterfly size={16} />
         </div>
 
-        <h2 className="font-script text-5xl sm:text-6xl text-gold-dark my-1">
-          Padres & Padrinos
+        <h2 className="font-script text-5xl sm:text-6xl text-gold-dark my-1 leading-tight text-center">
+          <span className="block">Padres &</span>
+          <span className="block">Padrinos</span>
         </h2>
 
         <span className="text-gold-dark text-xs my-1">✦</span>
@@ -4780,8 +4764,8 @@ function Navbar({
                 >
                   <span className="w-7 h-7 rounded-lg border border-gold/40 flex items-center justify-center bg-gold/10 text-gold-dark">💌</span>
                   <div>
-                    <div>Descargar Tarjeta & Compartir</div>
-                    <div className="text-[10px] text-text-sub font-normal">Tarjeta de enlace, PDF interactivo y QR</div>
+                    <div>Descargar Tarjeta & QR</div>
+                    <div className="text-[10px] text-text-sub font-normal">Tarjeta PNG, PDF interactivo y QR</div>
                   </div>
                 </button>
 
@@ -4816,7 +4800,7 @@ function Navbar({
           <button
             onClick={onOpenQR}
             className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gold/50 glass-card text-gold-dark hover:bg-gold/15 transition-all text-xs font-montserrat font-bold shadow-sm cursor-pointer"
-            title="Descargar Tarjeta o Compartir"
+            title="Descargar Tarjeta Oficial o QR"
           >
             <span>💌</span>
             <span className="hidden md:inline">Descargar Tarjeta</span>
@@ -4855,7 +4839,7 @@ function Navbar({
             onClick={() => { onOpenQR(); setMobileMenuOpen(false); }}
             className="w-full text-center py-2.5 px-4 rounded-full border border-gold/60 bg-gold/15 text-gold-dark text-xs font-montserrat font-bold uppercase tracking-wider mt-1 shadow-sm flex items-center justify-center gap-2 cursor-pointer"
           >
-            <span>💌</span> Descargar Tarjeta & Compartir
+            <span>💌</span> Descargar Tarjeta & QR
           </button>
           <a
             href="#rsvp"
