@@ -2404,29 +2404,29 @@ function ParentsSection() {
         {/* Cards: Mis Padres & Mis Padrinos (Mujeres primero exactamente como solicitó el usuario) */}
         <div className="flex flex-col gap-3.5 w-full mt-2">
           {/* Card 1: MIS PADRES */}
-          <div className="glass-card p-5 md:p-6 rounded-3xl border border-gold/40 shadow-sm flex flex-col items-center gap-2 bg-cream/75">
+          <div className="glass-card px-3 py-5 sm:p-6 rounded-3xl border border-gold/40 shadow-sm flex flex-col items-center gap-2 bg-cream/75">
             <p className="text-[11px] uppercase tracking-[0.3em] font-cinzel text-gold-dark font-bold">
               MIS PADRES
             </p>
-            <h3 className="font-cinzel text-base md:text-lg text-text-main font-bold">
+            <h3 className="font-cinzel text-[13px] sm:text-base md:text-lg text-text-main font-bold text-center whitespace-nowrap tracking-wide">
               {MOTHER_NAME}
             </h3>
             <span className="text-gold-dark font-script text-2xl leading-none">&</span>
-            <h3 className="font-cinzel text-base md:text-lg text-text-main font-bold">
+            <h3 className="font-cinzel text-[13px] sm:text-base md:text-lg text-text-main font-bold text-center whitespace-nowrap tracking-wide">
               {FATHER_NAME}
             </h3>
           </div>
 
           {/* Card 2: MIS PADRINOS */}
-          <div className="glass-card p-5 md:p-6 rounded-3xl border border-gold/40 shadow-sm flex flex-col items-center gap-2 bg-cream/75">
+          <div className="glass-card px-3 py-5 sm:p-6 rounded-3xl border border-gold/40 shadow-sm flex flex-col items-center gap-2 bg-cream/75">
             <p className="text-[11px] uppercase tracking-[0.3em] font-cinzel text-gold-dark font-bold">
               MIS PADRINOS
             </p>
-            <h3 className="font-cinzel text-base md:text-lg text-text-main font-bold">
+            <h3 className="font-cinzel text-[13px] sm:text-base md:text-lg text-text-main font-bold text-center whitespace-nowrap tracking-wide">
               {GODMOTHER_NAME}
             </h3>
             <span className="text-gold-dark font-script text-2xl leading-none">&</span>
-            <h3 className="font-cinzel text-base md:text-lg text-text-main font-bold">
+            <h3 className="font-cinzel text-[13px] sm:text-base md:text-lg text-text-main font-bold text-center whitespace-nowrap tracking-wide">
               {GODFATHER_NAME}
             </h3>
           </div>
@@ -3692,7 +3692,6 @@ function RSVPSection({ onTriggerSwarm }: { onTriggerSwarm: () => void }) {
   const [name, setName] = useState('')
   const [attendance, setAttendance] = useState<'yes' | 'no'>('yes')
   const [guests, setGuests] = useState('1')
-  const [note, setNote] = useState('')
   const [submitted, setSubmitted] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -3708,7 +3707,7 @@ function RSVPSection({ onTriggerSwarm }: { onTriggerSwarm: () => void }) {
       name: name.trim(),
       guests: attendance === 'yes' ? guests : '0',
       attendance: statusText,
-      note
+      note: ''
     })
 
     const msg = encodeURIComponent(
@@ -3716,7 +3715,6 @@ function RSVPSection({ onTriggerSwarm }: { onTriggerSwarm: () => void }) {
       `👤 *Nombre:* ${name.trim()}\n` +
       `✨ *Asistencia:* ${statusText}\n` +
       (attendance === 'yes' ? `👥 *Invitados:* ${guests} persona(s)\n` : '') +
-      (note ? `💬 *Mensaje:* ${note}\n` : '') +
       `\n¡Nos vemos pronto!`
     )
 
@@ -3844,20 +3842,6 @@ function RSVPSection({ onTriggerSwarm }: { onTriggerSwarm: () => void }) {
                   </button>
                 ))}
               </div>
-            </div>
-
-            {/* Mensaje */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] sm:text-[11px] uppercase tracking-[0.18em] font-montserrat text-[#6D5229] font-bold">
-                MENSAJE PARA KRISTA MARIEL / RESTRICCIONES
-              </label>
-              <textarea
-                rows={3}
-                value={note}
-                onChange={e => setNote(e.target.value)}
-                placeholder="Escribe aquí un mensaje especial para la quinceañera..."
-                className="w-full bg-[#FFFDF9] border border-[#D9CABA] focus:border-[#AA874C] rounded-2xl px-4 py-3.5 text-sm sm:text-base text-[#3E2B16] placeholder:text-[#9F8C76]/70 outline-none transition-colors resize-none font-medium shadow-inner shadow-black/[0.02]"
-              />
             </div>
 
             {/* Botón Confirmar Asistencia */}
