@@ -2404,29 +2404,29 @@ function ParentsSection() {
         {/* Cards: Mis Padres & Mis Padrinos (Mujeres primero exactamente como solicitó el usuario) */}
         <div className="flex flex-col gap-3.5 w-full mt-2">
           {/* Card 1: MIS PADRES */}
-          <div className="glass-card px-3 py-5 sm:p-6 rounded-3xl border border-gold/40 shadow-sm flex flex-col items-center gap-2 bg-cream/75">
+          <div className="glass-card w-full max-w-full overflow-hidden px-2.5 sm:px-6 py-5 rounded-3xl border border-gold/40 shadow-sm flex flex-col items-center gap-2 bg-cream/75">
             <p className="text-[11px] uppercase tracking-[0.3em] font-cinzel text-gold-dark font-bold">
               MIS PADRES
             </p>
-            <h3 className="font-cinzel text-[13px] sm:text-base md:text-lg text-text-main font-bold text-center whitespace-nowrap tracking-wide">
+            <h3 className="font-cinzel text-[12px] min-[380px]:text-[13px] sm:text-base md:text-lg text-text-main font-bold text-center whitespace-nowrap tracking-wide max-w-full">
               {MOTHER_NAME}
             </h3>
             <span className="text-gold-dark font-script text-2xl leading-none">&</span>
-            <h3 className="font-cinzel text-[13px] sm:text-base md:text-lg text-text-main font-bold text-center whitespace-nowrap tracking-wide">
+            <h3 className="font-cinzel text-[12px] min-[380px]:text-[13px] sm:text-base md:text-lg text-text-main font-bold text-center whitespace-nowrap tracking-wide max-w-full">
               {FATHER_NAME}
             </h3>
           </div>
 
           {/* Card 2: MIS PADRINOS */}
-          <div className="glass-card px-3 py-5 sm:p-6 rounded-3xl border border-gold/40 shadow-sm flex flex-col items-center gap-2 bg-cream/75">
+          <div className="glass-card w-full max-w-full overflow-hidden px-2.5 sm:px-6 py-5 rounded-3xl border border-gold/40 shadow-sm flex flex-col items-center gap-2 bg-cream/75">
             <p className="text-[11px] uppercase tracking-[0.3em] font-cinzel text-gold-dark font-bold">
               MIS PADRINOS
             </p>
-            <h3 className="font-cinzel text-[13px] sm:text-base md:text-lg text-text-main font-bold text-center whitespace-nowrap tracking-wide">
+            <h3 className="font-cinzel text-[12px] min-[380px]:text-[13px] sm:text-base md:text-lg text-text-main font-bold text-center whitespace-nowrap tracking-wide max-w-full">
               {GODMOTHER_NAME}
             </h3>
             <span className="text-gold-dark font-script text-2xl leading-none">&</span>
-            <h3 className="font-cinzel text-[13px] sm:text-base md:text-lg text-text-main font-bold text-center whitespace-nowrap tracking-wide">
+            <h3 className="font-cinzel text-[12px] min-[380px]:text-[13px] sm:text-base md:text-lg text-text-main font-bold text-center whitespace-nowrap tracking-wide max-w-full">
               {GODFATHER_NAME}
             </h3>
           </div>
