@@ -2837,16 +2837,13 @@ function ReservedColorSection({ onTriggerToast }: { onTriggerToast: (msg: string
 
       <div className="max-w-4xl mx-auto flex flex-col items-center">
         {/* Header decoration */}
-        <div className="flex items-center gap-3 mb-2 opacity-80">
+        <div className="flex items-center gap-3 mb-3 opacity-80">
           <div className="h-px w-12 bg-gold/60" />
           <GoldButterfly size={18} />
           <div className="h-px w-12 bg-gold/60" />
         </div>
-        <p className="text-[10px] sm:text-xs uppercase tracking-[0.35em] font-cinzel text-gold-dark font-bold mb-1">
-          Código de Vestimenta
-        </p>
         <h2 className="font-cinzel text-2xl sm:text-3xl md:text-4xl text-text-main font-bold tracking-[0.18em] uppercase text-center mb-6 sm:mb-8">
-          Guía de Color para Invitados
+          Código de Vestimenta
         </h2>
 
         {/* Tarjeta Oficial Impresa con Enmarcado Dorado de Lujo y Lightbox */}
@@ -4524,7 +4521,7 @@ function Navbar({
     { href: '#padres', label: 'Familia' },
     { href: '#video-especial', label: 'Video' },
     { href: '#itinerario', label: 'Protocolo' },
-    { href: '#color-reservado', label: 'Guía de Color' },
+    { href: '#color-reservado', label: 'Vestimenta' },
     { href: '#galeria', label: 'Galería' },
     { href: '#rsvp', label: 'RSVP' },
   ]
@@ -4536,7 +4533,7 @@ function Navbar({
     { href: '#video-especial', label: 'Video Especial 🎬' },
     { href: '#itinerario', label: 'Protocolo' },
     { href: '#llegada', label: 'Ubicación & Mapas 📍' },
-    { href: '#color-reservado', label: 'Guía de Color ✨' },
+    { href: '#color-reservado', label: 'Código de Vestimenta ✨' },
     { href: '#vestimenta', label: 'Sugerencia de Regalos' },
     { href: '#galeria', label: 'Galería' },
     { href: '#rsvp', label: 'RSVP' },
