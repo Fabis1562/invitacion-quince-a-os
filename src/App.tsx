@@ -2308,6 +2308,9 @@ END:VCALENDAR`
 }
 
 // ─── Parents & Godparents Section (Lámina 3 Oficial) ───────────────────────────
+// 💡 Cambiar a true cuando el usuario proporcione el audio oficial de voz de Krista
+const SHOW_VOICE_MESSAGE = false
+
 function ParentsSection() {
   const [isVoicePlaying, setIsVoicePlaying] = useState(false)
 
@@ -2350,49 +2353,61 @@ function ParentsSection() {
     <section id="padres" className="relative py-12 md:py-20 px-4 md:px-6">
       <div className="section-sep mb-12 md:mb-16" />
       <StationeryPlate className="max-w-xl">
-        <p className="text-xs uppercase tracking-[0.35em] font-cinzel text-gold-dark font-bold">
-          KRISTA MARIEL
-        </p>
-        <span className="text-gold-dark text-xs my-1">✦</span>
+        {/* Mensaje de Voz de Krista Mariel (Oculto temporalmente hasta recibir el audio oficial) */}
+        {SHOW_VOICE_MESSAGE && (
+          <>
+            <p className="text-xs uppercase tracking-[0.35em] font-cinzel text-gold-dark font-bold">
+              KRISTA MARIEL
+            </p>
+            <span className="text-gold-dark text-xs my-1">✦</span>
 
-        {/* Mensaje de Voz de Krista Mariel matching image copy 2.png */}
-        <div className="glass-card p-4 sm:p-5 rounded-3xl border border-gold/40 shadow-sm w-full max-w-md bg-cream/85 flex flex-col gap-2.5 my-2">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] uppercase tracking-[0.25em] font-cinzel text-gold-dark font-bold">
-              MENSAJE DE VOZ · KRISTA MARIEL
-            </span>
-            <span className="text-[10px] font-mono text-text-sub font-semibold">0:28</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={handleToggleVoice}
-              className="w-11 h-11 rounded-full bg-gradient-to-r from-gold to-gold-dark text-text-main flex items-center justify-center text-sm shadow-md hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer"
-              title={isVoicePlaying ? "Pausar mensaje de voz" : "Escuchar mensaje de voz de Krista"}
-            >
-              {isVoicePlaying ? '⏸' : '▶'}
-            </button>
-            <div className="flex-1 flex items-center gap-1 overflow-hidden h-6 opacity-75">
-              {[6, 12, 18, 14, 22, 10, 16, 24, 18, 8, 14, 20, 12, 16, 22, 18, 10, 6, 14, 20, 10, 6].map((h, i) => (
-                <div
-                  key={i}
-                  className={`w-1 rounded-full transition-all duration-300 ${isVoicePlaying ? 'bg-gold animate-pulse' : 'bg-gold/45'}`}
-                  style={{ height: `${h}px` }}
-                />
-              ))}
+            <div className="glass-card p-4 sm:p-5 rounded-3xl border border-gold/40 shadow-sm w-full max-w-md bg-cream/85 flex flex-col gap-2.5 my-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] uppercase tracking-[0.25em] font-cinzel text-gold-dark font-bold">
+                  MENSAJE DE VOZ · KRISTA MARIEL
+                </span>
+                <span className="text-[10px] font-mono text-text-sub font-semibold">0:28</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleToggleVoice}
+                  className="w-11 h-11 rounded-full bg-gradient-to-r from-gold to-gold-dark text-text-main flex items-center justify-center text-sm shadow-md hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer"
+                  title={isVoicePlaying ? "Pausar mensaje de voz" : "Escuchar mensaje de voz de Krista"}
+                >
+                  {isVoicePlaying ? '⏸' : '▶'}
+                </button>
+                <div className="flex-1 flex items-center gap-1 overflow-hidden h-6 opacity-75">
+                  {[6, 12, 18, 14, 22, 10, 16, 24, 18, 8, 14, 20, 12, 16, 22, 18, 10, 6, 14, 20, 10, 6].map((h, i) => (
+                    <div
+                      key={i}
+                      className={`w-1 rounded-full transition-all duration-300 ${isVoicePlaying ? 'bg-gold animate-pulse' : 'bg-gold/45'}`}
+                      style={{ height: `${h}px` }}
+                    />
+                  ))}
+                </div>
+              </div>
+              <p className="font-playfair italic text-xs sm:text-sm text-text-main leading-relaxed text-left font-normal mt-0.5">
+                “Hola, bienvenidos a mi invitación. Me hace mucha ilusión poder compartir con ustedes una fecha tan especial para mí. Espero que disfruten cada momento y que juntos hagamos de esta celebración un recuerdo inolvidable. ¡Nos vemos en mis XV!”
+              </p>
             </div>
-          </div>
-          <p className="font-playfair italic text-xs sm:text-sm text-text-main leading-relaxed text-left font-normal mt-0.5">
-            “Hola, bienvenidos a mi invitación. Me hace mucha ilusión poder compartir con ustedes una fecha tan especial para mí. Espero que disfruten cada momento y que juntos hagamos de esta celebración un recuerdo inolvidable. ¡Nos vemos en mis XV!”
-          </p>
-        </div>
 
-        {/* Descubrir Más Arrow matching image copy 2.png */}
-        <div className="flex flex-col items-center gap-0.5 my-3">
-          <span className="text-[9px] uppercase tracking-[0.3em] font-cinzel text-gold-dark font-bold">
-            DESCUBRIR MÁS
-          </span>
-          <span className="text-gold-dark text-sm animate-bounce">↓</span>
+            {/* Descubrir Más Arrow matching image copy 2.png */}
+            <div className="flex flex-col items-center gap-0.5 my-3">
+              <span className="text-[9px] uppercase tracking-[0.3em] font-cinzel text-gold-dark font-bold">
+                DESCUBRIR MÁS
+              </span>
+              <span className="text-gold-dark text-sm animate-bounce">↓</span>
+            </div>
+          </>
+        )}
+
+        <div className="flex items-center gap-3 mb-1 opacity-85">
+          <GoldButterfly size={16} />
+          <p className="text-xs uppercase tracking-[0.35em] font-cinzel text-gold-dark font-bold">
+            NUESTRA FAMILIA
+          </p>
+          <GoldButterfly size={16} />
         </div>
 
         <h2 className="font-script text-5xl sm:text-6xl text-gold-dark my-1">
