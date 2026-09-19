@@ -1893,7 +1893,7 @@ function EnvelopeModal({
   )
 }
 
-// ─── Interactive Share & QR Code Modal ───────────────────────────────────────────
+// ─── Interactive QR Code Modal ─────────────────────────────────────────────────
 function QRCodeModal({
   isOpen,
   onClose,
@@ -1903,7 +1903,6 @@ function QRCodeModal({
   onClose: () => void
   onTriggerToast?: (msg: string) => void
 }) {
-  const [activeTab, setActiveTab] = useState<'card' | 'qr'>('card')
   const [targetUrl, setTargetUrl] = useState<string>('')
   const [qrDataUrl, setQrDataUrl] = useState<string>('')
   const [copied, setCopied] = useState(false)
@@ -1968,7 +1967,7 @@ function QRCodeModal({
     >
       <div
         onClick={e => e.stopPropagation()}
-        className="glass-card p-5 sm:p-7 rounded-3xl max-w-lg w-full max-h-[92vh] overflow-y-auto text-center flex flex-col items-center gap-4 border-2 border-gold/50 shadow-2xl relative bg-[#FCF9F3]/95 backdrop-blur-2xl"
+        className="glass-card p-6 md:p-8 rounded-3xl max-w-sm w-full text-center flex flex-col items-center gap-4 border-2 border-gold/50 shadow-2xl relative bg-[#FCF9F3]/95 backdrop-blur-2xl"
       >
         <button
           onClick={onClose}
@@ -1978,190 +1977,100 @@ function QRCodeModal({
           ✕
         </button>
 
-        {/* Header */}
-        <div className="text-center pt-1 px-4">
+        <div className="text-center pt-1">
           <p className="text-[10px] uppercase tracking-widest text-gold-dark font-bold font-montserrat flex items-center justify-center gap-1.5">
-            <GoldButterfly size={14} /> Descargar Tarjeta Oficial <GoldButterfly size={14} />
+            <GoldButterfly size={14} /> Escanear para Abrir <GoldButterfly size={14} />
           </p>
           <h3 className="font-greatvibes text-3xl sm:text-4xl gold-text-gradient mt-0.5">
             XV Años de Krista Mariel
           </h3>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="flex w-full rounded-2xl p-1 bg-gold/15 border border-gold/40">
+        {/* Real Scannable QR Code Image */}
+        <div className="p-3 bg-white rounded-2xl shadow-xl border-4 border-gold/40 relative flex items-center justify-center">
+          {displayQr ? (
+            <img
+              src={displayQr}
+              alt="Código QR oficial para abrir la invitación digital"
+              className="w-48 h-48 rounded-xl object-contain block"
+              onError={(e) => {
+                const fallback = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(targetUrl)}`
+                if (e.currentTarget.src !== fallback) {
+                  e.currentTarget.src = fallback
+                }
+              }}
+            />
+          ) : (
+            <div className="w-48 h-48 flex items-center justify-center text-gold-dark font-montserrat text-xs animate-pulse">
+              Generando código QR...
+            </div>
+          )}
+        </div>
+
+        <p className="text-xs font-montserrat text-text-sub font-medium">
+          Apunta la cámara de cualquier celular al código para abrir la invitación digital al instante.
+        </p>
+
+        {/* Actions: Copy link & Download QR */}
+        <div className="flex gap-2 w-full">
           <button
             type="button"
-            onClick={() => setActiveTab('card')}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-montserrat font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-              activeTab === 'card'
-                ? 'bg-gradient-to-r from-gold via-gold-dark to-gold text-text-main shadow-md'
-                : 'text-gold-dark hover:bg-gold/10'
-            }`}
+            onClick={handleCopy}
+            className="flex-1 py-2.5 px-3 rounded-xl border border-gold/60 bg-gold/10 hover:bg-gold/20 text-gold-dark font-montserrat font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
           >
-            <span>💌</span>
-            <span>Tarjeta & PDF Interactivo</span>
+            <span>{copied ? '✅' : '📋'}</span>
+            <span>{copied ? '¡Copiado!' : 'Copiar link'}</span>
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab('qr')}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-montserrat font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-              activeTab === 'qr'
-                ? 'bg-gradient-to-r from-gold via-gold-dark to-gold text-text-main shadow-md'
-                : 'text-gold-dark hover:bg-gold/10'
-            }`}
+            onClick={handleDownloadQR}
+            className="flex-1 py-2.5 px-3 rounded-xl border border-gold/60 bg-gold/10 hover:bg-gold/20 text-gold-dark font-montserrat font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
           >
-            <span>📲</span>
-            <span>Código QR Oficial</span>
+            <span>📥</span>
+            <span>Guardar QR</span>
           </button>
         </div>
 
-        {/* Content based on tab */}
-        {activeTab === 'card' ? (
-          <div className="w-full flex flex-col items-center gap-4 animate-fade-in">
-            {/* Card Preview */}
-            <div className="relative group max-w-[170px] sm:max-w-[195px] mx-auto rounded-2xl overflow-hidden shadow-xl border-2 border-gold/50 bg-[#FBF7F0]">
-              <img
-                src="/fotos/tarjeta_enlace_invitacion.png"
-                alt="Tarjeta Mensaje Especial Krista Mariel XV"
-                className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-2">
-                <span className="text-[9px] text-white font-montserrat font-semibold">
-                  Tarjeta Oficial de Krista Mariel
-                </span>
-              </div>
-            </div>
-
-            {/* Explanation Guide */}
-            <div className="w-full text-left bg-gold/10 border border-gold/30 rounded-2xl p-3 sm:p-3.5 text-xs font-montserrat flex flex-col gap-2">
-              <p className="font-bold text-gold-dark text-[11px] uppercase tracking-wider flex items-center gap-1.5">
-                <span>✨</span> Opciones de Descarga Oficial
-              </p>
-              <div className="text-[11px] text-text-sub space-y-1.5 leading-relaxed">
-                <p>
-                  <strong className="text-text-main">📄 PDF Interactivo:</strong> Guarda el archivo en tu dispositivo. Al abrirlo, el botón <em>"DA CLIC AQUÍ"</em> abre directamente la experiencia interactiva con música, animación y fotos.
-                </p>
-                <p>
-                  <strong className="text-text-main">🖼️ Imagen (PNG):</strong> Descarga la tarjeta oficial en alta resolución para conservarla como recuerdo en tu galería.
-                </p>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col gap-2.5 w-full">
-              {/* Interactive PDF Button */}
-              <a
-                href="/fotos/Invitacion_Digital_Krista_Mariel_XV.pdf"
-                download="Invitacion_Digital_Krista_Mariel_XV.pdf"
-                onClick={() => onTriggerToast?.("¡Descargando PDF interactivo! 📄")}
-                className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-gold via-gold-dark to-gold text-text-main font-montserrat font-bold text-xs uppercase tracking-wider shadow-lg hover:brightness-110 flex items-center justify-center gap-2 transition-all cursor-pointer"
-              >
-                <span>📄</span>
-                <span>Descargar PDF Interactivo (Botón Clickeable)</span>
-              </a>
-
-              {/* PNG High-res Button */}
-              <a
-                href="/fotos/tarjeta_enlace_invitacion.png"
-                download="Tarjeta_Invitacion_Krista_Mariel_XV.png"
-                onClick={() => onTriggerToast?.("¡Descargando imagen PNG! 🖼️")}
-                className="w-full py-2.5 px-4 rounded-2xl border border-gold/60 bg-gold/15 hover:bg-gold/25 text-gold-dark font-montserrat font-bold text-xs uppercase tracking-wider shadow-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
-              >
-                <span>🖼️</span>
-                <span>Descargar Imagen en Alta Calidad (PNG)</span>
-              </a>
-            </div>
+        {/* Localhost / Custom Link Notice & Editor */}
+        <div className="w-full text-left bg-gold/10 border border-gold/30 rounded-xl p-2.5 flex flex-col gap-1.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold font-montserrat text-gold-dark uppercase tracking-wider">
+              Enlace codificado:
+            </span>
+            <button
+              type="button"
+              onClick={() => setShowEdit(!showEdit)}
+              className="text-[10px] font-bold text-gold-dark underline hover:text-gold cursor-pointer"
+            >
+              {showEdit ? 'Ocultar' : 'Personalizar link'}
+            </button>
           </div>
-        ) : (
-          <div className="w-full flex flex-col items-center gap-4 animate-fade-in">
-            {/* Real Scannable QR Code Image */}
-            <div className="p-3 bg-white rounded-2xl shadow-xl border-4 border-gold/40 relative flex items-center justify-center">
-              {displayQr ? (
-                <img
-                  src={displayQr}
-                  alt="Código QR oficial para abrir la invitación digital"
-                  className="w-44 h-44 sm:w-48 sm:h-48 rounded-xl object-contain block"
-                  onError={(e) => {
-                    const fallback = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(targetUrl)}`
-                    if (e.currentTarget.src !== fallback) {
-                      e.currentTarget.src = fallback
-                    }
-                  }}
-                />
-              ) : (
-                <div className="w-44 h-44 flex items-center justify-center text-gold-dark font-montserrat text-xs animate-pulse">
-                  Generando código QR...
-                </div>
-              )}
-            </div>
 
-            <p className="text-xs font-montserrat text-text-sub font-medium">
-              Apunta la cámara de cualquier celular al código para abrir la invitación digital al instante.
+          {!showEdit ? (
+            <p className="text-[11px] font-mono text-text-muted truncate">
+              {targetUrl}
             </p>
-
-            {/* Actions: Copy link & Download QR */}
-            <div className="flex gap-2 w-full">
-              <button
-                type="button"
-                onClick={handleCopy}
-                className="flex-1 py-2.5 px-3 rounded-xl border border-gold/60 bg-gold/10 hover:bg-gold/20 text-gold-dark font-montserrat font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-              >
-                <span>{copied ? '✅' : '📋'}</span>
-                <span>{copied ? '¡Copiado!' : 'Copiar link'}</span>
-              </button>
-              <button
-                type="button"
-                onClick={handleDownloadQR}
-                className="flex-1 py-2.5 px-3 rounded-xl border border-gold/60 bg-gold/10 hover:bg-gold/20 text-gold-dark font-montserrat font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-              >
-                <span>📥</span>
-                <span>Guardar QR</span>
-              </button>
-            </div>
-
-            {/* Localhost / Custom Link Notice & Editor */}
-            <div className="w-full text-left bg-gold/10 border border-gold/30 rounded-xl p-2.5 flex flex-col gap-1.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold font-montserrat text-gold-dark uppercase tracking-wider">
-                  Enlace codificado:
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setShowEdit(!showEdit)}
-                  className="text-[10px] font-bold text-gold-dark underline hover:text-gold cursor-pointer"
-                >
-                  {showEdit ? 'Ocultar' : 'Personalizar link'}
-                </button>
-              </div>
-
-              {!showEdit ? (
-                <p className="text-[11px] font-mono text-text-muted truncate">
-                  {targetUrl}
+          ) : (
+            <div className="flex flex-col gap-1 mt-1">
+              <input
+                type="text"
+                value={targetUrl}
+                onChange={e => setTargetUrl(e.target.value)}
+                placeholder="https://tudominio.com"
+                className="w-full px-2.5 py-1.5 text-xs font-mono bg-white border border-gold/50 rounded-lg text-text-main focus:outline-none focus:ring-1 focus:ring-gold"
+              />
+              {isLocal && (
+                <p className="text-[9px] text-text-muted leading-tight mt-0.5">
+                  💡 Tip: En tu PC estás en <code className="bg-gold/20 px-1 rounded font-bold">localhost</code>. Para abrirlo desde tu celular en tu WiFi, puedes poner la IP de tu PC o tu link publicado.
                 </p>
-              ) : (
-                <div className="flex flex-col gap-1 mt-1">
-                  <input
-                    type="text"
-                    value={targetUrl}
-                    onChange={e => setTargetUrl(e.target.value)}
-                    placeholder="https://tudominio.com"
-                    className="w-full px-2.5 py-1.5 text-xs font-mono bg-white border border-gold/50 rounded-lg text-text-main focus:outline-none focus:ring-1 focus:ring-gold"
-                  />
-                  {isLocal && (
-                    <p className="text-[9px] text-text-muted leading-tight mt-0.5">
-                      💡 Tip: En tu PC estás en <code className="bg-gold/20 px-1 rounded font-bold">localhost</code>. Para abrirlo desde tu celular en tu WiFi, puedes poner la IP de tu PC o tu link publicado.
-                    </p>
-                  )}
-                </div>
               )}
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         <button
           onClick={onClose}
-          className="w-full py-2.5 rounded-2xl border border-gold/40 text-gold-dark font-montserrat font-bold text-xs uppercase tracking-wider hover:bg-gold/10 transition-all cursor-pointer mt-1"
+          className="w-full py-2.5 rounded-2xl border border-gold/40 text-gold-dark font-montserrat font-bold text-xs uppercase tracking-wider hover:bg-gold/10 transition-all cursor-pointer"
         >
           Cerrar
         </button>
@@ -2169,7 +2078,6 @@ function QRCodeModal({
     </div>
   )
 }
-
 
 // ─── Reusable Ornate Stationery Plate Component (Matching the 7 Official Photos) ─
 function StationeryPlate({
@@ -2258,13 +2166,7 @@ function StationeryPlate({
 }
 
 // ─── Hero Section (Lámina 1 Oficial) ───────────────────────────────────────────
-function HeroSection({
-  onTriggerToast,
-  onOpenShare,
-}: {
-  onTriggerToast: (msg: string) => void
-  onOpenShare?: () => void
-}) {
+function HeroSection({ onTriggerToast }: { onTriggerToast: (msg: string) => void }) {
   const time = useCountdown(EVENT_DATE)
   const units = [
     { v: time.days, l: "DÍAS", icon: "📅" },
@@ -2390,22 +2292,14 @@ END:VCALENDAR`
           ))}
         </div>
 
-        {/* Pill Action Buttons */}
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5 w-full px-2">
+        {/* 3 Pill Buttons matching image.png */}
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-2.5 w-full px-2">
           <a
             href="#video-especial"
             className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-gradient-to-r from-[#E6D0A7] via-[#C9A871] to-[#9F7E47] text-[#332415] text-[11px] font-cinzel uppercase tracking-wider font-bold shadow-md hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
           >
             <span>🎬</span> VER VIDEO ESPECIAL <GoldButterfly size={14} className="inline-block ml-1" />
           </a>
-          {onOpenShare && (
-            <button
-              onClick={onOpenShare}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-full border border-gold/60 glass-card text-[10px] font-cinzel uppercase tracking-wider text-gold-dark hover:bg-gold/15 transition-all flex items-center justify-center gap-1.5 font-bold shadow-sm cursor-pointer"
-            >
-              <span>💌</span> DESCARGAR TARJETA OFICIAL
-            </button>
-          )}
           <button
             onClick={() => handleCalendar('google')}
             className="w-full sm:w-auto px-5 py-2.5 rounded-full border border-gold/60 glass-card text-[10px] font-cinzel uppercase tracking-wider text-gold-dark hover:bg-gold/15 transition-all flex items-center justify-center gap-1.5 font-bold shadow-sm cursor-pointer"
@@ -4762,10 +4656,10 @@ function Navbar({
                   onClick={() => { onOpenQR(); setOptionsOpen(false); }}
                   className="flex items-center gap-3 p-2 rounded-xl hover:bg-gold/15 transition-colors text-left text-xs font-montserrat font-bold text-text-main cursor-pointer"
                 >
-                  <span className="w-7 h-7 rounded-lg border border-gold/40 flex items-center justify-center bg-gold/10 text-gold-dark">💌</span>
+                  <span className="w-7 h-7 rounded-lg border border-gold/40 flex items-center justify-center bg-gold/10 text-gold-dark">📲</span>
                   <div>
-                    <div>Descargar Tarjeta & QR</div>
-                    <div className="text-[10px] text-text-sub font-normal">Tarjeta PNG, PDF interactivo y QR</div>
+                    <div>Código QR Oficial</div>
+                    <div className="text-[10px] text-text-sub font-normal">Escanear para abrir invitación</div>
                   </div>
                 </button>
 
@@ -4796,17 +4690,6 @@ function Navbar({
             )}
           </div>
 
-          {/* Quick Share Button for Tablet / Desktop */}
-          <button
-            onClick={onOpenQR}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gold/50 glass-card text-gold-dark hover:bg-gold/15 transition-all text-xs font-montserrat font-bold shadow-sm cursor-pointer"
-            title="Descargar Tarjeta Oficial o QR"
-          >
-            <span>💌</span>
-            <span className="hidden md:inline">Descargar Tarjeta</span>
-            <span className="md:hidden">Tarjeta</span>
-          </button>
-
           <a
             href="#rsvp"
             className="px-4 md:px-5 py-2 rounded-full bg-gradient-to-r from-gold to-gold-dark text-text-main text-xs font-montserrat font-bold uppercase tracking-wider hover:brightness-110 transition-all shadow-md shrink-0"
@@ -4835,16 +4718,10 @@ function Navbar({
               {label}
             </a>
           ))}
-          <button
-            onClick={() => { onOpenQR(); setMobileMenuOpen(false); }}
-            className="w-full text-center py-2.5 px-4 rounded-full border border-gold/60 bg-gold/15 text-gold-dark text-xs font-montserrat font-bold uppercase tracking-wider mt-1 shadow-sm flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <span>💌</span> Descargar Tarjeta & QR
-          </button>
           <a
             href="#rsvp"
             onClick={() => setMobileMenuOpen(false)}
-            className="w-full text-center py-3 rounded-full bg-gradient-to-r from-gold to-gold-dark text-text-main text-xs font-montserrat font-bold uppercase tracking-wider mt-1 shadow-md"
+            className="w-full text-center py-3 rounded-full bg-gradient-to-r from-gold to-gold-dark text-text-main text-xs font-montserrat font-bold uppercase tracking-wider mt-2 shadow-md"
           >
             Confirmar Asistencia
           </a>
@@ -5078,10 +4955,7 @@ export default function App() {
 
       {/* Main Sections */}
       <main className="relative z-20">
-        <HeroSection
-          onTriggerToast={setToastMessage}
-          onOpenShare={() => setQrOpen(true)}
-        />
+        <HeroSection onTriggerToast={setToastMessage} />
         <KristaLetterSection />
         <ParentsSection />
         <SpecialVideoSection onTriggerToast={setToastMessage} onTriggerBurst={triggerExplosiveBurst} />
